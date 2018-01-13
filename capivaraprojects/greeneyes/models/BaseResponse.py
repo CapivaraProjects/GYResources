@@ -3,4 +3,4 @@ class BaseResponse:
         self.status_code = status_code
         self.message = message
         self.elapsed_ms = elapsed_ms
-        self.reponse = response
+        self.response = response
