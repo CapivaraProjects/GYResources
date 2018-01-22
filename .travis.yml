@@ -19,4 +19,4 @@ before_script:
   - psql -U capivara green_eyes < backupGreeneyes.sql  
 # command to run tests
 script:
-  - pytest capivaraprojects/greeneyes/repository/base_test.py # or py.test for Python versions 3.5 and below
+  - pytest /home/travis/build/CapivaraProjects/GYResources/capivaraprojects/greeneyes/repository/base_test.py # or py.test for Python versions 3.5 and below
