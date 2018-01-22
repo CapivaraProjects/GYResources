@@ -8,6 +8,15 @@ python:
 # command to install dependencies
 install:
   - pip3 install -r requirements.txt
+services:
+  - postgresql 
+addons:
+  postgresql: "9.5"  
+before_script:
+  - createuser -s -w -U postgres -e capivara
+  - createdb green_eyes -U capivara
+  - psql -c "ALTER USER capivara WITH PASSWORD 'test';" -U postgres
+  - psql -U capivara green_eyes < backupGreeneyes.sql  
 # command to run tests
 script:
-  - pytest capivaraprojects/greeneyes/models/BaseResponse.py # or py.test for Python versions 3.5 and below
+  - pytest capivaraprojects/greeneyes/repository/base_test.py # or py.test for Python versions 3.5 and below
