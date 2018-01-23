@@ -1,0 +1,3 @@
+[submodule "capivaraprojects/greeneyes/models"]
+	path = capivaraprojects/greeneyes/models
+	url = https://github.com/CapivaraProjects/models.git

@@ -17,6 +17,7 @@ before_script:
   - createdb green_eyes -U capivara
   - psql -c "ALTER USER capivara WITH PASSWORD 'test';" -U postgres
   - psql -U capivara green_eyes < backupGreeneyes.sql  
+  - export PYTHONPATH=$PYTHONPATH:$(pwd)  
 # command to run tests
 script:
   - pytest capivaraprojects/greeneyes/repository/base_test.py # or py.test for Python versions 3.5 and below
