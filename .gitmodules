@@ -1,0 +1,9 @@
+[submodule "capivaraprojects/greeneyes/models"]
+	path = capivaraprojects/greeneyes/models
+	url = https://github.com/CapivaraProjects/models.git
+[submodule "capivaraprojects/greeneyes/database"]
+	path = capivaraprojects/greeneyes/database
+	url = https://github.com/CapivaraProjects/database.git
+[submodule "capivaraprojects/greeneyes/repository"]
+	path = capivaraprojects/greeneyes/repository
+	url = https://github.com/CapivaraProjects/repository.git
