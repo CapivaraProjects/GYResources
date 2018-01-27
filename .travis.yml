@@ -20,4 +20,6 @@ before_script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)  
 # command to run tests
 script:
-  - pytest capivaraprojects/greeneyes/repository/base_test.py # or py.test for Python versions 3.5 and below
+  - pytest repository/base_test.py # or py.test for Python versions 3.5 and below
+  - pytest repository/ImageRepository_test.py
+  - pytest tools/crypto_test.py  
