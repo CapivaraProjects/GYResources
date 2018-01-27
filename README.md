@@ -36,6 +36,11 @@ sudo /etc/init.d/postgresql restart
 
 Clone this repository, enter and execute:
 
-```
+```zsh
 psql green_eyes -U capivara <  	backupGreeneyes.sql
+```
+
+Install dependences from project:
+```zsh
+pip3 install -r requirements.txt
 ```
