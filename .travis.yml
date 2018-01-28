@@ -16,7 +16,8 @@ before_script:
   - createuser -s -w -U postgres -e capivara
   - createdb green_eyes -U capivara
   - psql -c "ALTER USER capivara WITH PASSWORD 'test';" -U postgres
-  - psql -U capivara green_eyes < backupGreeneyes.sql  
+  - psql -U capivara green_eyes < backupGreeneyes.sql
+  - psql -U capivara green_eyes < missingSQL.sql  
   - export PYTHONPATH=$PYTHONPATH:$(pwd)  
 # command to run tests
 script:
