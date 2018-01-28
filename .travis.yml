@@ -26,5 +26,6 @@ script:
   - pytest repository/PlantRepository_test.py
   - pytest repository/TextRepository_test.py
   - pytest repository/TypeRepository_test.py
+  - pytest repository/UserRepository_test.py
   - pytest tools/crypto_test.py  
   
