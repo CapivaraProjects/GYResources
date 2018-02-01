@@ -1,3 +1,4 @@
+import pytest
 from flask import Flask
 from app import initialize_app
 import models.Plant
@@ -9,6 +10,7 @@ app = initialize_app(app)
 client = app.test_client
 
 
+@pytest.mark.order1
 def test_search_by_unexistent_id():
     resp = client().get(
             '/api/gyresources/plants/searchByID/1000',
@@ -21,6 +23,7 @@ def test_search_by_unexistent_id():
     assert json.loads(resp.get_data(as_text=True))['status_code'] == 500
 
 
+@pytest.mark.order2
 def test_search_by_id():
     resp = client().get(
             '/api/gyresources/plants/searchByID/23',
@@ -35,6 +38,7 @@ def test_search_by_id():
             resp.get_data(as_text=True))['response']['commonName']
 
 
+@pytest.mark.order3
 def test_search():
     data = {
                 "commonName": "Apple",
@@ -54,6 +58,7 @@ def test_search():
         assert 'Apple' in response['commonName']
 
 
+@pytest.mark.order4
 def test_create():
     plant = models.Plant.Plant(scientificName='test3', commonName='test3')
     resp = client().post('/api/gyresources/plants/', data=str(
@@ -64,6 +69,7 @@ def test_create():
     assert "'id': 0" not in json.loads(resp.get_data(as_text=True))['response']
 
 
+@pytest.mark.order5
 def test_update():
     plant = models.Plant.Plant(
             id=26,
@@ -78,6 +84,7 @@ def test_update():
             resp.get_data(as_text=True))['response']['scientificName']
 
 
+@pytest.mark.order6
 def test_delete():
     plant = models.Plant.Plant(
             id=26,
