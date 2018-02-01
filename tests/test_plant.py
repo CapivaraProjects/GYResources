@@ -1,8 +1,9 @@
+import json
 import pytest
 from flask import Flask
 from app import initialize_app
+from collections import namedtuple
 import models.Plant
-import json
 
 
 app = Flask(__name__)
@@ -72,7 +73,7 @@ def test_create():
 @pytest.mark.order5
 def test_update():
     plant = models.Plant.Plant(
-            id=26,
+            id=35,
             scientificName='test4',
             commonName='test3')
     resp = client().put('/api/gyresources/plants/', data=str(
@@ -80,8 +81,10 @@ def test_update():
             'Accept': 'application/json',
             'Content-Type': 'application/json'})
     assert resp.status_code == 200
-    assert "test4" in json.loads(
-            resp.get_data(as_text=True))['response']['scientificName']
+    plant = json.loads(
+                resp.get_data(as_text=True))
+    plant = namedtuple("Plant", plant.keys())(*plant.values())
+    assert "test4" in plant.response['scientificName']
 
 
 @pytest.mark.order6
