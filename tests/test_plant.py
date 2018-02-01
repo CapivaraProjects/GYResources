@@ -54,9 +54,19 @@ def test_search():
         assert 'Apple' in response['commonName']
 
 
+def test_create():
+    plant = models.Plant.Plant(scientificName='test3', commonName='test3')
+    resp = client().post('/api/gyresources/plants/', data=str(
+        json.dumps(plant.__dict__)), headers={
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'})
+    assert resp.status_code == 200
+    assert "'id': 0" not in json.loads(resp.get_data(as_text=True))['response']
+
+
 def test_update():
     plant = models.Plant.Plant(
-            id=30,
+            id=24,
             scientificName='test4',
             commonName='test3')
     resp = client().put('/api/gyresources/plants/', data=str(
@@ -68,19 +78,9 @@ def test_update():
             resp.get_data(as_text=True))['response']['scientificName']
 
 
-def test_create():
-    plant = models.Plant.Plant(scientificName='test3', commonName='test3')
-    resp = client().post('/api/gyresources/plants/', data=str(
-        json.dumps(plant.__dict__)), headers={
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'})
-    assert resp.status_code == 200
-    assert "'id': 0" not in json.loads(resp.get_data(as_text=True))['response']
-
-
 def test_delete():
     plant = models.Plant.Plant(
-            id=32,
+            id=24,
             scientificName='test3',
             commonName='test3')
     resp = client().delete('/api/gyresources/plants/', data=str(
