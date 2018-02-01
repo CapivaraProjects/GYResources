@@ -44,3 +44,8 @@ Install dependences from project:
 ```zsh
 pip3 install -r requirements.txt
 ```
+
+# Running
+```zsh
+python3 app.py
+```
