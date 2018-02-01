@@ -101,8 +101,11 @@ class PlantController(BaseController):
                 'green_eyes')
 
         try:
-            plant.id = None
             plant = repository.create(plant)
+            return self.okResponse(
+                response=plant,
+                message="Plant sucessfuly created.",
+                status=201), 200
         except exc.SQLAlchemyError as sqlerr:
             # log
             print(str(sqlerr))
@@ -113,13 +116,8 @@ class PlantController(BaseController):
         except Exception as err:
             return self.okResponse(
                 response=err,
-                message="Internal server error",
+                message="Internal server error "+str(err),
                 status=500)
-
-        return self.okResponse(
-                response=plant,
-                message="Plant sucessfuly created.",
-                status=201), 200
 
     @api.response(200, 'Plant changed successfuly')
     @api.expect(plantSerializer)
@@ -140,6 +138,10 @@ class PlantController(BaseController):
                 'green_eyes')
         try:
             plant = repository.update(plant)
+            return self.okResponse(
+                response=plant,
+                message="Plant sucessfuly updated.",
+                status=204), 200
         except exc.SQLAlchemyError as sqlerr:
             # log
             print(str(sqlerr))
@@ -177,6 +179,16 @@ class PlantController(BaseController):
 
         try:
             status = repository.delete(plant)
+            if (status):
+                return self.okResponse(
+                    response=models.Plant.Plant(),
+                    message="Plant deleted sucessfuly.",
+                    status=204), 200
+            else:
+                return self.okResponse(
+                    response=plant,
+                    message="Problem deleting plant",
+                    status=500), 200
         except exc.SQLAlchemyError as sqlerr:
             # log
             print(str(sqlerr))
@@ -190,13 +202,3 @@ class PlantController(BaseController):
                 message="Internal server error: "+str(err),
                 status=500)
 
-        if (status):
-            return self.okResponse(
-                response=models.Plant.Plant(),
-                message="Plant deleted sucessfuly.",
-                status=204), 200
-        else:
-            return self.okResponse(
-                response=plant,
-                message="Problem deleting plant",
-                status=500), 200
