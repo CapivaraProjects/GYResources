@@ -27,6 +27,7 @@ def initialize_app(flask_app):
     api.init_app(blueprint)
     api.add_namespace(plant_namespace)
     flask_app.register_blueprint(blueprint)
+    return flask_app
 
 
 def main():
