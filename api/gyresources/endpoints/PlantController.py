@@ -35,7 +35,7 @@ class PlantSearch(BaseController):
             please define pageSize and offset parameters
         """
         self.startTime = time.time()
-        result = object()
+        result = models.Plant.Plant()
         total = 0
         plant = models.Plant.Plant(
                       scientificName=request.args.get('scientificName'),
@@ -54,9 +54,9 @@ class PlantSearch(BaseController):
                 return self.okResponse(
                             response=result,
                             message="Ok",
-                            status=200), 200
+                            status=200)
             elif (action == 'search'):
-                result = repository.search(plant, int(pageSize), int(offset))
+                result = repository.search(plant, pageSize, offset)
                 total = result['total']
                 result = result['content']
                 return self.okResponse(
@@ -66,12 +66,11 @@ class PlantSearch(BaseController):
                             total=total,
                             offset=offset,
                             pageSize=pageSize), 200
-        except exc.SQLAlchemyError as sqlerr:
+        except (exc.SQLAlchemyError, Exception) as sqlerr:
             # log
-            print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
-                message="SQL eror",
+                message="SQL error: "+str(sqlerr),
                 status=500)
 
 
@@ -187,7 +186,7 @@ class PlantController(BaseController):
         except Exception as err:
             return self.okResponse(
                 response=err,
-                message="Internal server error",
+                message="Internal server error: "+str(err),
                 status=500)
 
         if (status):
