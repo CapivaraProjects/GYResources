@@ -88,7 +88,7 @@ def test_update():
 def test_delete():
     plant = models.Plant.Plant(
             id=26,
-            scientificName='test4',
+            scientificName='test3',
             commonName='test3')
     resp = client().delete('/api/gyresources/plants/', data=str(
         json.dumps(plant.__dict__)), headers={

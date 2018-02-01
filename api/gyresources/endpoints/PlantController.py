@@ -101,6 +101,7 @@ class PlantController(BaseController):
                 'green_eyes')
 
         try:
+            plant.id = None
             plant = repository.create(plant)
         except exc.SQLAlchemyError as sqlerr:
             # log
