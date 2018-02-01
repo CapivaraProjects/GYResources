@@ -73,7 +73,7 @@ def test_create():
 @pytest.mark.order5
 def test_update():
     plant = models.Plant.Plant(
-            id=35,
+            id=26,
             scientificName='test4',
             commonName='test3')
     resp = client().put('/api/gyresources/plants/', data=str(
@@ -91,7 +91,7 @@ def test_update():
 def test_delete():
     plant = models.Plant.Plant(
             id=26,
-            scientificName='test3',
+            scientificName='test4',
             commonName='test3')
     resp = client().delete('/api/gyresources/plants/', data=str(
         json.dumps(plant.__dict__)), headers={
