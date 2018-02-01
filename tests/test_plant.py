@@ -66,7 +66,7 @@ def test_create():
 
 def test_update():
     plant = models.Plant.Plant(
-            id=24,
+            id=26,
             scientificName='test4',
             commonName='test3')
     resp = client().put('/api/gyresources/plants/', data=str(
@@ -80,7 +80,7 @@ def test_update():
 
 def test_delete():
     plant = models.Plant.Plant(
-            id=24,
+            id=26,
             scientificName='test3',
             commonName='test3')
     resp = client().delete('/api/gyresources/plants/', data=str(
