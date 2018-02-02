@@ -1,0 +1,33 @@
+language: python
+python:
+  - "3.5"
+  - "3.5-dev"  # 3.5 development branch
+  - "3.6"
+  - "3.6-dev"  # 3.6 development branch
+  - "3.7-dev"  # 3.7 development branch
+# command to install dependencies
+install:
+  - pip3 install -r requirements.txt
+services:
+  - postgresql 
+addons:
+  postgresql: "9.5"  
+before_script:
+  - createuser -s -w -U postgres -e capivara
+  - createdb green_eyes -U capivara
+  - psql -c "ALTER USER capivara WITH PASSWORD 'test';" -U postgres
+  - psql -U capivara green_eyes < backupGreeneyes.sql
+  - psql -U capivara green_eyes < missingSQL.sql  
+  - export PYTHONPATH=$PYTHONPATH:$(pwd)  
+# command to run tests
+script:
+  - pytest repository/base_test.py # or py.test for Python versions 3.5 and below
+  - pytest repository/DiseaseRepository_test.py
+  - pytest repository/ImageRepository_test.py
+  - pytest repository/PlantRepository_test.py
+  - pytest repository/TextRepository_test.py
+  - pytest repository/TypeRepository_test.py
+  - pytest repository/UserRepository_test.py
+  - pytest tools/crypto_test.py  
+  - pytest tests/test_plant.py  
+  
