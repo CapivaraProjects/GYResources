@@ -1,6 +1,10 @@
 from flask_restplus import fields
 from api.restplus import api
 
+"""
+Here we have something like parsers, the difference here, we're building
+default json models, which can be used in swagger as example.
+"""
 
 images = api.model('Image', {
     'id': fields.Integer(readOnly=True, description='Disease identification'),

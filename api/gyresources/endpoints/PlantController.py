@@ -7,27 +7,28 @@ from collections import namedtuple
 from repository.PlantRepository import PlantRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import plant as plantSerializer
+from api.gyresources.parsers import plant_search_args
 
 
 ns = api.namespace('gyresources/plants',
                    description='Operations related to plants')
 
 
-@ns.route('/<string:action>/<int:id>')
-class PlantSearch(BaseController):
+@ns.route('/')
+class PlantController(BaseController):
     """
-    This class was created with the objective to use get function with a
-        action parameter, so you will've to use the same function get using
-        action to set what you want, and another parameters like
-        scientificName, commonName, should be getted from request.args
+    This class was created with the objective to control functions
+        from PlantRepository, here, you can insert, update and delete
+        data. Searchs are realized in PlantSearch.
     """
 
+    @api.expect(plant_search_args)
     @api.response(200, 'Plant searched.')
-    def get(self, action, id):
+    def get(self):
         """
         Return a list of plants based on action.
 
-        If action=searchById:
+        If action=searchByID:
             please set id parameter.
 
         If action=search:
@@ -37,6 +38,8 @@ class PlantSearch(BaseController):
         self.startTime = time.time()
         result = models.Plant.Plant()
         total = 0
+        action = request.args.get('action')
+        id = request.args.get('id')
         plant = models.Plant.Plant(
                       scientificName=request.args.get('scientificName'),
                       commonName=request.args.get('commonName'))
@@ -72,15 +75,6 @@ class PlantSearch(BaseController):
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
                 status=500)
-
-
-@ns.route('/')
-class PlantController(BaseController):
-    """
-    This class was created with the objective to control functions
-        from PlantRepository, here, you can insert, update and delete
-        data. Searchs are realized in PlantSearch.
-    """
 
     @api.response(200, 'Plant successfuly created.')
     @api.expect(plantSerializer)
@@ -201,4 +195,3 @@ class PlantController(BaseController):
                 response=err,
                 message="Internal server error: "+str(err),
                 status=500)
-
