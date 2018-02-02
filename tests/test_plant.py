@@ -14,27 +14,37 @@ generic_plant = models.Plant.Plant(scientificName='test3', commonName='test3')
 
 @pytest.mark.order1
 def test_search_by_unexistent_id():
+    data = {
+                "action": "searchByID",
+                "id": "1000",
+            }
     resp = client().get(
-            '/api/gyresources/plants/searchByID/1000',
+            '/api/gyresources/plants',
             content_type='application/json',
             headers={
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'dataType': 'json',
-                'timeout': 240})
+                'timeout': 240},
+            query_string=data, follow_redirects=True)
     assert json.loads(resp.get_data(as_text=True))['status_code'] == 500
 
 
 @pytest.mark.order2
 def test_search_by_id():
+    data = {
+                "action": "searchByID",
+                "id": "23",
+            }
     resp = client().get(
-            '/api/gyresources/plants/searchByID/23',
+            '/api/gyresources/plants',
             content_type='application/json',
             headers={
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'dataType': 'json',
-                'timeout': 240})
+                'timeout': 240},
+            query_string=data, follow_redirects=True)
     assert json.loads(resp.get_data(as_text=True))['status_code'] == 200
     assert 'Strawberry' in json.loads(
             resp.get_data(as_text=True))['response']['commonName']
@@ -43,17 +53,18 @@ def test_search_by_id():
 @pytest.mark.order3
 def test_search():
     data = {
+                "action": "search",
                 "commonName": "Apple",
                 "scientificName": "Malus"
             }
     resp = client().get(
-            '/api/gyresources/plants/search/0',
+            '/api/gyresources/plants',
             content_type='application/json',
             headers={
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'dataType': 'json'},
-            query_string=data)
+            query_string=data, follow_redirects=True)
     pagedResponse = json.loads(resp.get_data(as_text=True))
     assert pagedResponse['status_code'] == 200
     for response in pagedResponse['response']:
@@ -76,14 +87,16 @@ def test_create(generic_plant=generic_plant):
 
 @pytest.mark.order5
 def test_update(generic_plant=generic_plant):
+    data = generic_plant.__dict__
+    data['action'] = 'search'
     resp = client().get(
-            '/api/gyresources/plants/search/0',
+            '/api/gyresources/plants',
             content_type='application/json',
             headers={
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'dataType': 'json'},
-            query_string=generic_plant.__dict__)
+            query_string=data, follow_redirects=True)
     pagedResponse = json.loads(resp.get_data(as_text=True))
     plant = object()
     for response in pagedResponse['response']:
@@ -108,14 +121,16 @@ def test_update(generic_plant=generic_plant):
 @pytest.mark.order6
 def test_delete():
     print(str(generic_plant.__dict__))
+    data = generic_plant.__dict__
+    data['action'] = 'search'
     resp = client().get(
-            '/api/gyresources/plants/search/0',
+            '/api/gyresources/plants',
             content_type='application/json',
             headers={
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
                 'dataType': 'json'},
-            query_string=generic_plant.__dict__)
+            query_string=data, follow_redirects=True)
     pagedResponse = json.loads(resp.get_data(as_text=True))
     plant = object()
     for response in pagedResponse['response']:
