@@ -39,3 +39,15 @@ plant = api.model('Plant', {
                                 description='Common name'),
     'diseases': fields.List(fields.Nested(disease))
 })
+
+text = api.model('Text', {
+    'id': fields.Integer(readOnly=True, description='Text identification'),
+    'language': fields.String(required=True,
+                                    description='Text language'),
+    'tag': fields.String(required=True,
+                                description='Text tag'),
+    'value': fields.String(required=True,
+                                description='Text value'),
+    'description': fields.String(required=True,
+                                description='Text description'),
+})
