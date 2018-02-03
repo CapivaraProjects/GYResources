@@ -1,4 +1,4 @@
-# GYResources
+# GYResources [![Build Status](https://travis-ci.org/CapivaraProjects/GYResources.svg?branch=master)](https://travis-ci.org/CapivaraProjects/GYResources)
 This repository is dedicated to turn available green eyes resources in a API and website project
 
 # Dependences

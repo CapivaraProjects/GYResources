@@ -30,4 +30,6 @@ script:
   - pytest repository/UserRepository_test.py
   - pytest tools/crypto_test.py  
   - pytest tests/test_plant.py  
-  
+  - pytest tests/test_text.py  
+  - pytest tests/test_type.py  
+  - pytest tests/test_image.py
