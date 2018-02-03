@@ -6,56 +6,71 @@ Here we have something like parsers, the difference here, we're building
 default json models, which can be used in swagger as example.
 """
 
-images = api.model('Image', {
+image = api.model('Image', {
     'id': fields.Integer(readOnly=True, description='Disease identification'),
-    'idDisease': fields.String(readOnly=True,
-                               required=True,
-                               attribute='disease.id',
-                               description='Disease ID'),
+    'idDisease': fields.Integer(
+        readOnly=True,
+        required=True,
+        attribute='disease.id',
+        description='Disease ID'),
     'url': fields.String(description='URL image or base64 image'),
     'description': fields.String(description='Description'),
     'source': fields.String(description='Metadata info'),
     'size': fields.Integer(description='Size type'),
-})
+    'action': fields.String(
+        description='Action to be used in POST request',
+        choices=['create', 'save'])
+    })
 
 disease = api.model('Disease', {
     'id': fields.Integer(readOnly=True, description='Disease identification'),
-    'idPlant': fields.Integer(required=True,
-                              attribute='plant.id',
-                              description='Plant ID'),
+    'idPlant': fields.Integer(
+        required=True,
+        attribute='plant.id',
+        description='Plant ID'),
     'plant': fields.String(attribute='plant.id'),
-    'scientificName': fields.String(required=True,
-                                    description='Scientific name'),
-    'commonName': fields.String(required=True,
-                                description='Common name'),
-    'images': fields.List(fields.Nested(images)),
-})
+    'scientificName': fields.String(
+        required=True,
+        description='Scientific name'),
+    'commonName': fields.String(
+        required=True,
+        description='Common name'),
+    'images': fields.List(fields.Nested(image)),
+    })
 
 plant = api.model('Plant', {
     'id': fields.Integer(readOnly=True, description='Plant identification'),
-    'scientificName': fields.String(required=True,
-                                    description='Scientific name'),
-    'commonName': fields.String(required=True,
-                                description='Common name'),
+    'scientificName': fields.String(
+        required=True,
+        description='Scientific name'),
+    'commonName': fields.String(
+        required=True,
+        description='Common name'),
     'diseases': fields.List(fields.Nested(disease))
-})
+    })
 
 text = api.model('Text', {
     'id': fields.Integer(readOnly=True, description='Text identification'),
-    'language': fields.String(required=True,
-                                    description='Text language'),
-    'tag': fields.String(required=True,
-                                description='Text tag'),
-    'value': fields.String(required=True,
-                                description='Text value'),
-    'description': fields.String(required=True,
-                                description='Text description'),
-})
+    'language': fields.String(
+        required=True,
+        description='Text language'),
+    'tag': fields.String(
+        required=True,
+        description='Text tag'),
+    'value': fields.String(
+        required=True,
+        description='Text value'),
+    'description': fields.String(
+        required=True,
+        description='Text description'),
+    })
 
 type = api.model('Type', {
     'id': fields.Integer(readOnly=True, description='Type identification'),
-    'value': fields.String(required=True,
-                                    description='Type value'),
-    'description': fields.String(required=True,
-                                description='Type description'),
-})
+    'value': fields.String(
+        required=True,
+        description='Type value'),
+    'description': fields.String(
+        required=True,
+        description='Type description'),
+    })
