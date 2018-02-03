@@ -51,3 +51,11 @@ text = api.model('Text', {
     'description': fields.String(required=True,
                                 description='Text description'),
 })
+
+type = api.model('Type', {
+    'id': fields.Integer(readOnly=True, description='Type identification'),
+    'value': fields.String(required=True,
+                                    description='Type value'),
+    'description': fields.String(required=True,
+                                description='Type description'),
+})
