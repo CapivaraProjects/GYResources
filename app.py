@@ -1,6 +1,7 @@
 from flask import Flask, Blueprint
 from api.gyresources.endpoints.PlantController import ns as plant_namespace
 from api.gyresources.endpoints.TextController import ns as text_namespace
+from api.gyresources.endpoints.TypeController import ns as type_namespace
 from api.restplus import api
 
 
@@ -28,6 +29,7 @@ def initialize_app(flask_app):
     api.init_app(blueprint)
     api.add_namespace(plant_namespace)
     api.add_namespace(text_namespace)
+    api.add_namespace(type_namespace)
     flask_app.register_blueprint(blueprint)
     return flask_app
 
