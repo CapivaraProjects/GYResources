@@ -2,6 +2,7 @@ import time
 import models.User
 from sqlalchemy import exc
 from flask import request
+from flask import Flask
 from api.restplus import api
 from collections import namedtuple
 from repository.UserRepository import UserRepository
@@ -9,6 +10,8 @@ from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import user as userSerializer
 from api.gyresources.parsers import user_search_args
 
+flask_app = Flask(__name__)
+flask_app.config.from_object('config.DefaultConfig')
 
 ns = api.namespace('gyresources/users',
                    description='Operations related to users')
@@ -49,11 +52,11 @@ class UserController(BaseController):
         pageSize = request.args.get('pageSize')
         offset = request.args.get('offset')
         repository = UserRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
         try:
             if (action == 'search'):
                 result = repository.search(user, pageSize, offset)
@@ -85,11 +88,11 @@ class UserController(BaseController):
 
         user = namedtuple("User", user.keys())(*user.values())
         repository = UserRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
 
         try:
             user = repository.create(user)
@@ -122,11 +125,11 @@ class UserController(BaseController):
 
         user = namedtuple("User", user.keys())(*user.values())
         repository = UserRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
         try:
             user = repository.update(user)
             return self.okResponse(
@@ -162,11 +165,11 @@ class UserController(BaseController):
 
         user = namedtuple("User", user.keys())(*user.values())
         repository = UserRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
 
         try:
             status = repository.delete(user)
