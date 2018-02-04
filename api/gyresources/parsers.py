@@ -75,3 +75,26 @@ image_search_args.add_argument('pageSize', type=int, required=False,
                                help='Quantity of elements required')
 image_search_args.add_argument('offset', type=int, required=False, default=0,
                                help='Quantity of elements to be jumped')
+
+user_search_args = reqparse.RequestParser()
+user_search_args.add_argument('id', type=int, required=False, default=1,
+                              help='User ID, used when action=searchByID')
+user_search_args.add_argument('idType', type=int, required=False,
+                              default='', help='Type ID')
+user_search_args.add_argument('email', type=str, required=False,
+                              default='', help='Email')
+user_search_args.add_argument('username', type=str, required=False,
+                              default='', help='Username')
+user_search_args.add_argument('password', type=str, required=False,
+                              default='', help='Password')
+user_search_args.add_argument('salt', type=str, required=False,
+                              default='', help='User salt')
+user_search_args.add_argument('dateInsertion', type=str, required=False,
+                              default='', help='User date insertion')
+user_search_args.add_argument('dateUpdate', type=str, required=False,
+                              default='', help='User last update')
+user_search_args.add_argument('pageSize', type=int, required=False,
+                              default=10,
+                              help='Quantity of elements required')
+user_search_args.add_argument('offset', type=int, required=False, default=10,
+                              help='Quantity of elements to be jumped')

@@ -74,3 +74,28 @@ type = api.model('Type', {
         required=True,
         description='Type description'),
     })
+
+user = api.model('User', {
+    'id': fields.Integer(readOnly=True, description='User identification'),
+    'idType': fields.Integer(
+        required=True,
+        description='Type identification'),
+    'email': fields.String(
+        required=True,
+        description='Email'),
+    'username': fields.String(
+        required=True,
+        description='Username'),
+    'password': fields.String(
+        required=True,
+        description='Password'),
+    'salt': fields.String(
+        required=True,
+        description='User salt'),
+    'dateInsertion': fields.String(
+        required=True,
+        description='User date insertion'),
+    'dateUpdate': fields.String(
+        required=True,
+        description='User last update'),
+    })
