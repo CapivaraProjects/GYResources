@@ -2,6 +2,7 @@ import time
 import models.Type
 from sqlalchemy import exc
 from flask import request
+from flask import Flask
 from api.restplus import api
 from collections import namedtuple
 from repository.TypeRepository import TypeRepository
@@ -9,6 +10,8 @@ from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import type as typeSerializer
 from api.gyresources.parsers import type_search_args
 
+flask_app = Flask(__name__)
+flask_app.config.from_object('config.DefaultConfig')
 
 ns = api.namespace('gyresources/types',
                    description='Operations related to types')
@@ -43,11 +46,11 @@ class TypeController(BaseController):
         pageSize = request.args.get('pageSize')
         offset = request.args.get('offset')
         repository = TypeRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
         try:
             if (action == 'search'):
                 result = repository.search(type, pageSize, offset)
@@ -79,11 +82,11 @@ class TypeController(BaseController):
 
         type = namedtuple("Type", type.keys())(*type.values())
         repository = TypeRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
 
         try:
             type = repository.create(type)
@@ -116,11 +119,11 @@ class TypeController(BaseController):
 
         type = namedtuple("Type", type.keys())(*type.values())
         repository = TypeRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
         try:
             type = repository.update(type)
             return self.okResponse(
@@ -156,11 +159,11 @@ class TypeController(BaseController):
 
         type = namedtuple("Type", type.keys())(*type.values())
         repository = TypeRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
 
         try:
             status = repository.delete(type)
