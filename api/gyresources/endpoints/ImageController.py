@@ -2,6 +2,7 @@ import time
 import models.Image
 from sqlalchemy import exc
 from flask import request
+from flask import Flask
 from api.restplus import api
 from collections import namedtuple
 from repository.ImageRepository import ImageRepository
@@ -10,6 +11,8 @@ from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import image as imageSerializer
 from api.gyresources.parsers import image_search_args
 
+flask_app = Flask(__name__)
+flask_app.config.from_object('config.DefaultConfig')
 
 ns = api.namespace(
         'gyresources/images',
@@ -60,11 +63,11 @@ class ImageController(BaseController):
             offset = 0
 
         repository = ImageRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
 
         try:
             if (action == 'searchByID'):
@@ -116,11 +119,11 @@ class ImageController(BaseController):
                 source=image.source,
                 url=image.url)
         repository = ImageRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
 
         try:
             if (action == 'create'):
@@ -157,17 +160,17 @@ class ImageController(BaseController):
         image = namedtuple("Image", image.keys())(*image.values())
 
         disease = DiseaseRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
         repository = ImageRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
         try:
             diesase = disease.searchByID(image.idDisease)
             image = models.Image.Image(
@@ -214,11 +217,11 @@ class ImageController(BaseController):
         image = namedtuple("Image", image.keys())(*image.values())
         image = models.Image.Image(id=image.id)
         repository = ImageRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
 
         try:
             status = repository.delete(image)

@@ -2,6 +2,7 @@ import time
 import models.Plant
 from sqlalchemy import exc
 from flask import request
+from flask import Flask
 from api.restplus import api
 from collections import namedtuple
 from repository.PlantRepository import PlantRepository
@@ -9,6 +10,8 @@ from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import plant as plantSerializer
 from api.gyresources.parsers import plant_search_args
 
+flask_app = Flask(__name__)
+flask_app.config.from_object('config.DefaultConfig')
 
 ns = api.namespace('gyresources/plants',
                    description='Operations related to plants')
@@ -46,11 +49,11 @@ class PlantController(BaseController):
         pageSize = request.args.get('pageSize')
         offset = request.args.get('offset')
         repository = PlantRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
         try:
             if (action == 'searchByID'):
                 result = repository.searchByID(id)
@@ -88,11 +91,11 @@ class PlantController(BaseController):
 
         plant = namedtuple("Plant", plant.keys())(*plant.values())
         repository = PlantRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
 
         try:
             plant = repository.create(plant)
@@ -125,11 +128,11 @@ class PlantController(BaseController):
 
         plant = namedtuple("Plant", plant.keys())(*plant.values())
         repository = PlantRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
         try:
             plant = repository.update(plant)
             return self.okResponse(
@@ -165,11 +168,11 @@ class PlantController(BaseController):
 
         plant = namedtuple("Plant", plant.keys())(*plant.values())
         repository = PlantRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
 
         try:
             status = repository.delete(plant)

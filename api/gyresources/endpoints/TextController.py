@@ -2,6 +2,7 @@ import time
 import models.Text
 from sqlalchemy import exc
 from flask import request
+from flask import Flask
 from api.restplus import api
 from collections import namedtuple
 from repository.TextRepository import TextRepository
@@ -9,6 +10,8 @@ from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import text as textSerializer
 from api.gyresources.parsers import text_search_args
 
+flask_app = Flask(__name__)
+flask_app.config.from_object('config.DefaultConfig')
 
 ns = api.namespace('gyresources/texts',
                    description='Operations related to texts')
@@ -45,11 +48,12 @@ class TextController(BaseController):
         pageSize = request.args.get('pageSize')
         offset = request.args.get('offset')
         repository = TextRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
+
         try:
             if (action == 'search'):
                 result = repository.search(text, pageSize, offset)
@@ -81,11 +85,11 @@ class TextController(BaseController):
 
         text = namedtuple("Text", text.keys())(*text.values())
         repository = TextRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
 
         try:
             text = repository.create(text)
@@ -118,11 +122,11 @@ class TextController(BaseController):
 
         text = namedtuple("Text", text.keys())(*text.values())
         repository = TextRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
         try:
             text = repository.update(text)
             return self.okResponse(
@@ -158,11 +162,11 @@ class TextController(BaseController):
 
         text = namedtuple("Text", text.keys())(*text.values())
         repository = TextRepository(
-                'capivara',
-                'test',
-                '127.0.0.1',
-                '5432',
-                'green_eyes')
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
 
         try:
             status = repository.delete(text)
