@@ -11,7 +11,7 @@ app = Flask(__name__)
 app = initialize_app(app)
 client = app.test_client
 generic_disease = models.Disease.Disease(
-        plant=models.Plant.Plant(),
+        plant=models.Plant.Plant(id=1),
         scientificName="test1",
         commonName="test1",
         images=[])
