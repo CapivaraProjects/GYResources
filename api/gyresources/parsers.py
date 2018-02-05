@@ -98,3 +98,23 @@ user_search_args.add_argument('pageSize', type=int, required=False,
                               help='Quantity of elements required')
 user_search_args.add_argument('offset', type=int, required=False, default=10,
                               help='Quantity of elements to be jumped')
+
+disease_search_args = reqparse.RequestParser()
+disease_search_args.add_argument(
+        'action', type=str, required=True,
+        default='searchByID',
+        help='Defines what kind of search you gonna do.'
+        + ' DO YOU KNOW THE WAY?',
+        choices=['searchByID', 'search'])
+disease_search_args.add_argument('id', type=int, required=False, default=1,
+                                 help='Plant ID, used when action=searchByID')
+disease_search_args.add_argument('scientificName', type=str, required=False,
+                                 default='', help='Plant scientific name')
+disease_search_args.add_argument('commonName', type=str, required=False,
+                                 default='', help='Plant common name')
+disease_search_args.add_argument('pageSize', type=int, required=False,
+                                 default=10,
+                                 help='Quantity of elements required')
+disease_search_args.add_argument('offset', type=int, required=False,
+                                 default=10,
+                                 help='Quantity of elements to be jumped')
