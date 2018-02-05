@@ -28,7 +28,6 @@ disease = api.model('Disease', {
         required=True,
         attribute='plant.id',
         description='Plant ID'),
-    'plant': fields.String(attribute='plant.id'),
     'scientificName': fields.String(
         required=True,
         description='Scientific name'),
