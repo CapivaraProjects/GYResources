@@ -1,33 +1,9 @@
-FROM debian:stretch
-
-WORKDIR /root
-
-ADD api ./api
-ADD app.py ./app.py
-ADD backupGreeneyes.sql ./backupGreeneyes.sql
-ADD config.py ./config.py
-ADD database ./database
-ADD Dockerfile ./Dockerfile
-ADD missingSQL.sql ./missingSQL.sql
-ADD models ./models
-ADD README.md ./README.md
-ADD repository ./repository 
-ADD requirements.txt ./requirements.txt
-ADD tests ./tests
-ADD thumb ./thumb
-ADD tools ./tools
+FROM wendelhime/basic:latest
 
 RUN apt-get update && \
-        apt-get install python \
-        python3 \
-        python-dev \
-        python3-dev \
-        python-pip \
-        python3-pip \
-        git \
-        build-essential \
-        gcc \
-        postgresql-9.5
+        apt-get install -y postgresql
 
-RUN pip3 install -r requirements.txt
+WORKDIR /root/git
+RUN git clone https://github.com/CapivaraProjects/GYResources && \
+        pip3 install -r GYResources/requirements.txt
 
