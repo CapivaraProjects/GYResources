@@ -58,5 +58,5 @@ docker run \
     -p 8888:8888 \
     --net=host \
     -it \
-    --rm wendelhime/gyresources /usr/bin/zsh
+    --rm capivaraprojects/gyresources /usr/bin/zsh
 ```
