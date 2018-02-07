@@ -49,3 +49,14 @@ pip3 install -r requirements.txt
 ```zsh
 python3 app.py
 ```
+
+# Docker
+You can use docker for development using:
+```zsh
+docker run \
+    -v /dir/to/GYResources:/root/git/GYResources \
+    -p 8888:8888 \
+    --net=host \
+    -it \
+    --rm capivaraprojects/gyresources /usr/bin/zsh
+```
