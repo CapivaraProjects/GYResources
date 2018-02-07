@@ -11,7 +11,10 @@ class DefaultConfig(object):
     RESTPLUS_VALIDATE = True
     RESTPLUS_MASK_SWAGGER = False
     RESTPLUS_ERROR_404_HELP = False
+    TYPE = 'TEST'
+    ELASTICURL = ''
 
 class TestConfig(object):
     # test settings
+    TYPE = 'TEST'
     pass

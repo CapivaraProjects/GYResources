@@ -5,6 +5,7 @@ from api.gyresources.endpoints.TypeController import ns as type_namespace
 from api.gyresources.endpoints.ImageController import ns as image_namespace
 from api.gyresources.endpoints.UserController import ns as user_namespace
 from api.gyresources.endpoints.DiseaseController import ns as disease_namespace
+from api.gyresources.endpoints.LoggerController import ns as logger_namespace
 from api.restplus import api
 
 
@@ -22,6 +23,7 @@ def initialize_app(flask_app):
     api.add_namespace(image_namespace)
     api.add_namespace(user_namespace)
     api.add_namespace(disease_namespace)
+    api.add_namespace(logger_namespace)
     flask_app.register_blueprint(blueprint)
     return flask_app
 

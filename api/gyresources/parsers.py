@@ -118,3 +118,17 @@ disease_search_args.add_argument('pageSize', type=int, required=False,
 disease_search_args.add_argument('offset', type=int, required=False,
                                  default=10,
                                  help='Quantity of elements to be jumped')
+
+log_post_args = reqparse.RequestParser()
+log_post_args.add_argument('url', type=str, required=True, default='',
+                           help='URL from the ambient that you running')
+log_post_args.add_argument('type', type=str, required=False, default='',
+                           help='Type of log (Error or informative')
+log_post_args.add_argument('message', type=str, required=False, default='No messages here',
+                           help='Message to be sended by the POST method')
+log_post_args.add_argument('function', type=str, required=True, default='',
+                           help='Function of exception')
+log_post_args.add_argument('obs', type=str, required=False, default='No observation here',
+                           help='Observation of method')
+log_post_args.add_argument('config', type=str, required=True, default='',
+                           help='Ambient that you are working (EX: TEST, PRODUCTION)')
