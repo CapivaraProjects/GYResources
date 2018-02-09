@@ -4,3 +4,4 @@ sjcl
 flask-restplus
 flask_httpauth
 itsdangerous
+pytest

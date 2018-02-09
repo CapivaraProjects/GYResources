@@ -3,7 +3,7 @@ import models.User
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
-from api.restplus import api, auth
+from api.restplus import api, token_auth
 from collections import namedtuple
 from repository.UserRepository import UserRepository
 from api.gyresources.endpoints.BaseController import BaseController
@@ -124,7 +124,7 @@ class UserController(BaseController):
 
     @api.response(200, 'User changed successfuly')
     @api.expect(userSerializer)
-    @auth.login_required
+    @token_auth.login_required
     def put(self):
         """
         Method used to update user in database
@@ -165,7 +165,7 @@ class UserController(BaseController):
 
     @api.response(200, 'User deleted successfuly')
     @api.expect(userSerializer)
-    @auth.login_required
+    @token_auth.login_required
     def delete(self):
         """
         Method used to delete user in database

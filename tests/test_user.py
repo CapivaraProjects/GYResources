@@ -11,11 +11,36 @@ from tools.Cryptography import Crypto
 app = Flask(__name__)
 app = initialize_app(app)
 client = app.test_client()
+crypto = Crypto()
 generic_user = models.User.User(
-        idType=1, email='test@hotmail.com',
-        username='username', password='password',
-        salt='salt', dateInsertion='03/02/2018',
-        dateUpdate='04/02/2018')
+    idType=1, email='test@hotmail.com',
+    username='username', password='password',
+    salt='salt', dateInsertion='03/02/2018',
+    dateUpdate='04/02/2018')
+generic_user.salt = crypto.generateRandomSalt()
+generic_user.password = crypto.encrypt(
+    generic_user.salt,
+    generic_user.password)
+
+data = {'salt': 'generic_user.salt'}
+creds = base64.b64encode(
+    bytes(
+        "username:"+generic_user.password,
+        'utf-8')).decode('utf-8')
+headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'Authorization': 'Basic %s' % creds
+}
+resp = client.post(
+    '/api/gyresources/token/',
+    headers=headers,
+    data=str(
+        json.dumps(generic_user.__dict__)),
+    follow_redirects=True)
+resp = json.loads(resp.get_data(as_text=True))
+token = resp['response']
+generic_user.password = 'password'
 
 
 @pytest.mark.order1
@@ -38,7 +63,7 @@ def test_create(generic_user=generic_user):
 
 
 @pytest.mark.order2
-def test_search(generic_user=generic_user, client=client):
+def test_search(generic_user=generic_user, client=client, token=token):
     data = {
             "action": "search",
             "idType": generic_user.idType,
@@ -49,14 +74,10 @@ def test_search(generic_user=generic_user, client=client):
             "dateInsertion": generic_user.dateInsertion,
             "dateUpdate": generic_user.dateUpdate
             }
-    creds = base64.b64encode(
-                bytes(
-                    generic_user.username + ":" + generic_user.password,
-                    'utf-8')).decode('utf-8')
     headers = {
        'Content-Type': 'application/json',
        'Accept': 'application/json',
-       'Authorization': 'Basic %s' % creds
+       'Authorization': 'Basic %s' % token
     }
     resp = client.get(
          '/api/gyresources/users',
@@ -71,7 +92,7 @@ def test_search(generic_user=generic_user, client=client):
 
 
 @pytest.mark.order3
-def test_update(generic_user=generic_user):
+def test_update(generic_user=generic_user, token=token):
     data = generic_user.__dict__
     data['action'] = 'search'
     resp = client.get(
@@ -100,15 +121,11 @@ def test_update(generic_user=generic_user):
     user.password = crypto.encrypt(
             user.salt,
             user.password)
-    creds = base64.b64encode(
-                bytes(
-                    user.username + ":" + user.password,
-                    'utf-8')).decode('utf-8')
     user.username = 'username2'
     headers = {
        'Content-Type': 'application/json',
        'Accept': 'application/json',
-       'Authorization': 'Basic %s' % creds
+       'Authorization': 'Bearer %s' % token['token']
     }
     resp = client.put('/api/gyresources/users/', data=str(
         json.dumps(user.__dict__)), headers=headers)
@@ -120,7 +137,7 @@ def test_update(generic_user=generic_user):
 
 
 @pytest.mark.order4
-def test_delete():
+def test_delete(token=token):
     data = generic_user.__dict__
     data['action'] = 'search'
     resp = client.get(
@@ -136,7 +153,6 @@ def test_delete():
     for response in pagedResponse['response']:
         user = namedtuple("User", response.keys())(*response.values())
 
-    crypto = Crypto()
     user = models.User.User(
             id=user.id,
             idType=user.idType,
@@ -146,18 +162,10 @@ def test_delete():
             salt=user.salt,
             dateInsertion=user.dateInsertion,
             dateUpdate=user.dateUpdate)
-    user.salt = crypto.generateRandomSalt()
-    user.password = crypto.encrypt(
-            user.salt,
-            user.password)
-    creds = base64.b64encode(
-                bytes(
-                    user.username + ":" + user.password,
-                    'utf-8')).decode('utf-8')
     headers = {
        'Content-Type': 'application/json',
        'Accept': 'application/json',
-       'Authorization': 'Basic %s' % creds
+       'Authorization': 'Bearer %s' % token['token']
     }
     resp = client.delete('/api/gyresources/users/', data=str(
         json.dumps(user.__dict__)), headers=headers)
