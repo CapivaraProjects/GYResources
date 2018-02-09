@@ -22,7 +22,7 @@ generic_user.password = crypto.encrypt(
     generic_user.salt,
     generic_user.password)
 
-data = {'salt': 'generic_user.salt'}
+data = {'salt': generic_user.salt}
 creds = base64.b64encode(
     bytes(
         "username:"+generic_user.password,
