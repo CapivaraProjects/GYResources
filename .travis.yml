@@ -18,7 +18,7 @@ before_script:
   - psql -c "ALTER USER capivara WITH PASSWORD 'test';" -U postgres
   - psql -U capivara green_eyes < backupGreeneyes.sql
   - psql -U capivara green_eyes < missingSQL.sql  
-  - psql green_eyes -U capivara -c "INSERT INTO USERS(id_type, email, username, password, salt, date_insertion, date_last_update) values(1, 'test@hotmail.com', 'username', 'eyJtb2RlIjogImNjbSIsICJrcyI6IDEyOCwgIml2IjogImRETk9OVlpOUkdWWFZpOTZLMjlpY2xSVWFERk9RVDA5IiwgIml0ZXIiOiAxMDAwLCAidHMiOiA2NCwgImN0IjogIldHUkpkalZ3SzNkRWIzcFlSRkU0U0V4NGRVdFRkejA5IiwgImNpcGhlciI6ICJhZXMiLCAidiI6IDEsICJhZGF0YSI6ICIiLCAic2FsdCI6ICJNMVphYTB0bk1teGtZazA5In0=', '+xz+2mRcNV/I1/9s93iNJqbL0p89e+Bq', '03/02/2018', '04/02/2018');"
+    #- psql green_eyes -U capivara -c "INSERT INTO USERS(id_type, email, username, password, salt, date_insertion, date_last_update) values(1, 'test@hotmail.com', 'username', 'eyJtb2RlIjogImNjbSIsICJrcyI6IDEyOCwgIml2IjogImRETk9OVlpOUkdWWFZpOTZLMjlpY2xSVWFERk9RVDA5IiwgIml0ZXIiOiAxMDAwLCAidHMiOiA2NCwgImN0IjogIldHUkpkalZ3SzNkRWIzcFlSRkU0U0V4NGRVdFRkejA5IiwgImNpcGhlciI6ICJhZXMiLCAidiI6IDEsICJhZGF0YSI6ICIiLCAic2FsdCI6ICJNMVphYTB0bk1teGtZazA5In0=', '+xz+2mRcNV/I1/9s93iNJqbL0p89e+Bq', '03/02/2018', '04/02/2018');"
   - export PYTHONPATH=$PYTHONPATH:$(pwd)  
 # command to run tests
 script:

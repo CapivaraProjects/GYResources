@@ -19,6 +19,27 @@ generic_user = models.User.User(
 
 
 @pytest.mark.order1
+def test_create(generic_user=generic_user):
+    crypto = Crypto()
+    generic_user.salt = crypto.generateRandomSalt()
+    generic_user.password = crypto.encrypt(
+            generic_user.salt,
+            generic_user.password)
+    resp = client.post('/api/gyresources/users/', data=str(
+        json.dumps(generic_user.__dict__)), headers={
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'})
+
+    user = json.loads(resp.get_data(as_text=True))['response']
+    user['password'] = generic_user.password
+    user['salt'] = generic_user.salt
+    user = namedtuple("User", user.keys())(*user.values())
+    generic_user = user
+    assert resp.status_code == 200
+    assert "'id': 0" not in json.loads(resp.get_data(as_text=True))['response']
+
+
+@pytest.mark.order2
 def test_auth(generic_user=generic_user):
     crypto = Crypto()
     generic_user.salt = crypto.generateRandomSalt()
@@ -29,7 +50,7 @@ def test_auth(generic_user=generic_user):
     data = {'salt': generic_user.salt}
     creds = base64.b64encode(
         bytes(
-            "username:"+generic_user.password,
+            generic_user.username+":"+generic_user.password,
             'utf-8')).decode('utf-8')
     headers = {
         'Content-Type': 'application/json',
@@ -46,29 +67,10 @@ def test_auth(generic_user=generic_user):
     token = resp['response']
     generic_user.password = 'password'
     assert token
-    return token
+    return (generic_user, token)
 
 
-token = test_auth(generic_user)
-
-
-@pytest.mark.order2
-def test_create(generic_user=generic_user):
-    crypto = Crypto()
-    generic_user.salt = crypto.generateRandomSalt()
-    generic_user.password = crypto.encrypt(
-            generic_user.salt,
-            generic_user.password)
-    resp = client.post('/api/gyresources/users/', data=str(
-        json.dumps(generic_user.__dict__)), headers={
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'})
-
-    user = json.loads(resp.get_data(as_text=True))['response']
-    user = namedtuple("User", user.keys())(*user.values())
-    generic_user = user
-    assert resp.status_code == 200
-    assert "'id': 0" not in json.loads(resp.get_data(as_text=True))['response']
+(generic_user, token) = test_auth(generic_user)
 
 
 @pytest.mark.order3
