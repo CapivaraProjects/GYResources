@@ -11,6 +11,8 @@ class DefaultConfig(object):
     RESTPLUS_VALIDATE = True
     RESTPLUS_MASK_SWAGGER = False
     RESTPLUS_ERROR_404_HELP = False
+    SECRET_KEY = 'testing gyresources api'
+
 
 class TestConfig(object):
     # test settings
