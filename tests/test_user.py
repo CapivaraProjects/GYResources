@@ -11,39 +11,48 @@ from tools.Cryptography import Crypto
 app = Flask(__name__)
 app = initialize_app(app)
 client = app.test_client()
-crypto = Crypto()
 generic_user = models.User.User(
     idType=1, email='test@hotmail.com',
     username='username', password='password',
     salt='salt', dateInsertion='03/02/2018',
     dateUpdate='04/02/2018')
-generic_user.salt = crypto.generateRandomSalt()
-generic_user.password = crypto.encrypt(
-    generic_user.salt,
-    generic_user.password)
-
-data = {'salt': generic_user.salt}
-creds = base64.b64encode(
-    bytes(
-        "username:"+generic_user.password,
-        'utf-8')).decode('utf-8')
-headers = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'Authorization': 'Basic %s' % creds
-}
-resp = client.post(
-    '/api/gyresources/token/',
-    headers=headers,
-    data=str(
-        json.dumps(generic_user.__dict__)),
-    follow_redirects=True)
-resp = json.loads(resp.get_data(as_text=True))
-token = resp['response']
-generic_user.password = 'password'
 
 
 @pytest.mark.order1
+def test_auth(generic_user=generic_user):
+    crypto = Crypto()
+    generic_user.salt = crypto.generateRandomSalt()
+    generic_user.password = crypto.encrypt(
+        generic_user.salt,
+        generic_user.password)
+
+    data = {'salt': generic_user.salt}
+    creds = base64.b64encode(
+        bytes(
+            "username:"+generic_user.password,
+            'utf-8')).decode('utf-8')
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Basic %s' % creds
+    }
+    resp = client.post(
+        '/api/gyresources/token/',
+        headers=headers,
+        data=str(
+            json.dumps(data)),
+        follow_redirects=True)
+    resp = json.loads(resp.get_data(as_text=True))
+    token = resp['response']
+    generic_user.password = 'password'
+    assert token
+    return token
+
+
+token = test_auth(generic_user)
+
+
+@pytest.mark.order2
 def test_create(generic_user=generic_user):
     crypto = Crypto()
     generic_user.salt = crypto.generateRandomSalt()
@@ -62,7 +71,7 @@ def test_create(generic_user=generic_user):
     assert "'id': 0" not in json.loads(resp.get_data(as_text=True))['response']
 
 
-@pytest.mark.order2
+@pytest.mark.order3
 def test_search(generic_user=generic_user, client=client, token=token):
     data = {
             "action": "search",
@@ -91,7 +100,7 @@ def test_search(generic_user=generic_user, client=client, token=token):
         assert 'test@hotmail.com' in response['email']
 
 
-@pytest.mark.order3
+@pytest.mark.order4
 def test_update(generic_user=generic_user, token=token):
     data = generic_user.__dict__
     data['action'] = 'search'
@@ -136,7 +145,7 @@ def test_update(generic_user=generic_user, token=token):
     assert "username2" in user.response['username']
 
 
-@pytest.mark.order4
+@pytest.mark.order5
 def test_delete(token=token):
     data = generic_user.__dict__
     data['action'] = 'search'
