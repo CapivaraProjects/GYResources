@@ -37,6 +37,7 @@ def test_create(generic_user=generic_user):
     generic_user = user
     assert resp.status_code == 200
     assert "'id': 0" not in json.loads(resp.get_data(as_text=True))['response']
+    return generic_user
 
 
 @pytest.mark.order2
@@ -70,6 +71,16 @@ def test_auth(generic_user=generic_user):
     return (generic_user, token)
 
 
+generic_user = test_create(generic_user=generic_user)
+generic_user = models.User.User(
+    id=generic_user.id,
+    idType=generic_user.idType,
+    email=generic_user.email,
+    username=generic_user.username,
+    password='password',
+    salt=generic_user.salt,
+    dateInsertion=generic_user.dateInsertion,
+    dateUpdate=generic_user.dateUpdate)
 (generic_user, token) = test_auth(generic_user)
 
 
