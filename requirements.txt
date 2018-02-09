@@ -1,7 +1,7 @@
 sqlalchemy 
-psycopg2
 sjcl
 flask-restplus
 flask_httpauth
 itsdangerous
 pytest
+psycopg2-binary
