@@ -16,3 +16,6 @@ CREATE TABLE USERS (
    date_insertion VARCHAR(100),
    date_last_update VARCHAR(100)
 );
+
+INSERT INTO users VALUES (1, 1, 'test@test.com', 'test', 'test', 'test', '03/02/2018', '10/02/2018');
+INSERT INTO texts VALUES (1, 'test', 'test', 'test', 'test');
