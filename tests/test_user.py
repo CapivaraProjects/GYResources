@@ -44,7 +44,7 @@ def test_search_by_id():
             "id": "1",
             }
     resp = client().get(
-            '/api/gyresources/types',
+            '/api/gyresources/users',
             content_type='application/json',
             headers={
                 'Accept': 'application/json',
