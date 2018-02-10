@@ -36,6 +36,20 @@ def test_search_by_unexistent_id():
 
 
 @pytest.mark.order2
+def test_create(generic_text=generic_text):
+    data = generic_text.__dict__
+    resp = client().post('/api/gyresources/texts/', data=str(
+        json.dumps(data)), headers={
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'})
+    text = json.loads(resp.get_data(as_text=True))['response']
+    text = namedtuple("Text", text.keys())(*text.values())
+    generic_text = text
+    assert resp.status_code == 200
+    assert "'id': 0" not in json.loads(resp.get_data(as_text=True))['response']
+
+
+@pytest.mark.order3
 def test_search_by_id():
     data = {
             "action": "searchByID",
@@ -55,7 +69,7 @@ def test_search_by_id():
             resp.get_data(as_text=True))['response']['language']
 
 
-@pytest.mark.order3
+@pytest.mark.order4
 def test_search():
     data = {
             "action": "search",
@@ -78,20 +92,6 @@ def test_search():
     assert pagedResponse['status_code'] == 200
     for response in pagedResponse['response']:
         assert 'test' in response['value']
-
-
-@pytest.mark.order4
-def test_create(generic_text=generic_text):
-    data = generic_text.__dict__
-    resp = client().post('/api/gyresources/texts/', data=str(
-        json.dumps(data)), headers={
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'})
-    text = json.loads(resp.get_data(as_text=True))['response']
-    text = namedtuple("Text", text.keys())(*text.values())
-    generic_text = text
-    assert resp.status_code == 200
-    assert "'id': 0" not in json.loads(resp.get_data(as_text=True))['response']
 
 
 @pytest.mark.order5
