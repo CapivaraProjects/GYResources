@@ -9,34 +9,67 @@ import models.User
 app = Flask(__name__)
 app = initialize_app(app)
 client = app.test_client
-generic_user = models.User.User(idType=1, email='test@hotmail.com',
-                                username='username test', password='password test',
-                                salt='salt test', dateInsertion='03/02/2018',
-                                dateUpdate='04/02/2018')
+generic_user = models.User.User(
+        idType=1,
+        email='test@test.com',
+        username='test',
+        password='test',
+        salt='test',
+        dateInsertion='03/02/2018',
+        dateUpdate='10/02/2018')
+
 
 @pytest.mark.order1
-def test_create(generic_user=generic_user):
-    resp = client().post('/api/gyresources/users/', data=str(
-        json.dumps(generic_user.__dict__)), headers={
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'})
-    user = json.loads(resp.get_data(as_text=True))['response']
-    user = namedtuple("User", user.keys())(*user.values())
-    generic_user = user
-    assert resp.status_code == 200
-    assert "'id': 0" not in json.loads(resp.get_data(as_text=True))['response']
+def test_search_by_unexistent_id():
+    data = {
+            "action": "searchByID",
+            "id": "1000000",
+            }
+    resp = client().get(
+            '/api/gyresources/users',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json',
+                'timeout': 240},
+            query_string=data, follow_redirects=True)
+    assert json.loads(resp.get_data(as_text=True))['status_code'] == 500
+
 
 @pytest.mark.order2
+def test_search_by_id():
+    data = {
+            "action": "searchByID",
+            "id": "1",
+            }
+    resp = client().get(
+            '/api/gyresources/types',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json',
+                'timeout': 240},
+            query_string=data, follow_redirects=True)
+    assert json.loads(resp.get_data(as_text=True))['status_code'] == 200
+    assert 'thumb' in json.loads(
+            resp.get_data(as_text=True))['response']['value']
+
+
+@pytest.mark.order3
 def test_search():
     data = {
                 "action": "search",
-                "idType": "1",
-                "email": "test@hotmail.com",
-                "username": "username test",
-                "password": "password test",
-                "salt": "salt test",
+                "idType": 1,
+                "email": "test@test.com",
+                "username": "test",
+                "password": "test",
+                "salt": "test",
                 "dateInsertion": "03/02/2018",
-                "dateUpdate": "04/02/2018"
+                "dateUpdate": "10/02/2018",
+                "pageSize": 10,
+                "offset": 0
             }
     resp = client().get(
             '/api/gyresources/users',
@@ -49,9 +82,23 @@ def test_search():
     pagedResponse = json.loads(resp.get_data(as_text=True))
     assert pagedResponse['status_code'] == 200
     for response in pagedResponse['response']:
-        assert 'test@hotmail.com' in response['email']
+        assert 'test' in response['password']
 
-@pytest.mark.order3
+@pytest.mark.order4
+def test_create(generic_user=generic_user):
+    data = generic_user.__dict__
+    resp = client().post('/api/gyresources/users/', data=str(
+        json.dumps(data)), headers={
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'})
+    user = json.loads(resp.get_data(as_text=True))['response']
+    user = namedtuple("User", user.keys())(*user.values())
+    generic_user = user
+    assert resp.status_code == 200
+    assert "'id': 0" not in json.loads(resp.get_data(as_text=True))['response']
+
+
+@pytest.mark.order5
 def test_update(generic_user=generic_user):
     data = generic_user.__dict__
     data['action'] = 'search'
@@ -68,29 +115,29 @@ def test_update(generic_user=generic_user):
     for response in pagedResponse['response']:
         user = namedtuple("User", response.keys())(*response.values())
 
-    user = models.User.User(
-                id=user.id,
-                idType=user.idType,
-                email=user.email,
-                username=user.username,
-                password=user.password,
-                salt=user.salt,
-                dateInsertion=user.dateInsertion,
-                dateUpdate=user.dateUpdate)
-    user.username = 'username update'
+    user = {
+                "id": user.id,
+                "idType": user.idType,
+                "email": user.email,
+                "username": 'update',
+                "password": user.password,
+                "salt": user.salt,
+                "dateInsertion": user.dateInsertion,
+                "dateUpdate": user.dateUpdate
+            }
+    generic_user.username = 'update'
     resp = client().put('/api/gyresources/users/', data=str(
-        json.dumps(user.__dict__)), headers={
+        json.dumps(user)), headers={
             'Accept': 'application/json',
             'Content-Type': 'application/json'})
     assert resp.status_code == 200
     user = json.loads(
                 resp.get_data(as_text=True))
     user = namedtuple("User", user.keys())(*user.values())
-    assert "username update" in user.response['username']
+    assert "update" in user.response['username']
 
-@pytest.mark.order4
-def test_delete():
-    print(str(generic_user.__dict__))
+@pytest.mark.order6
+def test_delete(generic_user=generic_user):
     data = generic_user.__dict__
     data['action'] = 'search'
     resp = client().get(
@@ -106,18 +153,19 @@ def test_delete():
     for response in pagedResponse['response']:
         user = namedtuple("User", response.keys())(*response.values())
 
-    user = models.User.User(
-                id=user.id,
-                idType=user.idType,
-                email=user.email,
-                username=user.username,
-                password=user.password,
-                salt=user.salt,
-                dateInsertion=user.dateInsertion,
-                dateUpdate=user.dateUpdate)
-    print('delete' + str(user.__dict__))
+    user = {
+                "id": user.id,
+                "idType": user.idType,
+                "email": user.email,
+                "username": user.username,
+                "password": user.password,
+                "salt": user.salt,
+                "dateInsertion": user.dateInsertion,
+                "dateUpdate": user.dateUpdate
+            }
+
     resp = client().delete('/api/gyresources/users/', data=str(
-        json.dumps(user.__dict__)), headers={
+        json.dumps(user)), headers={
             'Accept': 'application/json',
             'Content-Type': 'application/json'})
     assert resp.status_code == 200
