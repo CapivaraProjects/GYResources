@@ -37,6 +37,20 @@ def test_search_by_unexistent_id():
     assert json.loads(resp.get_data(as_text=True))['status_code'] == 500
 
 
+@pytest.mark.order2
+def test_create(generic_user=generic_user):
+    data = generic_user.__dict__
+    resp = client().post('/api/gyresources/users/', data=str(
+        json.dumps(data)), headers={
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'})
+    user = json.loads(resp.get_data(as_text=True))['response']
+    user = namedtuple("User", user.keys())(*user.values())
+    generic_user = user
+    assert resp.status_code == 200
+    assert "'id': 0" not in json.loads(resp.get_data(as_text=True))['response']
+
+
 @pytest.mark.order3
 def test_search_by_id():
     data = {
@@ -83,19 +97,6 @@ def test_search():
     assert pagedResponse['status_code'] == 200
     for response in pagedResponse['response']:
         assert 'test' in response['password']
-
-@pytest.mark.order2
-def test_create(generic_user=generic_user):
-    data = generic_user.__dict__
-    resp = client().post('/api/gyresources/users/', data=str(
-        json.dumps(data)), headers={
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'})
-    user = json.loads(resp.get_data(as_text=True))['response']
-    user = namedtuple("User", user.keys())(*user.values())
-    generic_user = user
-    assert resp.status_code == 200
-    assert "'id': 0" not in json.loads(resp.get_data(as_text=True))['response']
 
 
 @pytest.mark.order5
