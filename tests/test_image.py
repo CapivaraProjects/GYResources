@@ -88,7 +88,6 @@ def test_search():
 def test_create(generic_image=generic_image):
     data = generic_image.__dict__
     data["idDisease"] = generic_image.disease['id']
-    data["action"] = 'create'
     resp = client().post('/api/gyresources/images/', data=str(
         json.dumps(data)), headers={
             'Accept': 'application/json',
@@ -120,13 +119,13 @@ def test_update(generic_image=generic_image):
 
     image = {
                 "id": image.id,
-                "description": image.description,
+                "description": 'update',
                 "idDisease": image.disease["id"],
                 "size": image.size,
-                "source": 'test',
-                "url": 'test4'
+                "source": image.source,
+                "url": image.url
             }
-
+    generic_image.description = 'update'
     resp = client().put('/api/gyresources/images/', data=str(
         json.dumps(image)), headers={
             'Accept': 'application/json',
@@ -135,11 +134,11 @@ def test_update(generic_image=generic_image):
     img = json.loads(
                 resp.get_data(as_text=True))
     img = namedtuple("Image", img.keys())(*img.values())
-    assert "test4" in img.response['url']
+    assert "update" in img.response['description']
 
 
 @pytest.mark.order6
-def test_delete():
+def test_delete(generic_image=generic_image):
     data = generic_image.__dict__
     data['action'] = 'search'
     resp = client().get(
@@ -156,13 +155,12 @@ def test_delete():
         image = namedtuple("Image", response.keys())(*response.values())
 
     image = {
-                "action": "string",
-                "description": "string",
                 "id": image.id,
+                "description": image.description,
                 "idDisease": image.disease["id"],
-                "size": 0,
-                "source": "string",
-                "url": "string"
+                "size": image.size,
+                "source": image.source,
+                "url": image.url
             }
     resp = client().delete('/api/gyresources/images/', data=str(
         json.dumps(image)), headers={

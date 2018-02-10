@@ -44,10 +44,19 @@ class PlantController(BaseController):
         action = request.args.get('action')
         id = request.args.get('id')
         plant = models.Plant.Plant(
-                      scientificName=request.args.get('scientificName'),
-                      commonName=request.args.get('commonName'))
-        pageSize = request.args.get('pageSize')
-        offset = request.args.get('offset')
+            scientificName=request.args.get('scientificName'),
+            commonName=request.args.get('commonName'))
+        pageSize = None
+        if pageSize:
+            pageSize = int(request.args.get('pageSize'))
+        else:
+            pageSize = 10
+
+        offset = None
+        if offset:
+            offset = int(request.args.get('offset'))
+        else:
+            offset = 0
         repository = PlantRepository(
                 flask_app.config["DBUSER"],
                 flask_app.config["DBPASS"],
@@ -76,7 +85,7 @@ class PlantController(BaseController):
             # log
             return self.okResponse(
                 response=sqlerr,
-                message="SQL error: "+str(sqlerr),
+                message="SQL error: "+str(sqlerr) + " : " + str(total),
                 status=500)
 
     @api.response(200, 'Plant successfuly created.')
@@ -85,11 +94,15 @@ class PlantController(BaseController):
         """
         Method used to insert plant in database
         receives in body request a plant model
-        action should be anything
         """
         plant = request.json
 
         plant = namedtuple("Plant", plant.keys())(*plant.values())
+        plant = models.Plant.Plant(
+            id=None,
+            scientificName=plant.scientificName,
+            commonName=plant.commonName)
+
         repository = PlantRepository(
                 flask_app.config["DBUSER"],
                 flask_app.config["DBPASS"],
@@ -151,10 +164,6 @@ class PlantController(BaseController):
                 response=err,
                 message="Internal server error",
                 status=500)
-        return self.okResponse(
-                response=plant,
-                message="Plant sucessfuly updated.",
-                status=204), 200
 
     @api.response(200, 'Plant deleted successfuly')
     @api.expect(plantSerializer)
