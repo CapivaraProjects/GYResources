@@ -37,7 +37,7 @@ def test_search_by_unexistent_id():
     assert json.loads(resp.get_data(as_text=True))['status_code'] == 500
 
 
-@pytest.mark.order2
+@pytest.mark.order3
 def test_search_by_id():
     data = {
             "action": "searchByID",
@@ -57,7 +57,7 @@ def test_search_by_id():
             resp.get_data(as_text=True))['response']['value']
 
 
-@pytest.mark.order3
+@pytest.mark.order4
 def test_search():
     data = {
                 "action": "search",
@@ -84,7 +84,7 @@ def test_search():
     for response in pagedResponse['response']:
         assert 'test' in response['password']
 
-@pytest.mark.order4
+@pytest.mark.order2
 def test_create(generic_user=generic_user):
     data = generic_user.__dict__
     resp = client().post('/api/gyresources/users/', data=str(
