@@ -31,6 +31,9 @@ class TextController(BaseController):
         """
         Return a list of texts based on action.
 
+        If action=searchByID:
+            please set id parameter.
+
         If action=search:
             you can use language, tag, value or description to search,
             please define pageSize and offset parameters
@@ -45,17 +48,31 @@ class TextController(BaseController):
                       tag=request.args.get('tag'),
                       value=request.args.get('value'),
                       description=request.args.get('description'))
-        pageSize = request.args.get('pageSize')
-        offset = request.args.get('offset')
+        pageSize = None
+        if pageSize:
+            pageSize = int(request.args.get('pageSize'))
+        else:
+            pageSize = 10
+
+        offset = None
+        if offset:
+            offset = int(request.args.get('offset'))
+        else:
+            offset = 0
         repository = TextRepository(
                 flask_app.config["DBUSER"],
                 flask_app.config["DBPASS"],
                 flask_app.config["DBHOST"],
                 flask_app.config["DBPORT"],
                 flask_app.config["DBNAME"])
-
         try:
-            if (action == 'search'):
+            if (action == 'searchByID'):
+                result = repository.searchByID(id)
+                return self.okResponse(
+                            response=result,
+                            message="Ok",
+                            status=200)
+            elif (action == 'search'):
                 result = repository.search(text, pageSize, offset)
                 total = result['total']
                 result = result['content']
@@ -84,12 +101,19 @@ class TextController(BaseController):
         text = request.json
 
         text = namedtuple("Text", text.keys())(*text.values())
+        text = models.Text.Text(
+            id=None,
+            language=text.language,
+            tag=text.tag,
+            value=text.value,
+            description=text.description)
+
         repository = TextRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+            flask_app.config["DBUSER"],
+            flask_app.config["DBPASS"],
+            flask_app.config["DBHOST"],
+            flask_app.config["DBPORT"],
+            flask_app.config["DBNAME"])
 
         try:
             text = repository.create(text)
@@ -145,10 +169,6 @@ class TextController(BaseController):
                 response=err,
                 message="Internal server error",
                 status=500)
-        return self.okResponse(
-                response=text,
-                message="Text sucessfuly updated.",
-                status=204), 200
 
     @api.response(200, 'Text deleted successfuly')
     @api.expect(textSerializer)
