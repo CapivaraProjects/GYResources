@@ -67,8 +67,8 @@ def test_search_by_id():
                 'timeout': 240},
             query_string=data, follow_redirects=True)
     assert json.loads(resp.get_data(as_text=True))['status_code'] == 200
-    assert 'thumb' in json.loads(
-            resp.get_data(as_text=True))['response']['value']
+    assert 'test' in json.loads(
+            resp.get_data(as_text=True))['response']['username']
 
 
 @pytest.mark.order4
