@@ -9,7 +9,6 @@ default json models, which can be used in swagger as example.
 image = api.model('Image', {
     'id': fields.Integer(readOnly=True, description='Disease identification'),
     'idDisease': fields.Integer(
-        readOnly=True,
         required=True,
         attribute='disease.id',
         description='Disease ID'),
@@ -17,9 +16,6 @@ image = api.model('Image', {
     'description': fields.String(description='Description'),
     'source': fields.String(description='Metadata info'),
     'size': fields.Integer(description='Size type'),
-    'action': fields.String(
-        description='Action to be used in POST request',
-        choices=['create', 'save'])
     })
 
 disease = api.model('Disease', {
@@ -61,7 +57,7 @@ text = api.model('Text', {
         description='Text value'),
     'description': fields.String(
         required=True,
-        description='Text description'),
+        description='Text description')
     })
 
 type = api.model('Type', {

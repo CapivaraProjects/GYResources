@@ -31,8 +31,11 @@ class TypeController(BaseController):
         """
         Return a list of types based on action.
 
+        If action=searchByID:
+            please set id parameter.
+
         If action=search:
-            you can use language, tag, value or description to search,
+            you can use scientificName or commonName to search,
             please define pageSize and offset parameters
         """
         self.startTime = time.time()
@@ -43,8 +46,17 @@ class TypeController(BaseController):
         type = models.Type.Type(
                       value=request.args.get('value'),
                       description=request.args.get('description'))
-        pageSize = request.args.get('pageSize')
-        offset = request.args.get('offset')
+        pageSize = None
+        if pageSize:
+            pageSize = int(request.args.get('pageSize'))
+        else:
+            pageSize = 10
+
+        offset = None
+        if offset:
+            offset = int(request.args.get('offset'))
+        else:
+            offset = 0
         repository = TypeRepository(
                 flask_app.config["DBUSER"],
                 flask_app.config["DBPASS"],
@@ -52,7 +64,13 @@ class TypeController(BaseController):
                 flask_app.config["DBPORT"],
                 flask_app.config["DBNAME"])
         try:
-            if (action == 'search'):
+            if (action == 'searchByID'):
+                result = repository.searchByID(id)
+                return self.okResponse(
+                            response=result,
+                            message="Ok",
+                            status=200)
+            elif (action == 'search'):
                 result = repository.search(type, pageSize, offset)
                 total = result['total']
                 result = result['content']
@@ -81,6 +99,11 @@ class TypeController(BaseController):
         type = request.json
 
         type = namedtuple("Type", type.keys())(*type.values())
+        type = models.Type.Type(
+            id=None,
+            value=type.value,
+            description=type.description)
+
         repository = TypeRepository(
                 flask_app.config["DBUSER"],
                 flask_app.config["DBPASS"],
@@ -142,10 +165,6 @@ class TypeController(BaseController):
                 response=err,
                 message="Internal server error",
                 status=500)
-        return self.okResponse(
-                response=type,
-                message="Type sucessfuly updated.",
-                status=204), 200
 
     @api.response(200, 'Type deleted successfuly')
     @api.expect(typeSerializer)
