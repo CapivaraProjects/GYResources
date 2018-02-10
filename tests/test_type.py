@@ -33,6 +33,20 @@ def test_search_by_unexistent_id():
 
 
 @pytest.mark.order2
+def test_create(generic_type=generic_type):
+    data = generic_type.__dict__
+    resp = client().post('/api/gyresources/types/', data=str(
+        json.dumps(data)), headers={
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'})
+    type = json.loads(resp.get_data(as_text=True))['response']
+    type = namedtuple("Type", type.keys())(*type.values())
+    generic_type = type
+    assert resp.status_code == 200
+    assert "'id': 0" not in json.loads(resp.get_data(as_text=True))['response']
+
+
+@pytest.mark.order3
 def test_search_by_id():
     data = {
             "action": "searchByID",
@@ -48,11 +62,11 @@ def test_search_by_id():
                 'timeout': 240},
             query_string=data, follow_redirects=True)
     assert json.loads(resp.get_data(as_text=True))['status_code'] == 200
-    assert 'thumb' in json.loads(
+    assert 'test' in json.loads(
             resp.get_data(as_text=True))['response']['value']
 
 
-@pytest.mark.order3
+@pytest.mark.order4
 def test_search():
     data = {
                 "action": "search",
@@ -73,20 +87,6 @@ def test_search():
     assert pagedResponse['status_code'] == 200
     for response in pagedResponse['response']:
         assert 'test' in response['description']
-
-
-@pytest.mark.order4
-def test_create(generic_type=generic_type):
-    data = generic_type.__dict__
-    resp = client().post('/api/gyresources/types/', data=str(
-        json.dumps(data)), headers={
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'})
-    type = json.loads(resp.get_data(as_text=True))['response']
-    type = namedtuple("Type", type.keys())(*type.values())
-    generic_type = type
-    assert resp.status_code == 200
-    assert "'id': 0" not in json.loads(resp.get_data(as_text=True))['response']
 
 
 @pytest.mark.order5
