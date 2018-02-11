@@ -28,7 +28,7 @@ class ImageController(BaseController):
     """
 
     @api.expect(image_search_args)
-    @api.response(200, 'Plant searched.')
+    @api.response(200, 'Image search.')
     def get(self):
         """
         Return a list of plants based on action.
@@ -39,6 +39,10 @@ class ImageController(BaseController):
         If action=search:
             you can use scientificName or commonName to search,
             please define pageSize and offset parameters
+
+        If action=read:
+            please set id parameter
+            It will search by ID and return url with Base64 image
         """
         self.startTime = time.time()
         result = models.Image.Image()
@@ -93,12 +97,27 @@ class ImageController(BaseController):
                         total=total,
                         offset=offset,
                         pageSize=pageSize), 200
-        except (exc.SQLAlchemyError, Exception) as sqlerr:
-            # log
+            elif (action == 'read'):
+                image = repository.searchByID(id)
+                result = repository.getImageBase64(
+                        image,
+                        flask_app.config["IMAGESPATH"])
+                result.disease.plant = result.disease.plant.__dict__
+                result.disease = result.disease.__dict__
+                return self.okResponse(
+                        response=result,
+                        message="Ok",
+                        status=200)
+        except exc.SQLAlchemyError as sqlerr:
             return self.okResponse(
-                    response=sqlerr,
-                    message="SQL error: "+str(sqlerr),
-                    status=500)
+                response=sqlerr,
+                message="SQL error: " + str(sqlerr),
+                status=500)
+        except Exception as err:
+            return self.okResponse(
+                response=err,
+                message="Internal server error: " + str(err),
+                status=500)
 
     @api.response(200, 'Image successfuly created.')
     @api.expect(imageSerializer)

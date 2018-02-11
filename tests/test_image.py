@@ -230,3 +230,23 @@ def test_delete(generic_image=generic_image):
     assert resp.status_code == 200
     assert 204 == json.loads(
             resp.get_data(as_text=True))['status_code']
+
+
+@pytest.mark.order7
+def test_read():
+    data = {
+            "action": "read",
+            "id": 3264,
+            }
+    resp = client().get(
+            '/api/gyresources/images',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json',
+                'timeout': 240},
+            query_string=data, follow_redirects=True)
+    jsonResp = json.loads(resp.get_data(as_text=True))
+    assert jsonResp['status_code'] == 200
+    assert jsonResp['response']['url'].strip()[-1] == '='
