@@ -50,7 +50,7 @@ def test_create(generic_type=generic_type):
 def test_search_by_id():
     data = {
             "action": "searchByID",
-            "id": "1",
+            "id": "4",
             }
     resp = client().get(
             '/api/gyresources/types',
