@@ -108,16 +108,15 @@ class ImageController(BaseController):
         receives in body request a image model
         """
         image = request.json
-
         image = namedtuple("Image", image.keys())(*image.values())
-
-        action = image.action
         image = models.Image.Image(
-                description=image.description,
-                disease=models.Disease.Disease(image.idDisease),
-                size=image.size,
-                source=image.source,
-                url=image.url)
+            id=None,
+            disease=models.Disease.Disease(image.idDisease),
+            url=image.url,
+            description=image.description,
+            source=image.source,
+            size=image.size)
+
         repository = ImageRepository(
                 flask_app.config["DBUSER"],
                 flask_app.config["DBPASS"],
@@ -126,14 +125,13 @@ class ImageController(BaseController):
                 flask_app.config["DBNAME"])
 
         try:
-            if (action == 'create'):
-                image = repository.create(image)
-                image.disease.plant = image.disease.plant.__dict__
-                image.disease = image.disease.__dict__
-                return self.okResponse(
-                    response=image,
-                    message="Image sucessfuly created.",
-                    status=201), 200
+            image = repository.create(image)
+            image.disease.plant = image.disease.plant.__dict__
+            image.disease = image.disease.__dict__
+            return self.okResponse(
+                response=image,
+                message="Image sucessfuly created.",
+                status=201), 200
         except exc.SQLAlchemyError as sqlerr:
             # log
             print(str(sqlerr))
@@ -199,10 +197,6 @@ class ImageController(BaseController):
                 response=err,
                 message="Internal server error: " + str(err),
                 status=500)
-        return self.okResponse(
-                response=image,
-                message="Image sucessfuly updated.",
-                status=204), 200
 
     @api.response(200, 'Image deleted successfuly')
     @api.expect(imageSerializer)

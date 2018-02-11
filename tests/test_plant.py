@@ -9,7 +9,9 @@ import models.Plant
 app = Flask(__name__)
 app = initialize_app(app)
 client = app.test_client
-generic_plant = models.Plant.Plant(scientificName='test3', commonName='test3')
+generic_plant = models.Plant.Plant(
+        scientificName='test',
+        commonName='test')
 
 
 @pytest.mark.order1
@@ -34,7 +36,7 @@ def test_search_by_unexistent_id():
 def test_search_by_id():
     data = {
                 "action": "searchByID",
-                "id": "23",
+                "id": "1",
             }
     resp = client().get(
             '/api/gyresources/plants',
@@ -46,7 +48,7 @@ def test_search_by_id():
                 'timeout': 240},
             query_string=data, follow_redirects=True)
     assert json.loads(resp.get_data(as_text=True))['status_code'] == 200
-    assert 'Strawberry' in json.loads(
+    assert 'Apple' in json.loads(
             resp.get_data(as_text=True))['response']['commonName']
 
 
@@ -54,8 +56,8 @@ def test_search_by_id():
 def test_search():
     data = {
                 "action": "search",
-                "commonName": "Apple",
-                "scientificName": "Malus"
+                "scientificName": "Malus domestica",
+                "commonName": "Apple"
             }
     resp = client().get(
             '/api/gyresources/plants',
@@ -68,11 +70,12 @@ def test_search():
     pagedResponse = json.loads(resp.get_data(as_text=True))
     assert pagedResponse['status_code'] == 200
     for response in pagedResponse['response']:
-        assert 'Apple' in response['commonName']
+        assert 'Malus domestica' in response['scientificName']
 
 
 @pytest.mark.order4
 def test_create(generic_plant=generic_plant):
+    data = generic_plant.__dict__
     resp = client().post('/api/gyresources/plants/', data=str(
         json.dumps(generic_plant.__dict__)), headers={
             'Accept': 'application/json',
@@ -102,25 +105,26 @@ def test_update(generic_plant=generic_plant):
     for response in pagedResponse['response']:
         plant = namedtuple("Plant", response.keys())(*response.values())
 
-    plant = models.Plant.Plant(
-                id=plant.id,
-                scientificName=plant.scientificName,
-                commonName=plant.commonName)
-    plant.scientificName = 'test4'
+    plant = {
+                "action": "string",
+                "id": plant.id,
+                "scientificName": 'update',
+                "commonName": plant.commonName
+            }
+    generic_plant.scientificName = 'update'
     resp = client().put('/api/gyresources/plants/', data=str(
-        json.dumps(plant.__dict__)), headers={
+        json.dumps(plant)), headers={
             'Accept': 'application/json',
             'Content-Type': 'application/json'})
     assert resp.status_code == 200
     plant = json.loads(
                 resp.get_data(as_text=True))
     plant = namedtuple("Plant", plant.keys())(*plant.values())
-    assert "test4" in plant.response['scientificName']
+    assert "update" in plant.response['scientificName']
 
 
 @pytest.mark.order6
-def test_delete():
-    print(str(generic_plant.__dict__))
+def test_delete(generic_plant=generic_plant):
     data = generic_plant.__dict__
     data['action'] = 'search'
     resp = client().get(
@@ -136,13 +140,14 @@ def test_delete():
     for response in pagedResponse['response']:
         plant = namedtuple("Plant", response.keys())(*response.values())
 
-    plant = models.Plant.Plant(
-                id=plant.id,
-                scientificName=plant.scientificName,
-                commonName=plant.commonName)
-    print('delete' + str(plant.__dict__))
+    plant = {
+                "action": "string",
+                "id": plant.id,
+                "scientificName": plant.scientificName,
+                "commonName": plant.commonName
+            }
     resp = client().delete('/api/gyresources/plants/', data=str(
-        json.dumps(plant.__dict__)), headers={
+        json.dumps(plant)), headers={
             'Accept': 'application/json',
             'Content-Type': 'application/json'})
     assert resp.status_code == 200
