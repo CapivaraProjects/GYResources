@@ -3,7 +3,7 @@ import models.Text
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
-from api.restplus import api
+from api.restplus import api, token_auth
 from collections import namedtuple
 from repository.TextRepository import TextRepository
 from api.gyresources.endpoints.BaseController import BaseController
@@ -92,6 +92,7 @@ class TextController(BaseController):
 
     @api.response(200, 'Text successfuly created.')
     @api.expect(textSerializer)
+    @token_auth.login_required
     def post(self):
         """
         Method used to insert text in database
@@ -136,6 +137,7 @@ class TextController(BaseController):
 
     @api.response(200, 'Text changed successfuly')
     @api.expect(textSerializer)
+    @token_auth.login_required
     def put(self):
         """
         Method used to update text in database
@@ -172,6 +174,7 @@ class TextController(BaseController):
 
     @api.response(200, 'Text deleted successfuly')
     @api.expect(textSerializer)
+    @token_auth.login_required
     def delete(self):
         """
         Method used to delete text in database
