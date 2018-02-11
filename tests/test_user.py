@@ -12,21 +12,43 @@ app = Flask(__name__)
 app = initialize_app(app)
 client = app.test_client()
 generic_user = models.User.User(
-    idType=1, email='test@hotmail.com',
-    username='username', password='password',
-    salt='salt', dateInsertion='03/02/2018',
-    dateUpdate='04/02/2018')
+        idType=1,
+        email='test@test.com',
+        username='test',
+        password='test',
+        salt='test',
+        dateInsertion='03/02/2018',
+        dateUpdate='10/02/2018')
 
 
 @pytest.mark.order1
+def test_search_by_unexistent_id():
+    data = {
+            "action": "searchByID",
+            "id": "1000000",
+            }
+    resp = client.get(
+            '/api/gyresources/users',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json',
+                'timeout': 240},
+            query_string=data, follow_redirects=True)
+    assert json.loads(resp.get_data(as_text=True))['status_code'] == 500
+
+
+@pytest.mark.order2
 def test_create(generic_user=generic_user):
     crypto = Crypto()
     generic_user.salt = crypto.generateRandomSalt()
     generic_user.password = crypto.encrypt(
             generic_user.salt,
             generic_user.password)
+    data = generic_user.__dict__
     resp = client.post('/api/gyresources/users/', data=str(
-        json.dumps(generic_user.__dict__)), headers={
+        json.dumps(data)), headers={
             'Accept': 'application/json',
             'Content-Type': 'application/json'})
 
@@ -40,7 +62,7 @@ def test_create(generic_user=generic_user):
     return generic_user
 
 
-@pytest.mark.order2
+@pytest.mark.order3
 def test_auth(generic_user=generic_user):
     crypto = Crypto()
     generic_user.salt = crypto.generateRandomSalt()
@@ -84,7 +106,7 @@ generic_user = models.User.User(
 (generic_user, token) = test_auth(generic_user)
 
 
-@pytest.mark.order3
+@pytest.mark.order4
 def test_search(generic_user=generic_user, client=client, token=token):
     data = {
             "action": "search",
@@ -110,10 +132,10 @@ def test_search(generic_user=generic_user, client=client, token=token):
     pagedResponse = json.loads(resp.get_data(as_text=True))
     assert pagedResponse['status_code'] == 200
     for response in pagedResponse['response']:
-        assert 'test@hotmail.com' in response['email']
+        assert 'test@test.com' in response['email']
 
 
-@pytest.mark.order4
+@pytest.mark.order5
 def test_update(generic_user=generic_user, token=token):
     data = generic_user.__dict__
     data['action'] = 'search'
@@ -158,7 +180,7 @@ def test_update(generic_user=generic_user, token=token):
     assert "username2" in user.response['username']
 
 
-@pytest.mark.order5
+@pytest.mark.order6
 def test_delete(token=token):
     data = generic_user.__dict__
     data['action'] = 'search'
