@@ -21,17 +21,17 @@ before_script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)  
 # command to run tests
 script:
-  - pytest repository/base_test.py # or py.test for Python versions 3.5 and below
-  - pytest repository/DiseaseRepository_test.py
-  - pytest repository/ImageRepository_test.py
-  - pytest repository/PlantRepository_test.py
-  - pytest repository/TextRepository_test.py
-  - pytest repository/TypeRepository_test.py
-  - pytest repository/UserRepository_test.py
-  - pytest tools/crypto_test.py  
-  - pytest tests/test_user.py
-  - pytest tests/test_plant.py  
-  - pytest tests/test_text.py  
-  - pytest tests/test_type.py  
-  - pytest tests/test_image.py
-  - pytest tests/test_disease.py
+  - pytest -s -vv repository/base_test.py # or py.test for Python versions 3.5 and below
+  - pytest -s -vv repository/DiseaseRepository_test.py
+  - pytest -s -vv repository/ImageRepository_test.py
+  - pytest -s -vv repository/PlantRepository_test.py
+  - pytest -s -vv repository/TextRepository_test.py
+  - pytest -s -vv repository/TypeRepository_test.py
+  - pytest -s -vv repository/UserRepository_test.py
+  - pytest -s -vv tools/crypto_test.py  
+  - pytest -s -vv tests/test_user.py
+  - pytest -s -vv tests/test_plant.py  
+  - pytest -s -vv tests/test_text.py  
+  - pytest -s -vv tests/test_type.py  
+  - pytest -s -vv tests/test_image.py
+  - pytest -s -vv tests/test_disease.py

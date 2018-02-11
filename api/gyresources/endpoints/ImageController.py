@@ -28,7 +28,7 @@ class ImageController(BaseController):
     """
 
     @api.expect(image_search_args)
-    @api.response(200, 'Plant searched.')
+    @api.response(200, 'Image search.')
     def get(self):
         """
         Return a list of plants based on action.
@@ -39,6 +39,10 @@ class ImageController(BaseController):
         If action=search:
             you can use scientificName or commonName to search,
             please define pageSize and offset parameters
+
+        If action=read:
+            please set id parameter
+            It will search by ID and return url with Base64 image
         """
         self.startTime = time.time()
         result = models.Image.Image()
@@ -93,12 +97,27 @@ class ImageController(BaseController):
                         total=total,
                         offset=offset,
                         pageSize=pageSize), 200
-        except (exc.SQLAlchemyError, Exception) as sqlerr:
-            # log
+            elif (action == 'read'):
+                image = repository.searchByID(id)
+                result = repository.getImageBase64(
+                        image,
+                        flask_app.config["IMAGESPATH"])
+                result.disease.plant = result.disease.plant.__dict__
+                result.disease = result.disease.__dict__
+                return self.okResponse(
+                        response=result,
+                        message="Ok",
+                        status=200)
+        except exc.SQLAlchemyError as sqlerr:
             return self.okResponse(
-                    response=sqlerr,
-                    message="SQL error: "+str(sqlerr),
-                    status=500)
+                response=sqlerr,
+                message="SQL error: " + str(sqlerr),
+                status=500)
+        except Exception as err:
+            return self.okResponse(
+                response=err,
+                message="Internal server error: " + str(err),
+                status=500)
 
     @api.response(200, 'Image successfuly created.')
     @api.expect(imageSerializer)
@@ -112,7 +131,7 @@ class ImageController(BaseController):
         image = namedtuple("Image", image.keys())(*image.values())
         image = models.Image.Image(
             id=None,
-            disease=models.Disease.Disease(image.idDisease),
+            disease=models.Disease.Disease(id=image.idDisease),
             url=image.url,
             description=image.description,
             source=image.source,
@@ -124,8 +143,20 @@ class ImageController(BaseController):
                 flask_app.config["DBHOST"],
                 flask_app.config["DBPORT"],
                 flask_app.config["DBNAME"])
+        diseaseRepository = DiseaseRepository(
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
 
         try:
+            # if image is base 64 encoded save in a file
+            if (image.url.strip()[-1] == '='):
+                image.disease = diseaseRepository.searchByID(image.disease.id)
+                image = repository.saveImage(
+                        image,
+                        flask_app.config["IMAGESPATH"])
             image = repository.create(image)
             image.disease.plant = image.disease.plant.__dict__
             image.disease = image.disease.__dict__
@@ -135,7 +166,6 @@ class ImageController(BaseController):
                 status=201), 200
         except exc.SQLAlchemyError as sqlerr:
             # log
-            print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
