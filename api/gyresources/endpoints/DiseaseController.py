@@ -4,7 +4,7 @@ import models.Plant
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
-from api.restplus import api
+from api.restplus import api, token_auth
 from collections import namedtuple
 from repository.DiseaseRepository import DiseaseRepository
 from api.gyresources.endpoints.BaseController import BaseController
@@ -100,6 +100,7 @@ class DiseaseController(BaseController):
 
     @api.response(200, 'Disease successfuly created.')
     @api.expect(diseaseSerializer)
+    @token_auth.login_required
     def post(self):
         """
         Method used to insert disease in database
@@ -143,6 +144,7 @@ class DiseaseController(BaseController):
 
     @api.response(200, 'Disease changed successfuly')
     @api.expect(diseaseSerializer)
+    @token_auth.login_required
     def put(self):
         """
         Method used to update disease in database
@@ -189,6 +191,7 @@ class DiseaseController(BaseController):
 
     @api.response(200, 'Disease deleted successfuly')
     @api.expect(diseaseSerializer)
+    @token_auth.login_required
     def delete(self):
         """
         Method used to delete disease in database
