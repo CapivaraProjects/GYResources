@@ -3,7 +3,7 @@ import models.Image
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
-from api.restplus import api
+from api.restplus import api, token_auth
 from collections import namedtuple
 from repository.ImageRepository import ImageRepository
 from repository.DiseaseRepository import DiseaseRepository
@@ -102,6 +102,7 @@ class ImageController(BaseController):
 
     @api.response(200, 'Image successfuly created.')
     @api.expect(imageSerializer)
+    @token_auth.login_required
     def post(self):
         """
         Method used to insert image in database
@@ -147,6 +148,7 @@ class ImageController(BaseController):
 
     @api.response(200, 'Image changed successfuly')
     @api.expect(imageSerializer)
+    @token_auth.login_required
     def put(self):
         """
         Method used to update image in database
@@ -200,6 +202,7 @@ class ImageController(BaseController):
 
     @api.response(200, 'Image deleted successfuly')
     @api.expect(imageSerializer)
+    @token_auth.login_required
     def delete(self):
         """
         Method used to delete image in database
