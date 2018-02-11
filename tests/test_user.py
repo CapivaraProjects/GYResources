@@ -68,7 +68,7 @@ def test_auth(generic_user=generic_user):
     generic_user.salt = crypto.generateRandomSalt()
     generic_user.password = crypto.encrypt(
         generic_user.salt,
-        generic_user.password)
+        'test')
 
     data = {'salt': generic_user.salt}
     creds = base64.b64encode(
@@ -93,13 +93,21 @@ def test_auth(generic_user=generic_user):
     return (generic_user, token)
 
 
-generic_user = test_create(generic_user=generic_user)
+aux = models.User.User(
+        idType=1,
+        email='test@test.com',
+        username='username',
+        password='test',
+        salt='test',
+        dateInsertion='03/02/2018',
+        dateUpdate='10/02/2018')
+generic_user = test_create(generic_user=aux)
 generic_user = models.User.User(
     id=generic_user.id,
     idType=generic_user.idType,
     email=generic_user.email,
     username=generic_user.username,
-    password='password',
+    password='test',
     salt=generic_user.salt,
     dateInsertion=generic_user.dateInsertion,
     dateUpdate=generic_user.dateUpdate)

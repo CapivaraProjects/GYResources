@@ -45,7 +45,6 @@ def verify_auth_token(token):
 
 @token_auth.verify_token
 def verify_token(token):
-    print("Token: %s\n" % token)
     g.user = verify_auth_token(token)
     return (g.user is not None)
 
@@ -62,8 +61,9 @@ def verify_password(usernameOrToken, password):
             username=usernameOrToken,
             password=password,
             salt=request.json['salt'])
-    g.user = repository.authentication(user)
-    if (g.user):
+    user = repository.authentication(user)
+    if (user.id):
+        g.user = user
         return True
     return False
 
