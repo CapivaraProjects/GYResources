@@ -3,7 +3,7 @@ import models.Type
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
-from api.restplus import api
+from api.restplus import api, token_auth
 from collections import namedtuple
 from repository.TypeRepository import TypeRepository
 from api.gyresources.endpoints.BaseController import BaseController
@@ -90,6 +90,7 @@ class TypeController(BaseController):
 
     @api.response(200, 'Type successfuly created.')
     @api.expect(typeSerializer)
+    @token_auth.login_required
     def post(self):
         """
         Method used to insert type in database
@@ -132,6 +133,7 @@ class TypeController(BaseController):
 
     @api.response(200, 'Type changed successfuly')
     @api.expect(typeSerializer)
+    @token_auth.login_required
     def put(self):
         """
         Method used to update type in database
@@ -168,6 +170,7 @@ class TypeController(BaseController):
 
     @api.response(200, 'Type deleted successfuly')
     @api.expect(typeSerializer)
+    @token_auth.login_required
     def delete(self):
         """
         Method used to delete type in database
