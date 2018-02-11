@@ -131,7 +131,7 @@ class ImageController(BaseController):
         image = namedtuple("Image", image.keys())(*image.values())
         image = models.Image.Image(
             id=None,
-            disease=models.Disease.Disease(image.idDisease),
+            disease=models.Disease.Disease(id=image.idDisease),
             url=image.url,
             description=image.description,
             source=image.source,
@@ -143,8 +143,20 @@ class ImageController(BaseController):
                 flask_app.config["DBHOST"],
                 flask_app.config["DBPORT"],
                 flask_app.config["DBNAME"])
+        diseaseRepository = DiseaseRepository(
+                flask_app.config["DBUSER"],
+                flask_app.config["DBPASS"],
+                flask_app.config["DBHOST"],
+                flask_app.config["DBPORT"],
+                flask_app.config["DBNAME"])
 
         try:
+            # if image is base 64 encoded save in a file
+            if (image.url.strip()[-1] == '='):
+                image.disease = diseaseRepository.searchByID(image.disease.id)
+                image = repository.saveImage(
+                        image,
+                        flask_app.config["IMAGESPATH"])
             image = repository.create(image)
             image.disease.plant = image.disease.plant.__dict__
             image.disease = image.disease.__dict__
@@ -154,7 +166,6 @@ class ImageController(BaseController):
                 status=201), 200
         except exc.SQLAlchemyError as sqlerr:
             # log
-            print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
