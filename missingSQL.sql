@@ -11,7 +11,7 @@ CREATE TABLE USERS (
    id_type SERIAL,
    email VARCHAR(200),
    username VARCHAR(20),
-   password VARCHAR(256),
+   password VARCHAR(2000),
    salt VARCHAR(32),
    date_insertion VARCHAR(100),
    date_last_update VARCHAR(100)
