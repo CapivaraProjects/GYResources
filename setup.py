@@ -1,8 +1,9 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 setup(
-        packages=['models', 'database', 'repository', 'tools'],
+        packages=find_packages(),
+        setup_requires=['pytest-runner', ],
         tests_require=['pytest'],
         name='gyresources',
         test_suite='tests'
