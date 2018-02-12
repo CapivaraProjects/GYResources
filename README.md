@@ -1,4 +1,4 @@
-# GYResources [![Build Status](https://travis-ci.org/CapivaraProjects/GYResources.svg?branch=master)](https://travis-ci.org/CapivaraProjects/GYResources) [![Coverage Status](https://coveralls.io/repos/github/WendelHime/GYResources/badge.svg?branch=master)](https://coveralls.io/github/WendelHime/GYResources?branch=master)
+# GYResources [![Build Status](https://travis-ci.org/CapivaraProjects/GYResources.svg?branch=master)](https://travis-ci.org/CapivaraProjects/GYResources) [![Coverage Status](https://coveralls.io/repos/github/CapivaraProjects/GYResources/badge.svg?branch=master)](https://coveralls.io/github/CapivaraProjects/GYResources?branch=master)
 This repository is dedicated to turn available green eyes resources in a API and website project
 
 # Dependences
