@@ -8,6 +8,7 @@ python:
 # command to install dependencies
 install:
   - pip3 install -r requirements.txt
+  - pip3 install coveralls
 services:
   - postgresql 
 addons:
@@ -21,6 +22,7 @@ before_script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)  
 # command to run tests
 script:
+  - coverage run --source=gyresources setup.py test  
   - pytest -s -vv repository/base_test.py # or py.test for Python versions 3.5 and below
   - pytest -s -vv repository/DiseaseRepository_test.py
   - pytest -s -vv repository/ImageRepository_test.py
@@ -35,3 +37,5 @@ script:
   - pytest -s -vv tests/test_type.py  
   - pytest -s -vv tests/test_image.py
   - pytest -s -vv tests/test_disease.py
+after_success:
+  - coveralls
