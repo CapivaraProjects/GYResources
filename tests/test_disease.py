@@ -128,7 +128,7 @@ def test_search():
 
 
 @pytest.mark.order4
-def test_create(generic_disease=generic_disease):
+def test_create(generic_disease=generic_disease, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     aux = generic_disease.plant
     generic_disease.plant = generic_disease.plant.__dict__
@@ -150,7 +150,7 @@ def test_create(generic_disease=generic_disease):
 
 
 @pytest.mark.order5
-def test_update(generic_disease=generic_disease):
+def test_update(generic_disease=generic_disease, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     data = generic_disease.__dict__
     data['action'] = 'search'
@@ -190,7 +190,7 @@ def test_update(generic_disease=generic_disease):
 
 
 @pytest.mark.order6
-def test_delete(generic_disease=generic_disease):
+def test_delete(generic_disease=generic_disease, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     data = generic_disease.__dict__
     data['action'] = 'search'
