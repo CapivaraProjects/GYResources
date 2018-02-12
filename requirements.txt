@@ -5,3 +5,4 @@ flask_httpauth
 itsdangerous
 pytest
 psycopg2-binary
+coveralls
