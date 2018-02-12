@@ -63,7 +63,6 @@ generic_user = models.User.User(
     salt=generic_user.salt,
     dateInsertion=generic_user.dateInsertion,
     dateUpdate=generic_user.dateUpdate)
-(generic_user, token) = auth(generic_user)
 
 
 @pytest.mark.order1
@@ -85,7 +84,8 @@ def test_search_by_unexistent_id():
 
 
 @pytest.mark.order2
-def test_create(generic_type=generic_type):
+def test_create(generic_type=generic_type, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
     data = generic_type.__dict__
     headers = {
             'Accept': 'application/json',
@@ -145,7 +145,8 @@ def test_search():
 
 
 @pytest.mark.order5
-def test_update(generic_type=generic_type):
+def test_update(generic_type=generic_type, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
     data = generic_type.__dict__
     data['action'] = 'search'
     resp = client().get(
@@ -182,7 +183,8 @@ def test_update(generic_type=generic_type):
 
 
 @pytest.mark.order6
-def test_delete(generic_type=generic_type):
+def test_delete(generic_type=generic_type, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
     data = generic_type.__dict__
     data['action'] = 'search'
     resp = client().get(
