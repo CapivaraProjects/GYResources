@@ -23,7 +23,7 @@ class BaseController(Resource):
         Method used to calculate elapsed time by request
         """
         Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Method used to calculate elapsed time by request',
+                             'Informative.',
                              'Calculated elapsed time by request',
                              'calculateElapsedTime()',
                              'Empty',
@@ -56,11 +56,10 @@ class BaseController(Resource):
                     total=total,
                     offset=offset,
                     page_size=pageSize)
-        resp = str(resp.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative of creation of default response for request',
-                             resp,
+                             'Informative',
+                             str(resp.__dict__),
                              'okResponse()',
-                             'Empty',
+                             message,
                              'TEST')
         return resp.__dict__  # json.dumps(resp, indent=4, cls=CustomEncoder)
