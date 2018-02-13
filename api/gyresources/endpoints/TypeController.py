@@ -248,7 +248,7 @@ class TypeController(BaseController):
                                      'Informative',
                                      'Type deleted sucessfuly',
                                      'post()',
-                                     str(type.__dict__),
+                                     str(status),
                                      'TEST')
                 return self.okResponse(
                     response=models.Type.Type(),

@@ -259,7 +259,7 @@ class UserController(BaseController):
                                      'Informative',
                                      'User deleted sucessfuly',
                                      'delete()',
-                                     str(user.__dict__),
+                                     str(status),
                                      'TEST')
                 return self.okResponse(
                     response=models.User.User(),
