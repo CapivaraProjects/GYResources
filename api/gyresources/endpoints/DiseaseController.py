@@ -43,7 +43,6 @@ class DiseaseController(BaseController):
         self.startTime = time.time()
         result = models.Disease.Disease()
         total = 0
-        message = 'empty var'
         action = request.args.get('action')
         id = request.args.get('id')
         disease = models.Disease.Disease(
@@ -70,6 +69,12 @@ class DiseaseController(BaseController):
             if (action == 'searchByID'):
                 result = repository.searchByID(id)
                 result.plant = result.plant.__dict__
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative. Get disease of a plant by id',
+                                     'Ok',
+                                     'get()',
+                                     'Empty',
+                                     'TEST')
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -81,6 +86,12 @@ class DiseaseController(BaseController):
                 for content in result['content']:
                     content.plant = content.plant.__dict__
                     response.append(content)
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative. Get disease of a plant by id',
+                                     'Ok',
+                                     'get()',
+                                     'Empty',
+                                     'TEST')
                 return self.okResponse(
                             response=response,
                             message="Ok",
@@ -89,23 +100,28 @@ class DiseaseController(BaseController):
                             offset=offset,
                             pageSize=pageSize), 200
         except (exc.SQLAlchemyError) as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error. Get disease of a plant by id',
+                                 'SQL error' + str(sqlerr),
+                                 'get()',
+                                 'Empty',
+                                 'TEST')
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error. Get disease of a plant by id',
+                                 'Internal server error ' + str(err),
+                                 'get()',
+                                 'Empty',
+                                 'TEST')
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Get disease of plants',
-                             message,
-                             'get()',
-                             'Empty',
-                             'TEST')
+
 
     @api.response(200, 'Disease successfuly created.')
     @api.expect(diseaseSerializer)
@@ -133,29 +149,40 @@ class DiseaseController(BaseController):
         try:
             disease = repository.create(disease)
             disease.plant = disease.plant.__dict__
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Informative. Insert a Disease of a plant',
+                                 "Disease sucessfuly created",
+                                 'post()',
+                                 'Empty',
+                                 'TEST')
             return self.okResponse(
                 response=disease,
                 message="Disease sucessfuly created.",
                 status=201), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error. Insert a Disease of a plant',
+                                 'SQL Error' + str(sqlerr),
+                                 'post()',
+                                 'Empty',
+                                 'TEST')
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error. Insert a Disease of a plant',
+                                 'Internal server error ' + str(err),
+                                 'post()',
+                                 'Empty',
+                                 'TEST')
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Post method of a Disease',
-                              message,
-                             'post()',
-                             'Empty',
-                             'TEST')
+
 
     @api.response(200, 'Disease changed successfuly')
     @api.expect(diseaseSerializer)
@@ -182,33 +209,49 @@ class DiseaseController(BaseController):
         try:
             disease = repository.update(disease)
             disease.plant = disease.plant.__dict__
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Informative. Update a Disease',
+                                 'Disease sucessfuly updated',
+                                 'put()',
+                                 'Empty',
+                                 'TEST')
             return self.okResponse(
                 response=disease,
                 message="Disease sucessfuly updated.",
                 status=204), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error. Update a Disease',
+                                 'SQL Error' + str(sqlerr),
+                                 'put()',
+                                 'Empty',
+                                 'TEST')
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error. Update a Disease',
+                                 'Internal server error: ' + str(err),
+                                 'put()',
+                                 'Empty',
+                                 'TEST')
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
                 status=500)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Error. Update a Disease',
+                             'Disease sucessfuly updated',
+                             'put()',
+                             'Empty',
+                             'TEST')
         return self.okResponse(
                 response=disease,
                 message="Disease sucessfuly updated.",
                 status=204), 200
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                         'Informative. Update a disease of a plant',
-                         message,
-                         'put()',
-                         'Empty',
-                         'TEST')
 
     @api.response(200, 'Disease deleted successfuly')
     @api.expect(diseaseSerializer)
@@ -233,31 +276,47 @@ class DiseaseController(BaseController):
             if (status):
                 resp = models.Disease.Disease()
                 resp.plant = resp.plant.__dict__
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative. Delete a Disease',
+                                     'Disease deleted sucessfuly' + str(resp),
+                                     'delete()',
+                                     'Empty',
+                                     'TEST')
                 return self.okResponse(
                     response=resp,
                     message="Disease deleted sucessfuly.",
                     status=204), 200
             else:
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Error. Delete a Disease',
+                                     'Problem deleting disease',
+                                     'delete()',
+                                     'Empty',
+                                     'TEST')
                 return self.okResponse(
                     response=disease,
                     message="Problem deleting disease",
                     status=500), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error. Delete a Disease',
+                                 'SQL Eror' + str(sqlerr),
+                                 'delete()',
+                                 'Empty',
+                                 'TEST')
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error. Delete a Disease',
+                                 'Internal server error' + str(err),
+                                 'delete()',
+                                 'Empty',
+                                 'TEST')
             return self.okResponse(
                 response=err,
                 message="Internal server error: "+str(err),
                 status=500)
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Delete a disease',
-                             message,
-                             'delete()',
-                             'Empty',
-                             'TEST')
