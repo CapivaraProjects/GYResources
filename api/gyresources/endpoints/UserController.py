@@ -91,7 +91,7 @@ class UserController(BaseController):
                                      'Informative',
                                      'Ok',
                                      'get()',
-                                     str(result.__dict__),
+                                     str(result),
                                      'TEST')
                 return self.okResponse(
                             response=result,

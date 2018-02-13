@@ -90,7 +90,7 @@ class DiseaseController(BaseController):
                                      'Informative',
                                      'Ok',
                                      'get()',
-                                     str(response.__dict__),
+                                     str(response),
                                      'TEST')
                 return self.okResponse(
                             response=response,
