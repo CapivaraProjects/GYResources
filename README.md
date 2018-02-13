@@ -1,4 +1,7 @@
-# GYResources [![Build Status](https://travis-ci.org/CapivaraProjects/GYResources.svg?branch=master)](https://travis-ci.org/CapivaraProjects/GYResources)
+# GYResources
+[![Build Status](https://travis-ci.org/CapivaraProjects/GYResources.svg?branch=master)](https://travis-ci.org/CapivaraProjects/GYResources) 
+[![Coverage Status](https://coveralls.io/repos/github/CapivaraProjects/GYResources/badge.svg?branch=master)](https://coveralls.io/github/CapivaraProjects/GYResources?branch=master)
+[![Code Health](https://landscape.io/github/CapivaraProjects/GYResources/master/landscape.svg?style=flat)](https://landscape.io/github/CapivaraProjects/GYResources/master) <br />
 This repository is dedicated to turn available green eyes resources in a API and website project
 
 # Dependences
@@ -48,4 +51,15 @@ pip3 install -r requirements.txt
 # Running
 ```zsh
 python3 app.py
+```
+
+# Docker
+You can use docker for development using:
+```zsh
+docker run \
+    -v /dir/to/GYResources:/root/git/GYResources \
+    -p 8888:8888 \
+    --net=host \
+    -it \
+    --rm capivaraprojects/gyresources /usr/bin/zsh
 ```

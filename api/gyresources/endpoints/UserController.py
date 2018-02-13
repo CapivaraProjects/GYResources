@@ -3,7 +3,7 @@ import models.User
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
-from api.restplus import api
+from api.restplus import api, token_auth
 from collections import namedtuple
 from repository.UserRepository import UserRepository
 from api.gyresources.endpoints.BaseController import BaseController
@@ -32,6 +32,9 @@ class UserController(BaseController):
         """
         Return a list of users based on action.
 
+        If action=searchByID:
+            please set id parameter.
+
         If action=search:
             you can use idType, email, username, password, salt,
             dateInsertion, dateUpdate or description to search,
@@ -40,19 +43,27 @@ class UserController(BaseController):
         self.startTime = time.time()
         result = models.User.User()
         total = 0
-        message = 'empty var'
         action = request.args.get('action')
         id = request.args.get('id')
         user = models.User.User(
-                      idType=request.args.get('idType'),
-                      email=request.args.get('email'),
-                      username=request.args.get('username'),
-                      password=request.args.get('password'),
-                      salt=request.args.get('salt'),
-                      dateInsertion=request.args.get('dateInsertion'),
-                      dateUpdate=request.args.get('dateUpdate'))
-        pageSize = request.args.get('pageSize')
-        offset = request.args.get('offset')
+            idType=request.args.get('idType'),
+            email=request.args.get('email'),
+            username=request.args.get('username'),
+            password=request.args.get('password'),
+            salt=request.args.get('salt'),
+            dateInsertion=request.args.get('dateInsertion'),
+            dateUpdate=request.args.get('dateUpdate'))
+        pageSize = None
+        if pageSize:
+            pageSize = int(request.args.get('pageSize'))
+        else:
+            pageSize = 10
+
+        offset = None
+        if offset:
+            offset = int(request.args.get('offset'))
+        else:
+            offset = 0
         repository = UserRepository(
                 flask_app.config["DBUSER"],
                 flask_app.config["DBPASS"],
@@ -60,7 +71,13 @@ class UserController(BaseController):
                 flask_app.config["DBPORT"],
                 flask_app.config["DBNAME"])
         try:
-            if (action == 'search'):
+            if (action == 'searchByID'):
+                result = repository.searchByID(id)
+                return self.okResponse(
+                            response=result,
+                            message="Ok",
+                            status=200)
+            elif (action == 'search'):
                 result = repository.search(user, pageSize, offset)
                 total = result['total']
                 result = result['content']
@@ -77,13 +94,7 @@ class UserController(BaseController):
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
                 status=500)
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Get a User',
-                             message,
-                             'get()',
-                             'Empty',
-                             'TEST')
+
 
     @api.response(200, 'User successfuly created.')
     @api.expect(userSerializer)
@@ -96,6 +107,16 @@ class UserController(BaseController):
         user = request.json
 
         user = namedtuple("User", user.keys())(*user.values())
+        user = models.User.User(
+            id=None,
+            idType=user.idType,
+            email=user.email,
+            username=user.username,
+            password=user.password,
+            salt=user.salt,
+            dateInsertion=user.dateInsertion,
+            dateUpdate=user.dateUpdate)
+
         repository = UserRepository(
                 flask_app.config["DBUSER"],
                 flask_app.config["DBPASS"],
@@ -104,6 +125,7 @@ class UserController(BaseController):
                 flask_app.config["DBNAME"])
 
         try:
+            user.id = None
             user = repository.create(user)
             return self.okResponse(
                 response=user,
@@ -121,16 +143,11 @@ class UserController(BaseController):
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Insert a User',
-                             message,
-                             'post()',
-                             'Empty',
-                             'TEST')
+
 
     @api.response(200, 'User changed successfuly')
     @api.expect(userSerializer)
+    @token_auth.login_required
     def put(self):
         """
         Method used to update user in database
@@ -164,21 +181,10 @@ class UserController(BaseController):
                 response=err,
                 message="Internal server error",
                 status=500)
-        return self.okResponse(
-                response=user,
-                message="User sucessfuly updated.",
-                status=204), 200
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Update a User',
-                             message,
-                             'get()',
-                             'Empty',
-                             'TEST')
-
 
     @api.response(200, 'User deleted successfuly')
     @api.expect(userSerializer)
+    @token_auth.login_required
     def delete(self):
         """
         Method used to delete user in database
@@ -219,10 +225,4 @@ class UserController(BaseController):
                 response=err,
                 message="Internal server error: "+str(err),
                 status=500)
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Delete a User',
-                             message,
-                             'delete()',
-                             'Empty',
-                             'TEST')
+

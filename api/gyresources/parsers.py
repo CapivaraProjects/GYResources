@@ -8,8 +8,7 @@ methods for requests, here we create what it expects and documents.
 plant_search_args = reqparse.RequestParser()
 plant_search_args.add_argument('action', type=str, required=True,
                                default='searchByID',
-                               help='Defines what kind of search you gonna do.'
-                               + ' DO YOU KNOW THE WAY?',
+                               help='Defines what kind of search you gonna do',
                                choices=['searchByID', 'search'])
 plant_search_args.add_argument('id', type=int, required=False, default=1,
                                help='Plant ID, used when action=searchByID')
@@ -24,6 +23,10 @@ plant_search_args.add_argument('offset', type=int, required=False, default=10,
                                help='Quantity of elements to be jumped')
 
 text_search_args = reqparse.RequestParser()
+text_search_args.add_argument('action', type=str, required=True,
+                              default='searchByID',
+                              help='Defines what kind of search you gonna do.',
+                              choices=['searchByID', 'search'])
 text_search_args.add_argument('id', type=int, required=False, default=1,
                               help='Text ID, used when action=searchByID')
 text_search_args.add_argument('language', type=str, required=False,
@@ -41,6 +44,10 @@ text_search_args.add_argument('offset', type=int, required=False, default=10,
                               help='Quantity of elements to be jumped')
 
 type_search_args = reqparse.RequestParser()
+type_search_args.add_argument('action', type=str, required=True,
+                              default='searchByID',
+                              help='Defines what kind of search you gonna do.',
+                              choices=['searchByID', 'search'])
 type_search_args.add_argument('id', type=int, required=False, default=1,
                               help='Type ID, used when action=searchByID')
 type_search_args.add_argument('value', type=str, required=False,
@@ -56,9 +63,8 @@ type_search_args.add_argument('offset', type=int, required=False, default=10,
 image_search_args = reqparse.RequestParser()
 image_search_args.add_argument('action', type=str, required=True,
                                default='searchByID',
-                               help='Defines what kind of search you gonna do.'
-                               + ' DO YOU KNOW THE WAY?',
-                               choices=['searchByID', 'search'])
+                               help='Defines what kind of search you gonna do',
+                               choices=['searchByID', 'search', 'read'])
 image_search_args.add_argument('id', type=int, required=False, default=1,
                                help='Image ID, used when action=searchByID')
 image_search_args.add_argument('url', type=str, required=False,
@@ -77,6 +83,10 @@ image_search_args.add_argument('offset', type=int, required=False, default=0,
                                help='Quantity of elements to be jumped')
 
 user_search_args = reqparse.RequestParser()
+user_search_args.add_argument('action', type=str, required=True,
+                              default='searchByID',
+                              help='Defines what kind of search you gonna do.',
+                              choices=['searchByID', 'search'])
 user_search_args.add_argument('id', type=int, required=False, default=1,
                               help='User ID, used when action=searchByID')
 user_search_args.add_argument('idType', type=int, required=False,
@@ -103,8 +113,7 @@ disease_search_args = reqparse.RequestParser()
 disease_search_args.add_argument(
         'action', type=str, required=True,
         default='searchByID',
-        help='Defines what kind of search you gonna do.'
-        + ' DO YOU KNOW THE WAY?',
+        help='Defines what kind of search you gonna do',
         choices=['searchByID', 'search'])
 disease_search_args.add_argument('id', type=int, required=False, default=1,
                                  help='Plant ID, used when action=searchByID')

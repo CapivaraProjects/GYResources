@@ -3,7 +3,7 @@ import models.Type
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
-from api.restplus import api
+from api.restplus import api, token_auth
 from collections import namedtuple
 from repository.TypeRepository import TypeRepository
 from api.gyresources.endpoints.BaseController import BaseController
@@ -32,21 +32,32 @@ class TypeController(BaseController):
         """
         Return a list of types based on action.
 
+        If action=searchByID:
+            please set id parameter.
+
         If action=search:
-            you can use language, tag, value or description to search,
+            you can use value or description to search,
             please define pageSize and offset parameters
         """
         self.startTime = time.time()
         result = models.Type.Type()
         total = 0
-        message = 'empty var'
         action = request.args.get('action')
         id = request.args.get('id')
         type = models.Type.Type(
                       value=request.args.get('value'),
                       description=request.args.get('description'))
-        pageSize = request.args.get('pageSize')
-        offset = request.args.get('offset')
+        pageSize = None
+        if pageSize:
+            pageSize = int(request.args.get('pageSize'))
+        else:
+            pageSize = 10
+
+        offset = None
+        if offset:
+            offset = int(request.args.get('offset'))
+        else:
+            offset = 0
         repository = TypeRepository(
                 flask_app.config["DBUSER"],
                 flask_app.config["DBPASS"],
@@ -54,7 +65,13 @@ class TypeController(BaseController):
                 flask_app.config["DBPORT"],
                 flask_app.config["DBNAME"])
         try:
-            if (action == 'search'):
+            if (action == 'searchByID'):
+                result = repository.searchByID(id)
+                return self.okResponse(
+                            response=result,
+                            message="Ok",
+                            status=200)
+            elif (action == 'search'):
                 result = repository.search(type, pageSize, offset)
                 total = result['total']
                 result = result['content']
@@ -71,16 +88,11 @@ class TypeController(BaseController):
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
                 status=500)
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Get a Type',
-                             message,
-                             'get()',
-                             'Empty',
-                             'TEST')
+
 
     @api.response(200, 'Type successfuly created.')
     @api.expect(typeSerializer)
+    @token_auth.login_required
     def post(self):
         """
         Method used to insert type in database
@@ -90,6 +102,11 @@ class TypeController(BaseController):
         type = request.json
 
         type = namedtuple("Type", type.keys())(*type.values())
+        type = models.Type.Type(
+            id=None,
+            value=type.value,
+            description=type.description)
+
         repository = TypeRepository(
                 flask_app.config["DBUSER"],
                 flask_app.config["DBPASS"],
@@ -115,16 +132,11 @@ class TypeController(BaseController):
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Insert a Type',
-                             message,
-                             'post()',
-                             'Empty',
-                             'TEST')
+
 
     @api.response(200, 'Type changed successfuly')
     @api.expect(typeSerializer)
+    @token_auth.login_required
     def put(self):
         """
         Method used to update type in database
@@ -158,20 +170,10 @@ class TypeController(BaseController):
                 response=err,
                 message="Internal server error",
                 status=500)
-        return self.okResponse(
-                response=type,
-                message="Type sucessfuly updated.",
-                status=204), 200
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Update a Type',
-                             message,
-                             'put()',
-                             'Empty',
-                             'TEST')
 
     @api.response(200, 'Type deleted successfuly')
     @api.expect(typeSerializer)
+    @token_auth.login_required
     def delete(self):
         """
         Method used to delete type in database
@@ -212,10 +214,3 @@ class TypeController(BaseController):
                 response=err,
                 message="Internal server error: "+str(err),
                 status=500)
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Delete a Type',
-                             message,
-                             'delete()',
-                             'Empty',
-                             'TEST')

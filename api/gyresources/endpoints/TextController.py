@@ -3,7 +3,7 @@ import models.Text
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
-from api.restplus import api
+from api.restplus import api, token_auth
 from collections import namedtuple
 from repository.TextRepository import TextRepository
 from api.gyresources.endpoints.BaseController import BaseController
@@ -32,6 +32,9 @@ class TextController(BaseController):
         """
         Return a list of texts based on action.
 
+        If action=searchByID:
+            please set id parameter.
+
         If action=search:
             you can use language, tag, value or description to search,
             please define pageSize and offset parameters
@@ -47,20 +50,46 @@ class TextController(BaseController):
                       tag=request.args.get('tag'),
                       value=request.args.get('value'),
                       description=request.args.get('description'))
-        pageSize = request.args.get('pageSize')
-        offset = request.args.get('offset')
+        pageSize = None
+        if pageSize:
+            pageSize = int(request.args.get('pageSize'))
+        else:
+            pageSize = 10
+
+        offset = None
+        if offset:
+            offset = int(request.args.get('offset'))
+        else:
+            offset = 0
         repository = TextRepository(
                 flask_app.config["DBUSER"],
                 flask_app.config["DBPASS"],
                 flask_app.config["DBHOST"],
                 flask_app.config["DBPORT"],
                 flask_app.config["DBNAME"])
-
         try:
-            if (action == 'search'):
+            if (action == 'searchByID'):
+                result = repository.searchByID(id)
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Ok',
+                                     'get()',
+                                     str(result.__dict__),
+                                     'TEST')
+                return self.okResponse(
+                            response=result,
+                            message="Ok",
+                            status=200)
+            elif (action == 'search'):
                 result = repository.search(text, pageSize, offset)
                 total = result['total']
                 result = result['content']
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Ok',
+                                     'get()',
+                                     str(result.__dict__),
+                                     'TEST')
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -69,21 +98,20 @@ class TextController(BaseController):
                             offset=offset,
                             pageSize=pageSize), 200
         except (exc.SQLAlchemyError, Exception) as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'get()',
+                                 str(sqlerr),
+                                 'TEST')
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
                 status=500)
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Get a Text',
-                             message,
-                             'get()',
-                             'Empty',
-                             'TEST')
 
     @api.response(200, 'Text successfuly created.')
     @api.expect(textSerializer)
+    @token_auth.login_required
     def post(self):
         """
         Method used to insert text in database
@@ -93,41 +121,59 @@ class TextController(BaseController):
         text = request.json
 
         text = namedtuple("Text", text.keys())(*text.values())
+        text = models.Text.Text(
+            id=None,
+            language=text.language,
+            tag=text.tag,
+            value=text.value,
+            description=text.description)
+
         repository = TextRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+            flask_app.config["DBUSER"],
+            flask_app.config["DBPASS"],
+            flask_app.config["DBHOST"],
+            flask_app.config["DBPORT"],
+            flask_app.config["DBNAME"])
 
         try:
             text = repository.create(text)
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Informative',
+                                 'Text sucessfuly created',
+                                 'post()',
+                                 str(text.__dict__),
+                                 'TEST')
             return self.okResponse(
                 response=text,
                 message="Text sucessfuly created.",
                 status=201), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'post()',
+                                 str(sqlerr),
+                                 'TEST')
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server Error',
+                                 'post()',
+                                 str(err),
+                                 'TEST')
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Insert a Text',
-                             message,
-                             'post()',
-                             'Empty',
-                             'TEST')
 
     @api.response(200, 'Text changed successfuly')
     @api.expect(textSerializer)
+    @token_auth.login_required
     def put(self):
         """
         Method used to update text in database
@@ -145,36 +191,44 @@ class TextController(BaseController):
                 flask_app.config["DBNAME"])
         try:
             text = repository.update(text)
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Informative',
+                                 'Text sucessfuly updated',
+                                 'put()',
+                                 str(text.__dict__),
+                                 'TEST')
             return self.okResponse(
                 response=text,
                 message="Text sucessfuly updated.",
                 status=204), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'put()',
+                                 str(sqlerr),
+                                 'TEST')
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server Error',
+                                 'put()',
+                                 str(err),
+                                 'TEST')
             return self.okResponse(
                 response=err,
                 message="Internal server error",
                 status=500)
-        return self.okResponse(
-                response=text,
-                message="Text sucessfuly updated.",
-                status=204), 200
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Update a Text',
-                             message,
-                             'put()',
-                             'Empty',
-                             'TEST')
+
 
     @api.response(200, 'Text deleted successfuly')
     @api.expect(textSerializer)
+    @token_auth.login_required
     def delete(self):
         """
         Method used to delete text in database
@@ -194,31 +248,47 @@ class TextController(BaseController):
         try:
             status = repository.delete(text)
             if (status):
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Text deleted sucessfuly',
+                                     'delete()',
+                                     'Empty',
+                                     'TEST')
                 return self.okResponse(
                     response=models.Text.Text(),
                     message="Text deleted sucessfuly.",
                     status=204), 200
             else:
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Problem deleting text',
+                                     'delete()',
+                                     str(text.__dict__),
+                                     'TEST')
                 return self.okResponse(
                     response=text,
                     message="Problem deleting text",
                     status=500), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'delete()',
+                                 str(sqlerr),
+                                 'TEST')
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server Error',
+                                 'delete()',
+                                 str(err),
+                                 'TEST')
             return self.okResponse(
                 response=err,
                 message="Internal server error: "+str(err),
                 status=500)
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Delete a Text',
-                             message,
-                             'delete()',
-                             'Empty',
-                             'TEST')

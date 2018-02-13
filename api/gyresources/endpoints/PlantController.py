@@ -3,7 +3,7 @@ import models.Plant
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
-from api.restplus import api
+from api.restplus import api, token_auth
 from collections import namedtuple
 from repository.PlantRepository import PlantRepository
 from api.gyresources.endpoints.BaseController import BaseController
@@ -46,10 +46,19 @@ class PlantController(BaseController):
         action = request.args.get('action')
         id = request.args.get('id')
         plant = models.Plant.Plant(
-                      scientificName=request.args.get('scientificName'),
-                      commonName=request.args.get('commonName'))
-        pageSize = request.args.get('pageSize')
-        offset = request.args.get('offset')
+            scientificName=request.args.get('scientificName'),
+            commonName=request.args.get('commonName'))
+        pageSize = None
+        if pageSize:
+            pageSize = int(request.args.get('pageSize'))
+        else:
+            pageSize = 10
+
+        offset = None
+        if offset:
+            offset = int(request.args.get('offset'))
+        else:
+            offset = 0
         repository = PlantRepository(
                 flask_app.config["DBUSER"],
                 flask_app.config["DBPASS"],
@@ -90,15 +99,20 @@ class PlantController(BaseController):
 
     @api.response(200, 'Plant successfuly created.')
     @api.expect(plantSerializer)
+    @token_auth.login_required
     def post(self):
         """
         Method used to insert plant in database
         receives in body request a plant model
-        action should be anything
         """
         plant = request.json
 
         plant = namedtuple("Plant", plant.keys())(*plant.values())
+        plant = models.Plant.Plant(
+            id=None,
+            scientificName=plant.scientificName,
+            commonName=plant.commonName)
+
         repository = PlantRepository(
                 flask_app.config["DBUSER"],
                 flask_app.config["DBPASS"],
@@ -134,6 +148,7 @@ class PlantController(BaseController):
 
     @api.response(200, 'Plant changed successfuly')
     @api.expect(plantSerializer)
+    @token_auth.login_required
     def put(self):
         """
         Method used to update plant in database
@@ -167,6 +182,7 @@ class PlantController(BaseController):
                 response=err,
                 message="Internal server error",
                 status=500)
+<<<<<<< HEAD
         return self.okResponse(
                 response=plant,
                 message="Plant sucessfuly updated.",
@@ -178,9 +194,12 @@ class PlantController(BaseController):
                              'put()',
                              'Empty',
                              'TEST')
+=======
+>>>>>>> d7dbb2df117494bad1dc01f6347716c072aa2049
 
     @api.response(200, 'Plant deleted successfuly')
     @api.expect(plantSerializer)
+    @token_auth.login_required
     def delete(self):
         """
         Method used to delete plant in database
