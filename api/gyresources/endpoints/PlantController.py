@@ -182,20 +182,7 @@ class PlantController(BaseController):
                 response=err,
                 message="Internal server error",
                 status=500)
-<<<<<<< HEAD
-        return self.okResponse(
-                response=plant,
-                message="Plant sucessfuly updated.",
-                status=204), 200
-        str(message.dict)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Informative. Update a plant',
-                             message,
-                             'put()',
-                             'Empty',
-                             'TEST')
-=======
->>>>>>> d7dbb2df117494bad1dc01f6347716c072aa2049
+
 
     @api.response(200, 'Plant deleted successfuly')
     @api.expect(plantSerializer)
