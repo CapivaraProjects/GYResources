@@ -99,7 +99,7 @@ class DiseaseController(BaseController):
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
-        str(message.__dict__)
+        str(message.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                              'Informative. Get disease of plants',
                              message,
@@ -149,7 +149,7 @@ class DiseaseController(BaseController):
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
-        str(message.__dict__)
+        str(message.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                              'Informative. Post method of a Disease',
                               message,
@@ -202,7 +202,7 @@ class DiseaseController(BaseController):
                 response=disease,
                 message="Disease sucessfuly updated.",
                 status=204), 200
-        str(message.__dict__)
+        str(message.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                          'Informative. Update a disease of a plant',
                          message,
@@ -254,7 +254,7 @@ class DiseaseController(BaseController):
                 response=err,
                 message="Internal server error: "+str(err),
                 status=500)
-        str(message.__dict__)
+        str(message.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                              'Informative. Delete a disease',
                              message,

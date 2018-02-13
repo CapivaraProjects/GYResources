@@ -71,7 +71,7 @@ class TypeController(BaseController):
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
                 status=500)
-        str(message.__dict__)
+        str(message.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                              'Informative. Get a Type',
                              message,
@@ -115,7 +115,7 @@ class TypeController(BaseController):
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
-        str(message.__dict__)
+        str(message.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                              'Informative. Insert a Type',
                              message,
@@ -162,7 +162,7 @@ class TypeController(BaseController):
                 response=type,
                 message="Type sucessfuly updated.",
                 status=204), 200
-        str(message.__dict__)
+        str(message.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                              'Informative. Update a Type',
                              message,
@@ -212,7 +212,7 @@ class TypeController(BaseController):
                 response=err,
                 message="Internal server error: "+str(err),
                 status=500)
-        str(message.__dict__)
+        str(message.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                              'Informative. Delete a Type',
                              message,

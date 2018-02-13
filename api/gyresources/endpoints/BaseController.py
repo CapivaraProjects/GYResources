@@ -38,7 +38,6 @@ class BaseController(Resource):
                     message=message,
                     elapsed_ms=self.calculateElapsedTime(self.startTime),
                     response=response.__dict__)
-            str(resp.__dict__)
         else:
             hell = []
             for res in response:
@@ -51,8 +50,7 @@ class BaseController(Resource):
                     total=total,
                     offset=offset,
                     page_size=pageSize)
-            str(resp.__dict__)
-
+        str(resp.__dict__)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                              'Informative of creation of default response for request',
                              resp,

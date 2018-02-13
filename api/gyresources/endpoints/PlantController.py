@@ -80,7 +80,7 @@ class PlantController(BaseController):
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
                 status=500)
-        str(message.__dict__)
+        str(message.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                              'Informative. Get a plant',
                              message,
@@ -124,7 +124,7 @@ class PlantController(BaseController):
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
-        str(message.__dict__)
+        str(message.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                              'Informative. Insert a plant',
                              message,
@@ -171,7 +171,7 @@ class PlantController(BaseController):
                 response=plant,
                 message="Plant sucessfuly updated.",
                 status=204), 200
-        str(message.__dict__)
+        str(message.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                              'Informative. Update a plant',
                              message,
@@ -221,7 +221,7 @@ class PlantController(BaseController):
                 response=err,
                 message="Internal server error: "+str(err),
                 status=500)
-        str(message.__dict__)
+        str(message.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                              'Informative. Delete a plant',
                              message,

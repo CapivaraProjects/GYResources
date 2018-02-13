@@ -74,7 +74,7 @@ class TextController(BaseController):
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
                 status=500)
-        str(message.__dict__)
+        str(message.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                              'Informative. Get a Text',
                              message,
@@ -118,7 +118,7 @@ class TextController(BaseController):
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
-        str(message.__dict__)
+        str(message.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                              'Informative. Insert a Text',
                              message,
@@ -165,7 +165,7 @@ class TextController(BaseController):
                 response=text,
                 message="Text sucessfuly updated.",
                 status=204), 200
-        str(message.__dict__)
+        str(message.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                              'Informative. Update a Text',
                              message,
@@ -215,7 +215,7 @@ class TextController(BaseController):
                 response=err,
                 message="Internal server error: "+str(err),
                 status=500)
-        str(message.__dict__)
+        str(message.dict)
         Logger.Logger.create(flask_app.config["ELASTICURL"],
                              'Informative. Delete a Text',
                              message,
