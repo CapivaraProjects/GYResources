@@ -9,6 +9,7 @@ from repository.PlantRepository import PlantRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import plant as plantSerializer
 from api.gyresources.parsers import plant_search_args
+from tools import Logger
 
 flask_app = Flask(__name__)
 flask_app.config.from_object('config.DefaultConfig')
@@ -41,6 +42,7 @@ class PlantController(BaseController):
         self.startTime = time.time()
         result = models.Plant.Plant()
         total = 0
+        message = 'empty var'
         action = request.args.get('action')
         id = request.args.get('id')
         plant = models.Plant.Plant(
@@ -78,6 +80,13 @@ class PlantController(BaseController):
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Get a plant',
+                             message,
+                             'get()',
+                             'Empty',
+                             'TEST')
 
     @api.response(200, 'Plant successfuly created.')
     @api.expect(plantSerializer)
@@ -115,6 +124,13 @@ class PlantController(BaseController):
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Insert a plant',
+                             message,
+                             'post()',
+                             'Empty',
+                             'TEST')
 
     @api.response(200, 'Plant changed successfuly')
     @api.expect(plantSerializer)
@@ -155,6 +171,13 @@ class PlantController(BaseController):
                 response=plant,
                 message="Plant sucessfuly updated.",
                 status=204), 200
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Update a plant',
+                             message,
+                             'put()',
+                             'Empty',
+                             'TEST')
 
     @api.response(200, 'Plant deleted successfuly')
     @api.expect(plantSerializer)
@@ -198,3 +221,10 @@ class PlantController(BaseController):
                 response=err,
                 message="Internal server error: "+str(err),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Delete a plant',
+                             message,
+                             'delete()',
+                             'Empty',
+                             'TEST')

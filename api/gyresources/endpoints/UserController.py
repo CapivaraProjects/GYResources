@@ -9,6 +9,7 @@ from repository.UserRepository import UserRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import user as userSerializer
 from api.gyresources.parsers import user_search_args
+from tools import Logger
 
 flask_app = Flask(__name__)
 flask_app.config.from_object('config.DefaultConfig')
@@ -39,6 +40,7 @@ class UserController(BaseController):
         self.startTime = time.time()
         result = models.User.User()
         total = 0
+        message = 'empty var'
         action = request.args.get('action')
         id = request.args.get('id')
         user = models.User.User(
@@ -75,6 +77,13 @@ class UserController(BaseController):
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Get a User',
+                             message,
+                             'get()',
+                             'Empty',
+                             'TEST')
 
     @api.response(200, 'User successfuly created.')
     @api.expect(userSerializer)
@@ -112,6 +121,13 @@ class UserController(BaseController):
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Insert a User',
+                             message,
+                             'post()',
+                             'Empty',
+                             'TEST')
 
     @api.response(200, 'User changed successfuly')
     @api.expect(userSerializer)
@@ -152,6 +168,14 @@ class UserController(BaseController):
                 response=user,
                 message="User sucessfuly updated.",
                 status=204), 200
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Update a User',
+                             message,
+                             'get()',
+                             'Empty',
+                             'TEST')
+
 
     @api.response(200, 'User deleted successfuly')
     @api.expect(userSerializer)
@@ -195,3 +219,10 @@ class UserController(BaseController):
                 response=err,
                 message="Internal server error: "+str(err),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Delete a User',
+                             message,
+                             'delete()',
+                             'Empty',
+                             'TEST')

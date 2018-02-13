@@ -10,6 +10,7 @@ from repository.DiseaseRepository import DiseaseRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import disease as diseaseSerializer
 from api.gyresources.parsers import disease_search_args
+from tools import Logger
 
 flask_app = Flask(__name__)
 flask_app.config.from_object('config.DefaultConfig')
@@ -42,6 +43,7 @@ class DiseaseController(BaseController):
         self.startTime = time.time()
         result = models.Disease.Disease()
         total = 0
+        message = 'empty var'
         action = request.args.get('action')
         id = request.args.get('id')
         disease = models.Disease.Disease(
@@ -97,6 +99,13 @@ class DiseaseController(BaseController):
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Get disease of plants',
+                             message,
+                             'get()',
+                             'Empty',
+                             'TEST')
 
     @api.response(200, 'Disease successfuly created.')
     @api.expect(diseaseSerializer)
@@ -140,6 +149,13 @@ class DiseaseController(BaseController):
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Post method of a Disease',
+                              message,
+                             'post()',
+                             'Empty',
+                             'TEST')
 
     @api.response(200, 'Disease changed successfuly')
     @api.expect(diseaseSerializer)
@@ -186,6 +202,13 @@ class DiseaseController(BaseController):
                 response=disease,
                 message="Disease sucessfuly updated.",
                 status=204), 200
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                         'Informative. Update a disease of a plant',
+                         message,
+                         'put()',
+                         'Empty',
+                         'TEST')
 
     @api.response(200, 'Disease deleted successfuly')
     @api.expect(diseaseSerializer)
@@ -231,3 +254,10 @@ class DiseaseController(BaseController):
                 response=err,
                 message="Internal server error: "+str(err),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Delete a disease',
+                             message,
+                             'delete()',
+                             'Empty',
+                             'TEST')

@@ -9,6 +9,7 @@ from repository.TypeRepository import TypeRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import type as typeSerializer
 from api.gyresources.parsers import type_search_args
+from tools import Logger
 
 flask_app = Flask(__name__)
 flask_app.config.from_object('config.DefaultConfig')
@@ -38,6 +39,7 @@ class TypeController(BaseController):
         self.startTime = time.time()
         result = models.Type.Type()
         total = 0
+        message = 'empty var'
         action = request.args.get('action')
         id = request.args.get('id')
         type = models.Type.Type(
@@ -69,6 +71,13 @@ class TypeController(BaseController):
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Get a Type',
+                             message,
+                             'get()',
+                             'Empty',
+                             'TEST')
 
     @api.response(200, 'Type successfuly created.')
     @api.expect(typeSerializer)
@@ -106,6 +115,13 @@ class TypeController(BaseController):
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Insert a Type',
+                             message,
+                             'post()',
+                             'Empty',
+                             'TEST')
 
     @api.response(200, 'Type changed successfuly')
     @api.expect(typeSerializer)
@@ -146,6 +162,13 @@ class TypeController(BaseController):
                 response=type,
                 message="Type sucessfuly updated.",
                 status=204), 200
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Update a Type',
+                             message,
+                             'put()',
+                             'Empty',
+                             'TEST')
 
     @api.response(200, 'Type deleted successfuly')
     @api.expect(typeSerializer)
@@ -189,3 +212,10 @@ class TypeController(BaseController):
                 response=err,
                 message="Internal server error: "+str(err),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Delete a Type',
+                             message,
+                             'delete()',
+                             'Empty',
+                             'TEST')

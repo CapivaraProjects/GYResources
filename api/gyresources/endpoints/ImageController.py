@@ -10,6 +10,7 @@ from repository.DiseaseRepository import DiseaseRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import image as imageSerializer
 from api.gyresources.parsers import image_search_args
+from tools import Logger
 
 flask_app = Flask(__name__)
 flask_app.config.from_object('config.DefaultConfig')
@@ -43,6 +44,7 @@ class ImageController(BaseController):
         self.startTime = time.time()
         result = models.Image.Image()
         total = 0
+        message = 'empty var'
         action = request.args.get('action')
         id = request.args.get('id')
         image = models.Image.Image(
@@ -99,6 +101,13 @@ class ImageController(BaseController):
                     response=sqlerr,
                     message="SQL error: "+str(sqlerr),
                     status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Get a image of a plant',
+                             message,
+                             'get()',
+                             'Empty',
+                             'TEST')
 
     @api.response(200, 'Image successfuly created.')
     @api.expect(imageSerializer)
@@ -108,6 +117,7 @@ class ImageController(BaseController):
         receives in body request a image model
         """
         image = request.json
+        message = 'empty var'
 
         image = namedtuple("Image", image.keys())(*image.values())
 
@@ -146,6 +156,13 @@ class ImageController(BaseController):
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Insert a image of a plant',
+                             message,
+                             'get()',
+                             'Empty',
+                             'TEST')
 
     @api.response(200, 'Image changed successfuly')
     @api.expect(imageSerializer)
@@ -203,6 +220,14 @@ class ImageController(BaseController):
                 response=image,
                 message="Image sucessfuly updated.",
                 status=204), 200
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Update a image of a plant',
+                             message,
+                             'get()',
+                             'Empty',
+                             'TEST')
+
 
     @api.response(200, 'Image deleted successfuly')
     @api.expect(imageSerializer)
@@ -252,3 +277,10 @@ class ImageController(BaseController):
                 response=err,
                 message="Internal server error: " + str(err),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Delete a image of a plant',
+                             message,
+                             'get()',
+                             'Empty',
+                             'TEST')

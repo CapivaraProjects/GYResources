@@ -7,10 +7,10 @@ import models.Logger
 app = Flask(__name__)
 app = initialize_app(app)
 client = app.test_client
-generic_log = models.Logger.Logger(type='test',
+generic_log = models.Logger.Logger(type='testType',
                                    message='TestMessage',
                                    function="POST",
-                                   obs="test",
+                                   obs="testObs",
                                    config="Test")
 
 @pytest.mark.order1

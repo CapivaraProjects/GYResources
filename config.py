@@ -12,7 +12,7 @@ class DefaultConfig(object):
     RESTPLUS_MASK_SWAGGER = False
     RESTPLUS_ERROR_404_HELP = False
     TYPE = 'TEST'
-    ELASTICURL = ''
+    ELASTICURL = '127.0.0.1:9200'
 
 class TestConfig(object):
     # test settings

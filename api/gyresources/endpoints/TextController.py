@@ -9,6 +9,7 @@ from repository.TextRepository import TextRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import text as textSerializer
 from api.gyresources.parsers import text_search_args
+from tools import Logger
 
 flask_app = Flask(__name__)
 flask_app.config.from_object('config.DefaultConfig')
@@ -38,6 +39,7 @@ class TextController(BaseController):
         self.startTime = time.time()
         result = models.Text.Text()
         total = 0
+        message = 'empty var'
         action = request.args.get('action')
         id = request.args.get('id')
         text = models.Text.Text(
@@ -72,6 +74,13 @@ class TextController(BaseController):
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Get a Text',
+                             message,
+                             'get()',
+                             'Empty',
+                             'TEST')
 
     @api.response(200, 'Text successfuly created.')
     @api.expect(textSerializer)
@@ -109,6 +118,13 @@ class TextController(BaseController):
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Insert a Text',
+                             message,
+                             'post()',
+                             'Empty',
+                             'TEST')
 
     @api.response(200, 'Text changed successfuly')
     @api.expect(textSerializer)
@@ -149,6 +165,13 @@ class TextController(BaseController):
                 response=text,
                 message="Text sucessfuly updated.",
                 status=204), 200
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Update a Text',
+                             message,
+                             'put()',
+                             'Empty',
+                             'TEST')
 
     @api.response(200, 'Text deleted successfuly')
     @api.expect(textSerializer)
@@ -192,3 +215,10 @@ class TextController(BaseController):
                 response=err,
                 message="Internal server error: "+str(err),
                 status=500)
+        str(message.__dict__)
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative. Delete a Text',
+                             message,
+                             'delete()',
+                             'Empty',
+                             'TEST')
