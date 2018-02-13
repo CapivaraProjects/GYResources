@@ -63,7 +63,6 @@ generic_user = models.User.User(
     salt=generic_user.salt,
     dateInsertion=generic_user.dateInsertion,
     dateUpdate=generic_user.dateUpdate)
-(generic_user, token) = auth(generic_user)
 
 
 @pytest.mark.order1
@@ -126,7 +125,8 @@ def test_search():
 
 
 @pytest.mark.order4
-def test_create(generic_plant=generic_plant):
+def test_create(generic_plant=generic_plant, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
     data = generic_plant.__dict__
     headers = {
             'Accept': 'application/json',
@@ -144,7 +144,8 @@ def test_create(generic_plant=generic_plant):
 
 
 @pytest.mark.order5
-def test_update(generic_plant=generic_plant):
+def test_update(generic_plant=generic_plant, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
     data = generic_plant.__dict__
     data['action'] = 'search'
     resp = client().get(
@@ -182,7 +183,8 @@ def test_update(generic_plant=generic_plant):
 
 
 @pytest.mark.order6
-def test_delete(generic_plant=generic_plant):
+def test_delete(generic_plant=generic_plant, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
     data = generic_plant.__dict__
     data['action'] = 'search'
     resp = client().get(
