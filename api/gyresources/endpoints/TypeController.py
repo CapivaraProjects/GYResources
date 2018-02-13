@@ -67,6 +67,12 @@ class TypeController(BaseController):
         try:
             if (action == 'searchByID'):
                 result = repository.searchByID(id)
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Ok',
+                                     'get()',
+                                     str(result.__dict__),
+                                     'TEST')
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -75,6 +81,12 @@ class TypeController(BaseController):
                 result = repository.search(type, pageSize, offset)
                 total = result['total']
                 result = result['content']
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Ok',
+                                     'get()',
+                                     str(result.__dict__),
+                                     'TEST')
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -83,7 +95,12 @@ class TypeController(BaseController):
                             offset=offset,
                             pageSize=pageSize), 200
         except (exc.SQLAlchemyError, Exception) as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'get()',
+                                 str(sqlerr),
+                                 'TEST')
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
@@ -116,18 +133,35 @@ class TypeController(BaseController):
 
         try:
             type = repository.create(type)
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Informative',
+                                 'Type sucessfuly created',
+                                 'post()',
+                                 str(type.__dict__),
+                                 'TEST')
             return self.okResponse(
                 response=type,
                 message="Type sucessfuly created.",
                 status=201), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'post()',
+                                 str(sqlerr),
+                                 'TEST')
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server error',
+                                 'post()',
+                                 str(err),
+                                 'TEST')
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
@@ -154,18 +188,35 @@ class TypeController(BaseController):
                 flask_app.config["DBNAME"])
         try:
             type = repository.update(type)
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Informative',
+                                 'Type sucessfuly updated',
+                                 'post()',
+                                 str(type.__dict__),
+                                 'TEST')
             return self.okResponse(
                 response=type,
                 message="Type sucessfuly updated.",
                 status=204), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'put()',
+                                 str(sqlerr),
+                                 'TEST')
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server error',
+                                 'put()',
+                                 str(err),
+                                 'TEST')
             return self.okResponse(
                 response=err,
                 message="Internal server error",
@@ -193,23 +244,46 @@ class TypeController(BaseController):
         try:
             status = repository.delete(type)
             if (status):
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Type deleted sucessfuly',
+                                     'post()',
+                                     str(type.__dict__),
+                                     'TEST')
                 return self.okResponse(
                     response=models.Type.Type(),
                     message="Type deleted sucessfuly.",
                     status=204), 200
             else:
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Error',
+                                     'Problem deleting type',
+                                     'post()',
+                                     str(type.__dict__),
+                                     'TEST')
                 return self.okResponse(
                     response=type,
                     message="Problem deleting type",
                     status=500), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'delete()',
+                                 str(sqlerr),
+                                 'TEST')
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server error',
+                                 'delete()',
+                                 str(err),
+                                 'TEST')
             return self.okResponse(
                 response=err,
                 message="Internal server error: "+str(err),

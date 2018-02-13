@@ -73,6 +73,12 @@ class UserController(BaseController):
         try:
             if (action == 'searchByID'):
                 result = repository.searchByID(id)
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Ok',
+                                     'get()',
+                                     str(result.__dict__),
+                                     'TEST')
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -81,6 +87,12 @@ class UserController(BaseController):
                 result = repository.search(user, pageSize, offset)
                 total = result['total']
                 result = result['content']
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Ok',
+                                     'get()',
+                                     str(result.__dict__),
+                                     'TEST')
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -89,7 +101,12 @@ class UserController(BaseController):
                             offset=offset,
                             pageSize=pageSize), 200
         except (exc.SQLAlchemyError, Exception) as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'get()',
+                                 str(sqlerr),
+                                 'TEST')
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
@@ -127,18 +144,35 @@ class UserController(BaseController):
         try:
             user.id = None
             user = repository.create(user)
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Informative',
+                                 'User sucessfuly created',
+                                 'post()',
+                                 str(user.__dict__),
+                                 'TEST')
             return self.okResponse(
                 response=user,
                 message="User sucessfuly created.",
                 status=201), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'post()',
+                                 str(sqlerr),
+                                 'TEST')
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server Error',
+                                 'post()',
+                                 str(err),
+                                 'TEST')
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
@@ -165,18 +199,35 @@ class UserController(BaseController):
                 flask_app.config["DBNAME"])
         try:
             user = repository.update(user)
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Informative',
+                                 'User sucessfuly updated',
+                                 'put()',
+                                 str(user.__dict__),
+                                 'TEST')
             return self.okResponse(
                 response=user,
                 message="User sucessfuly updated.",
                 status=204), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'put()',
+                                 str(sqlerr),
+                                 'TEST')
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server Error',
+                                 'put()',
+                                 str(err),
+                                 'TEST')
             return self.okResponse(
                 response=err,
                 message="Internal server error",
@@ -204,23 +255,46 @@ class UserController(BaseController):
         try:
             status = repository.delete(user)
             if (status):
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'User deleted sucessfuly',
+                                     'delete()',
+                                     str(user.__dict__),
+                                     'TEST')
                 return self.okResponse(
                     response=models.User.User(),
                     message="User deleted sucessfuly.",
                     status=204), 200
             else:
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Error',
+                                     'Problem deleting user',
+                                     'delete()',
+                                     str(user.__dict__),
+                                     'TEST')
                 return self.okResponse(
                     response=user,
                     message="Problem deleting user",
                     status=500), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'delete()',
+                                 str(sqlerr),
+                                 'TEST')
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server Error',
+                                 'delete()',
+                                 str(err),
+                                 'TEST')
             return self.okResponse(
                 response=err,
                 message="Internal server error: "+str(err),

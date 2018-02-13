@@ -42,7 +42,6 @@ class TextController(BaseController):
         self.startTime = time.time()
         result = models.Text.Text()
         total = 0
-        message = 'empty var'
         action = request.args.get('action')
         id = request.args.get('id')
         text = models.Text.Text(
