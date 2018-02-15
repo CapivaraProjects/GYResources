@@ -182,7 +182,6 @@ class PlantController(BaseController):
                     response=models.Plant.Plant(),
                     message="Plant deleted sucessfuly.",
                     status=204), 200
-            raise Exception("Problem deleting plant")
         except Exception as err:
             return self.okResponse(
                 response=err,
