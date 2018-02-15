@@ -42,7 +42,7 @@ class PlantController(BaseController):
         result = models.Plant.Plant()
         total = 0
         action = request.args.get('action')
-        id = request.args.get('id')
+        idPlant = request.args.get('id')
         plant = models.Plant.Plant(
             scientificName=request.args.get('scientificName'),
             commonName=request.args.get('commonName'))
@@ -65,7 +65,7 @@ class PlantController(BaseController):
                 flask_app.config["DBNAME"])
         try:
             if (action == 'searchByID'):
-                result = repository.searchByID(id)
+                result = repository.searchByID(idPlant)
                 return self.okResponse(
                             response=result,
                             message="Ok",
