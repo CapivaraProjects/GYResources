@@ -167,25 +167,6 @@ def test_create(generic_plant=generic_plant, generic_user=generic_user):
 
 
 @pytest.mark.order6
-def test_create_empty(generic_plant=generic_plant, generic_user=generic_user):
-    (generic_user, token) = auth(generic_user)
-    plant = generic_plant
-    plant.scientificName = ''
-    plant.commonName = ''
-    data = plant.__dict__
-    headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer %s' % token['token']
-            }
-    resp = client().post('/api/gyresources/plants/', data=str(
-        json.dumps(data)), headers=headers)
-    resp = json.loads(
-                resp.get_data(as_text=True))
-    assert resp['status_code'] == 500
-
-
-@pytest.mark.order7
 def test_update(generic_plant=generic_plant, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     data = generic_plant.__dict__
@@ -224,7 +205,7 @@ def test_update(generic_plant=generic_plant, generic_user=generic_user):
     assert "update" in plant.response['scientificName']
 
 
-@pytest.mark.order8
+@pytest.mark.order7
 def test_delete(generic_plant=generic_plant, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     data = generic_plant.__dict__
@@ -258,3 +239,22 @@ def test_delete(generic_plant=generic_plant, generic_user=generic_user):
     assert resp.status_code == 200
     assert 204 == json.loads(
             resp.get_data(as_text=True))['status_code']
+
+
+@pytest.mark.order8
+def test_create_empty(generic_plant=generic_plant, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    plant = generic_plant
+    plant.scientificName = ''
+    plant.commonName = ''
+    data = plant.__dict__
+    headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % token['token']
+            }
+    resp = client().post('/api/gyresources/plants/', data=str(
+        json.dumps(data)), headers=headers)
+    resp = json.loads(
+                resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
