@@ -295,7 +295,7 @@ def test_update_wrong_id(
         json.dumps(plant)), headers=headers)
     resp = json.loads(
                 resp.get_data(as_text=True))
-    assert resp.status_code == 500
+    assert resp['status_code'] == 500
 
 
 @pytest.mark.order10
@@ -333,4 +333,4 @@ def test_update_nothing_changed(
         json.dumps(plant)), headers=headers)
     resp = json.loads(
                 resp.get_data(as_text=True))
-    assert resp.status_code == 500
+    assert resp['status_code'] == 500
