@@ -183,11 +183,6 @@ class PlantController(BaseController):
                     message="Plant deleted sucessfuly.",
                     status=204), 200
             raise Exception("Problem deleting plant")
-        except exc.SQLAlchemyError as sqlerr:
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror" + str(sqlerr),
-                status=500)
         except Exception as err:
             return self.okResponse(
                 response=err,

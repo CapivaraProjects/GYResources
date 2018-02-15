@@ -332,8 +332,7 @@ def test_delete_non_existent(
             }
     resp = client().delete('/api/gyresources/plants/', data=str(
         json.dumps(plant)), headers=headers)
-    assert resp.status_code == 200
-    assert 204 == json.loads(
-            resp.get_data(as_text=True))['status_code']
+    resp = json.loads(
+                resp.get_data(as_text=True))
     assert resp['status_code'] == 500
     assert 'Internal server error' in resp['message']
