@@ -8,7 +8,7 @@ methods for requests, here we create what it expects and documents.
 plant_search_args = reqparse.RequestParser()
 plant_search_args.add_argument('action', type=str, required=True,
                                default='searchByID',
-                               help='Defines what kind of search you gonna do.',
+                               help='Defines what kind of search you gonna do',
                                choices=['searchByID', 'search'])
 plant_search_args.add_argument('id', type=int, required=False, default=1,
                                help='Plant ID, used when action=searchByID')
@@ -63,8 +63,8 @@ type_search_args.add_argument('offset', type=int, required=False, default=10,
 image_search_args = reqparse.RequestParser()
 image_search_args.add_argument('action', type=str, required=True,
                                default='searchByID',
-                               help='Defines what kind of search you gonna do.',
-                               choices=['searchByID', 'search'])
+                               help='Defines what kind of search you gonna do',
+                               choices=['searchByID', 'search', 'read'])
 image_search_args.add_argument('id', type=int, required=False, default=1,
                                help='Image ID, used when action=searchByID')
 image_search_args.add_argument('url', type=str, required=False,
@@ -110,10 +110,11 @@ user_search_args.add_argument('offset', type=int, required=False, default=10,
                               help='Quantity of elements to be jumped')
 
 disease_search_args = reqparse.RequestParser()
-disease_search_args.add_argument('action', type=str, required=True,
-                                 default='searchByID',
-                                 help='Defines what kind of search you gonna do.',
-                                 choices=['searchByID', 'search'])
+disease_search_args.add_argument(
+        'action', type=str, required=True,
+        default='searchByID',
+        help='Defines what kind of search you gonna do',
+        choices=['searchByID', 'search'])
 disease_search_args.add_argument('id', type=int, required=False, default=1,
                                  help='Plant ID, used when action=searchByID')
 disease_search_args.add_argument('scientificName', type=str, required=False,

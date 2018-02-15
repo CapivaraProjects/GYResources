@@ -3,7 +3,7 @@ import models.Plant
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
-from api.restplus import api
+from api.restplus import api, token_auth
 from collections import namedtuple
 from repository.PlantRepository import PlantRepository
 from api.gyresources.endpoints.BaseController import BaseController
@@ -90,6 +90,7 @@ class PlantController(BaseController):
 
     @api.response(200, 'Plant successfuly created.')
     @api.expect(plantSerializer)
+    @token_auth.login_required
     def post(self):
         """
         Method used to insert plant in database
@@ -131,6 +132,7 @@ class PlantController(BaseController):
 
     @api.response(200, 'Plant changed successfuly')
     @api.expect(plantSerializer)
+    @token_auth.login_required
     def put(self):
         """
         Method used to update plant in database
@@ -167,6 +169,7 @@ class PlantController(BaseController):
 
     @api.response(200, 'Plant deleted successfuly')
     @api.expect(plantSerializer)
+    @token_auth.login_required
     def delete(self):
         """
         Method used to delete plant in database

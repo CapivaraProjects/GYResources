@@ -10,9 +10,11 @@ install:
   - pip3 install -r requirements.txt
 services:
   - postgresql 
+  - elasticsearch
 addons:
   postgresql: "9.5"  
 before_script:
+  - sleep 10
   - createuser -s -w -U postgres -e capivara
   - createdb green_eyes -U capivara
   - psql -c "ALTER USER capivara WITH PASSWORD 'test';" -U postgres
@@ -21,17 +23,6 @@ before_script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)  
 # command to run tests
 script:
-  - pytest repository/base_test.py # or py.test for Python versions 3.5 and below
-  - pytest repository/DiseaseRepository_test.py
-  - pytest repository/ImageRepository_test.py
-  - pytest repository/PlantRepository_test.py
-  - pytest repository/TextRepository_test.py
-  - pytest repository/TypeRepository_test.py
-  - pytest repository/UserRepository_test.py
-  - pytest tools/crypto_test.py  
-  - pytest tests/test_plant.py  
-  - pytest tests/test_text.py  
-  - pytest tests/test_type.py  
-  - pytest tests/test_image.py
-  - pytest tests/test_user.py
-  - pytest tests/test_disease.py
+  - coverage run --source=repository,api setup.py test  
+after_success:
+  - coveralls
