@@ -296,6 +296,7 @@ def test_update_wrong_id(
     resp = json.loads(
                 resp.get_data(as_text=True))
     assert resp['status_code'] == 500
+    assert 'SQL error' in resp['message']
 
 
 @pytest.mark.order10
@@ -334,3 +335,4 @@ def test_update_nothing_changed(
     resp = json.loads(
                 resp.get_data(as_text=True))
     assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']
