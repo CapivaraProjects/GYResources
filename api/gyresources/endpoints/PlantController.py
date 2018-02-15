@@ -151,16 +151,14 @@ class PlantController(BaseController):
                 message="Plant sucessfuly updated.",
                 status=204), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
-            print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
-                message="SQL eror",
+                message="SQL error: " + str(sqlerr),
                 status=500)
         except Exception as err:
             return self.okResponse(
                 response=err,
-                message="Internal server error",
+                message="Internal server error" + str(err),
                 status=500)
 
     @api.response(200, 'Plant deleted successfuly')
