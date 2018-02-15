@@ -47,13 +47,13 @@ class PlantController(BaseController):
             scientificName=request.args.get('scientificName'),
             commonName=request.args.get('commonName'))
         pageSize = None
-        if pageSize:
+        if request.args.get('pageSize'):
             pageSize = int(request.args.get('pageSize'))
         else:
             pageSize = 10
 
         offset = None
-        if offset:
+        if request.args.get('offset'):
             offset = int(request.args.get('offset'))
         else:
             offset = 0
