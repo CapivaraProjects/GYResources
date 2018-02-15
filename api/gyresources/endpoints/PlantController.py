@@ -112,18 +112,14 @@ class PlantController(BaseController):
                 flask_app.config["DBNAME"])
 
         try:
+            if (not plant.scientificName or not plant.commonName):
+                raise Exception(
+                        'Not defined scientificName or commonName field')
             plant = repository.create(plant)
             return self.okResponse(
                 response=plant,
                 message="Plant sucessfuly created.",
                 status=201), 200
-        except exc.SQLAlchemyError as sqlerr:
-            # log
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             return self.okResponse(
                 response=err,
