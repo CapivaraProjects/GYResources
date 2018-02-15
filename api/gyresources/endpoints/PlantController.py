@@ -150,11 +150,6 @@ class PlantController(BaseController):
                 response=plant,
                 message="Plant sucessfuly updated.",
                 status=204), 200
-        except exc.SQLAlchemyError as sqlerr:
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL error: " + str(sqlerr),
-                status=500)
         except Exception as err:
             return self.okResponse(
                 response=err,
@@ -187,20 +182,14 @@ class PlantController(BaseController):
                     response=models.Plant.Plant(),
                     message="Plant deleted sucessfuly.",
                     status=204), 200
-            else:
-                return self.okResponse(
-                    response=plant,
-                    message="Problem deleting plant",
-                    status=500), 200
+            raise Exception("Problem deleting plant")
         except exc.SQLAlchemyError as sqlerr:
-            # log
-            print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
-                message="SQL eror",
+                message="SQL eror" + str(sqlerr),
                 status=500)
         except Exception as err:
             return self.okResponse(
                 response=err,
-                message="Internal server error: "+str(err),
+                message="Internal server error: " + str(err),
                 status=500)

@@ -296,11 +296,11 @@ def test_update_wrong_id(
     resp = json.loads(
                 resp.get_data(as_text=True))
     assert resp['status_code'] == 500
-    assert 'SQL error' in resp['message']
+    assert 'Internal server error' in resp['message']
 
 
-@pytest.mark.order10
-def test_update_nothing_changed(
+@pytest.mark.order7
+def test_delete_non_existent(
         generic_plant=generic_plant,
         generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
@@ -321,7 +321,7 @@ def test_update_nothing_changed(
 
     plant = {
                 "action": "string",
-                "id": plant.id,
+                "id": 1000,
                 "scientificName": plant.scientificName,
                 "commonName": plant.commonName
             }
@@ -330,9 +330,10 @@ def test_update_nothing_changed(
             'Content-Type': 'application/json',
             'Authorization': 'Bearer %s' % token['token']
             }
-    resp = client().put('/api/gyresources/plants/', data=str(
+    resp = client().delete('/api/gyresources/plants/', data=str(
         json.dumps(plant)), headers=headers)
-    resp = json.loads(
-                resp.get_data(as_text=True))
+    assert resp.status_code == 200
+    assert 204 == json.loads(
+            resp.get_data(as_text=True))['status_code']
     assert resp['status_code'] == 500
     assert 'Internal server error' in resp['message']
