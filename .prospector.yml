@@ -1,6 +1,7 @@
-doc-warnings: true
+strictness : medium
+pylint:
+  run: false
 test-warnings: false
-strictness: veryhigh
 max-line-length: 120
 pep8:
   full: true
