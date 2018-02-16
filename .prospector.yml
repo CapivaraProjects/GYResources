@@ -1,12 +1,10 @@
 strictness : medium
 pylint:
   run: false
-test-warnings: false
-max-line-length: 120
-pep8:
-  full: true
-uses:
-  - flask
-autodetect: true
 python-targets:
-  - 3
+   - 3
+test-warnings: no
+pep8:
+   full: true
+requirements:
+   - setup.py
