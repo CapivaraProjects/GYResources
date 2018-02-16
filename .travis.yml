@@ -3,6 +3,7 @@ python:
   - "3.5"
   - "3.6"
 # command to install dependencies
+cache: pip
 install:
   - pip3 install -r requirements.txt
 services:
