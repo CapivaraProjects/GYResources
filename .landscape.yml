@@ -13,3 +13,5 @@ requirements:
   - setup.py
 pep8:
   full: true  
+pylint:
+  full: true
