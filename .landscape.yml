@@ -1,12 +1,7 @@
 autodetect: yes
-strictness: medium
-requirements:
-  - requirements.txt
-  - setup.py
-ignore-paths:
-  - tests
+strictness: high
 ignore-patterns:
-  - config.py
+  - ^config.py$
 python-targets:
   - 2
   - 3
