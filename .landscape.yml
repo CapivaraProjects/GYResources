@@ -2,6 +2,7 @@ strictness: medium
 pylint:
   run: true
 python-targets:
+  - 2
   - 3
 test-warnings: no
 pep8:
