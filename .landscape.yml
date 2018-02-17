@@ -1,6 +1,7 @@
 autodetect: yes
 strictness: medium
 requirements:
+  - requirements.txt
   - setup.py
 ignore-paths:
   - tests
