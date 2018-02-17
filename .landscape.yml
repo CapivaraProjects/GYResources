@@ -1,8 +1,8 @@
 strictness: medium
 pylint:
-  run: false
+  run: true
 python-targets:
-  - 2
+  - 3
 test-warnings: no
 pep8:
   full: true
