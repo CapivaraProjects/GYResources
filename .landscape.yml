@@ -14,4 +14,4 @@ requirements:
 pep8:
   full: true
 pylint:
-  run: true
+  run: false
