@@ -29,8 +29,8 @@ class LoggerController(BaseController):
                           type=request.args.get('type'),
                           message=request.args.get('message'),
                           function=request.args.get('function'),
-                          obs=request.args.get('message'),
-                          config=request.args.get('message'))
+                          obs=request.args.get('obs'),
+                          config=request.args.get('config'))
             return self.okResponse(
                 response='',
                 message="OK",
