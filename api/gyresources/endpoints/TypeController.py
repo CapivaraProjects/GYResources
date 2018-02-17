@@ -47,8 +47,8 @@ class TypeController(BaseController):
             value=request.args.get('value'),
             description=request.args.get('description'))
         page_size = None
-        if request.args.get('page_size'):
-            page_size = int(request.args.get('page_size'))
+        if request.args.get('pageSize'):
+            page_size = int(request.args.get('pageSize'))
         else:
             page_size = 10
 
