@@ -54,7 +54,7 @@ class TypeController(BaseController):
 
         offset = None
         if request.args.get('offset'):
-            offset = int()
+            offset = int(request.args.get('offset'))
         else:
             offset = 0
         repository = TypeRepository(

@@ -72,7 +72,7 @@ def test_search_by_unexistent_id():
             "id": "1000000",
             }
     resp = client().get(
-            '/api/gyresources/texts',
+            '/api/gyresources/types',
             content_type='application/json',
             headers={
                 'Accept': 'application/json',
