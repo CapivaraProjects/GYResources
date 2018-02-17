@@ -258,3 +258,79 @@ def test_create_empty(generic_type=generic_type, generic_user=generic_user):
     resp = json.loads(
         resp.get_data(as_text=True))
     assert resp['status_code'] == 500
+
+
+@pytest.mark.order9
+def test_update_wrong_id(
+        generic_type=generic_type,
+        generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    data = generic_type.__dict__
+    data['action'] = 'search'
+    resp = client().get(
+        '/api/gyresources/types',
+        content_type='application/json',
+        headers={
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'dataType': 'json'},
+        query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    type_model = object()
+    for response in pagedResponse['response']:
+        type_model = namedtuple("Type", response.keys())(*response.values())
+
+    type_model = {
+        "id": 1000,
+        "value": type_model.value,
+        "description": 'update'
+    }
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer %s' % token['token']
+    }
+    resp = client().put('/api/gyresources/types/', data=str(
+        json.dumps(type_model)), headers=headers)
+    resp = json.loads(
+        resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']
+
+
+@pytest.mark.order10
+def test_delete_non_existent(
+        generic_type=generic_type,
+        generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    data = generic_type.__dict__
+    data['action'] = 'search'
+    resp = client().get(
+        '/api/gyresources/types',
+        content_type='application/json',
+        headers={
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'dataType': 'json'},
+        query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    type_model = object()
+    for response in pagedResponse['response']:
+        type_model = namedtuple("Type", response.keys())(*response.values())
+
+    type_model = {
+        "id": 1000,
+        "value": type_model.value,
+        "description": type_model.description
+    }
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer %s' % token['token']
+    }
+    resp = client().delete('/api/gyresources/types/', data=str(
+        json.dumps(type_model)), headers=headers)
+    resp = json.loads(
+        resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']
