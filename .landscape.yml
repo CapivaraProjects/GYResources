@@ -1,7 +1,5 @@
 autodetect: yes
 strictness: medium
-test-warnings: false
-doc-warnings: true
 requirements:
   - setup.py
 ignore-paths:
@@ -16,4 +14,4 @@ requirements:
 pep8:
   full: true
 pylint:
-  run: false
+  run: true
