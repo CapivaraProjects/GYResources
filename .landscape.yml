@@ -1,6 +1,4 @@
 strictness: medium
-pylint:
-  run: false
 python-targets:
   - 2
   - 3
