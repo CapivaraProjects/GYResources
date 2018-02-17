@@ -4,6 +4,7 @@ test-warnings: false
 doc-warnings: true
 ignore-paths:
   - tests
+  - config.py
 python-targets:
   - 2
   - 3
@@ -11,7 +12,3 @@ requirements:
   - setup.py
 pep8:
   full: true  
-pylint:
-  full: true
-pep257:
-  full: true
