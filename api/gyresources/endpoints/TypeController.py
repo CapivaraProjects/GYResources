@@ -1,14 +1,14 @@
 import time
-import models.Type
+from collections import namedtuple
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
 from api.restplus import api, token_auth
-from collections import namedtuple
 from repository.TypeRepository import TypeRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import type as typeSerializer
 from api.gyresources.parsers import type_search_args
+import models.Type
 
 flask_app = Flask(__name__)
 flask_app.config.from_object('config.DefaultConfig')
@@ -42,45 +42,45 @@ class TypeController(BaseController):
         result = models.Type.Type()
         total = 0
         action = request.args.get('action')
-        id = request.args.get('id')
-        type = models.Type.Type(
+        idType = request.args.get('id')
+        typeModel = models.Type.Type(
                       value=request.args.get('value'),
                       description=request.args.get('description'))
         pageSize = None
-        if pageSize:
+        if request.args.get('pageSize'):
             pageSize = int(request.args.get('pageSize'))
         else:
             pageSize = 10
 
         offset = None
-        if offset:
-            offset = int(request.args.get('offset'))
+        if request.args.get('offset'):
+            offset = int()
         else:
             offset = 0
         repository = TypeRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+            flask_app.config["DBUSER"],
+            flask_app.config["DBPASS"],
+            flask_app.config["DBHOST"],
+            flask_app.config["DBPORT"],
+            flask_app.config["DBNAME"])
         try:
-            if (action == 'searchByID'):
-                result = repository.searchByID(id)
+            if action == 'searchByID':
+                result = repository.searchByID(idType)
                 return self.okResponse(
-                            response=result,
-                            message="Ok",
-                            status=200)
-            elif (action == 'search'):
-                result = repository.search(type, pageSize, offset)
+                    response=result,
+                    message="Ok",
+                    status=200)
+            elif action == 'search':
+                result = repository.search(typeModel, pageSize, offset)
                 total = result['total']
                 result = result['content']
                 return self.okResponse(
-                            response=result,
-                            message="Ok",
-                            status=200,
-                            total=total,
-                            offset=offset,
-                            pageSize=pageSize), 200
+                    response=result,
+                    message="Ok",
+                    status=200,
+                    total=total,
+                    offset=offset,
+                    pageSize=pageSize), 200
         except (exc.SQLAlchemyError, Exception) as sqlerr:
             # log
             return self.okResponse(
@@ -97,30 +97,29 @@ class TypeController(BaseController):
         receives in body request a type model
         action should be anything
         """
-        type = request.json
+        typeModel = request.json
 
-        type = namedtuple("Type", type.keys())(*type.values())
-        type = models.Type.Type(
+        typeModel = namedtuple("Type", typeModel.keys())(*typeModel.values())
+        typeModel = models.Type.Type(
             id=None,
-            value=type.value,
-            description=type.description)
+            value=typeModel.value,
+            description=typeModel.description)
 
         repository = TypeRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+            flask_app.config["DBUSER"],
+            flask_app.config["DBPASS"],
+            flask_app.config["DBHOST"],
+            flask_app.config["DBPORT"],
+            flask_app.config["DBNAME"])
 
         try:
-            type = repository.create(type)
+            typeModel = repository.create(typeModel)
             return self.okResponse(
-                response=type,
+                response=typeModel,
                 message="Type sucessfuly created.",
                 status=201), 200
         except exc.SQLAlchemyError as sqlerr:
             # log
-            print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",

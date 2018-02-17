@@ -127,7 +127,7 @@ def test_search():
                 "action": "search",
                 "value": "test",
                 "description": "test",
-                "pageSize": 10,
+                "pagesize": 10,
                 "offset": 0
             }
     resp = client().get(
@@ -215,4 +215,27 @@ def test_delete(generic_type=generic_type, generic_user=generic_user):
         json.dumps(type)), headers=headers)
     assert resp.status_code == 200
     assert 204 == json.loads(
-            resp.get_data(as_text=True))['status_code']
+        resp.get_data(as_text=True))['status_code']
+
+
+@pytest.mark.order7
+def test_search_with_page_size_and_offset():
+    data = {
+                "action": "search",
+                "value": "test",
+                "description": "test",
+                "pagesize": 10,
+                "offset": 0
+            }
+    resp = client().get(
+            '/api/gyresources/types',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json'},
+            query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    assert pagedResponse['status_code'] == 200
+    for response in pagedResponse['response']:
+        assert 'large' in response['value']
