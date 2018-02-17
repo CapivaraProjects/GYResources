@@ -4,7 +4,7 @@ test-warnings: false
 doc-warnings: true
 ignore-paths:
   - tests
-ignore-files:
+ignore-patterns:
   - config.py
 python-targets:
   - 2
@@ -14,8 +14,6 @@ requirements:
 pep8:
   full: true  
 pylint:
-  full: true
-dodgy:
-  full: true    
-mccabe:
-  full: true
+  run: false
+requirements:
+  - setup.py
