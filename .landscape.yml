@@ -1,11 +1,33 @@
 autodetect: yes
 strictness: medium
-test-warnings: no
+test-warnings: true
 doc-warnings: true
 python-targets:
   - 2
   - 3
-pep8:
-  full: true
 requirements:
   - setup.py
+pep8:
+  run: true
+  disable:
+    - W602
+    - W603
+  enable:
+    - W601
+  options:
+    max-line-length: 80
+    single-line-if-stmt: n
+pylint:
+  run: true
+pep257:
+  disable:
+    - D203
+  run: true
+mccabe:
+  run: true
+  options:
+    max-complexity: 10
+dodgy:
+  run: true
+pyflakes:
+  run: true
