@@ -239,3 +239,22 @@ def test_search_with_page_size_and_offset():
     assert pagedResponse['status_code'] == 200
     for response in pagedResponse['response']:
         assert 'large' in response['value']
+
+
+@pytest.mark.order8
+def test_create_empty(generic_type=generic_type, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    type_aux = generic_type
+    type_aux.value = ''
+    type_aux.description = ''
+    data = type_aux.__dict__
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer %s' % token['token']
+        }
+    resp = client().post('/api/gyresources/plants/', data=str(
+        json.dumps(data)), headers=headers)
+    resp = json.loads(
+        resp.get_data(as_text=True))
+    assert resp['status_code'] == 500

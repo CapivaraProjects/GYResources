@@ -113,21 +113,17 @@ class TypeController(BaseController):
             flask_app.config["DBNAME"])
 
         try:
+            if not typeModel.value:
+                raise Exception('value field from type model not defined')
             typeModel = repository.create(typeModel)
             return self.okResponse(
                 response=typeModel,
                 message="Type sucessfuly created.",
                 status=201), 200
-        except exc.SQLAlchemyError as sqlerr:
-            # log
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             return self.okResponse(
                 response=err,
-                message="Internal server error "+str(err),
+                message="Internal server error: "+str(err),
                 status=500)
 
     @api.response(200, 'Type changed successfuly')
