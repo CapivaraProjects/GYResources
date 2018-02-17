@@ -127,7 +127,7 @@ def test_search():
                 "action": "search",
                 "value": "test",
                 "description": "test",
-                "pagesize": 10,
+                "pageSize": 10,
                 "offset": 0
             }
     resp = client().get(
@@ -224,7 +224,7 @@ def test_search_with_page_size_and_offset():
                 "action": "search",
                 "value": "test",
                 "description": "test",
-                "pagesize": 10,
+                "pageSize": 10,
                 "offset": 0
             }
     resp = client().get(
