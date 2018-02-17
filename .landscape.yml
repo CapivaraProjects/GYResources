@@ -1,8 +1,10 @@
+autodetect: yes
 strictness: medium
+test-warnings: no
+doc-warnings: true
 python-targets:
   - 2
   - 3
-test-warnings: no
 pep8:
   full: true
 requirements:
