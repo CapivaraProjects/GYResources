@@ -21,6 +21,6 @@ before_script:
   - export PYTHONPATH=$PYTHONPATH:$(pwd)  
 # command to run tests
 script:
-  - coverage run --source=repository,api setup.py test  
+  - coverage run --source=api setup.py test  
 after_success:
   - coveralls
