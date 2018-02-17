@@ -4,7 +4,7 @@ test-warnings: false
 doc-warnings: true
 ignore-paths:
   - tests
-ignore-patterns:
+ignore-files:
   - config.py
 python-targets:
   - 2
