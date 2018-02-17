@@ -2,6 +2,8 @@ autodetect: yes
 strictness: medium
 test-warnings: false
 doc-warnings: true
+requirements:
+  - setup.py
 ignore-paths:
   - tests
 ignore-patterns:
@@ -12,8 +14,6 @@ python-targets:
 requirements:
   - setup.py
 pep8:
-  full: true  
+  full: true
 pylint:
   run: false
-requirements:
-  - setup.py
