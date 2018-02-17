@@ -1,15 +1,6 @@
 doc-warnings: false
-member-warnings: true
 max-line-length: 80
-
 strictness: veryhigh
 ignore-patterns:
   - ^[\w\/]*__init__.py$
   - ^config.py$
-python-targets:
-  - 2
-  - 3
-pep8:
-  full: true
-pylint:
-  run: false
