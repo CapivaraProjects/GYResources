@@ -1,4 +1,3 @@
-autodetect: yes
 doc-warnings: false
 member-warnings: true
 max-line-length: 80
@@ -10,8 +9,6 @@ ignore-patterns:
 python-targets:
   - 2
   - 3
-requirements:
-  - setup.py
 pep8:
   full: true
 pylint:
