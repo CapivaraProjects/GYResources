@@ -15,3 +15,7 @@ pep8:
   full: true  
 pylint:
   full: true
+dodgy:
+  full: true    
+mccabe:
+  full: true
