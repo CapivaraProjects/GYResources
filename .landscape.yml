@@ -1,6 +1,6 @@
 strictness: medium
 pylint:
-  run: true
+  run: false
 python-targets:
   - 2
   - 3
