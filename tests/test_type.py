@@ -1,11 +1,12 @@
+"""Test TypeController"""
 import json
-import pytest
 import base64
+from collections import namedtuple
+import pytest
+from flask import Flask
 import models.Type
 import models.User
-from flask import Flask
 from app import initialize_app
-from collections import namedtuple
 from tools.Cryptography import Crypto
 
 
@@ -26,6 +27,7 @@ generic_user = models.User.User(
 
 
 def auth(generic_user=generic_user):
+    """Method used to authenticate user"""
     crypto = Crypto()
     generic_user.salt = crypto.generateRandomSalt()
     generic_user.password = crypto.encrypt(
