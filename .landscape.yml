@@ -1,6 +1,5 @@
-doc-warnings: false
 max-line-length: 80
-strictness: veryhigh
+strictness: medium
 ignore-patterns:
   - ^[\w\/]*__init__.py$
   - ^config.py$
