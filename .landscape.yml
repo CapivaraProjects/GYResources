@@ -8,15 +8,7 @@ python-targets:
 requirements:
   - setup.py
 pep8:
-  run: true
-  disable:
-    - W602
-    - W603
-  enable:
-    - W601
-  options:
-    max-line-length: 80
-    single-line-if-stmt: n
+  full: true  
 pylint:
   run: true
 pep257:
