@@ -1,10 +1,10 @@
-strictness : medium
+strictness: medium
 pylint:
   run: false
 python-targets:
-   - 3
+  - 2
 test-warnings: no
 pep8:
-   full: true
+  full: true
 requirements:
-   - setup.py
+  - setup.py
