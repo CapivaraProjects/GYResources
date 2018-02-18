@@ -361,4 +361,5 @@ def test_wrong_auth(generic_user=generic_user):
             json.dumps(data)),
         follow_redirects=True)
     resp = json.loads(resp.get_data(as_text=True))
+    print(str(resp))
     assert resp['status_code'] == 401
