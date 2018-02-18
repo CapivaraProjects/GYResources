@@ -361,7 +361,4 @@ def test_wrong_auth(generic_user=generic_user):
             json.dumps(data)),
         follow_redirects=True)
     resp = json.loads(resp.get_data(as_text=True))
-    token = resp['response']
-    generic_user.password = 'password'
-    assert token
-    return (generic_user, token)
+    assert resp['status_code'] == 401
