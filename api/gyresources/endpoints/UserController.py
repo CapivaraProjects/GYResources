@@ -53,13 +53,13 @@ class UserController(BaseController):
             dateInsertion=request.args.get('dateInsertion'),
             dateUpdate=request.args.get('dateUpdate'))
         pageSize = None
-        if pageSize:
+        if request.args.get('pageSize'):
             pageSize = int(request.args.get('pageSize'))
         else:
             pageSize = 10
 
         offset = None
-        if offset:
+        if request.args.get('offset'):
             offset = int(request.args.get('offset'))
         else:
             offset = 0
