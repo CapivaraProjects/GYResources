@@ -61,11 +61,13 @@ def verify_password(usernameOrToken, password):
             username=usernameOrToken,
             password=password,
             salt=request.json['salt'])
-    user = repository.authentication(user)
-    if (user.id):
-        g.user = user
-        return True
-    return False
+    try:
+        user = repository.authentication(user)
+        if (user.id):
+            g.user = user
+            return True
+    except Exception as err:
+        return False
 
 
 @auth.error_handler
