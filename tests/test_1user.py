@@ -191,6 +191,27 @@ def test_update(generic_user=generic_user, token=token):
 
 
 @pytest.mark.order6
+def test_search_by_id(generic_user=generic_user, client=client, token=token):
+    data = {
+            "action": "searchByID",
+            "id": generic_user.id
+            }
+    headers = {
+       'Content-Type': 'application/json',
+       'Accept': 'application/json',
+       'Authorization': 'Basic %s' % token
+    }
+    resp = client.get(
+         '/api/gyresources/users',
+         headers=headers,
+         content_type='application/json',
+         query_string=data,
+         follow_redirects=True)
+    baseResponse = json.loads(resp.get_data(as_text=True))
+    assert baseResponse['status_code'] == 200
+
+
+@pytest.mark.order7
 def test_delete(token=token):
     data = generic_user.__dict__
     data['action'] = 'search'
@@ -226,24 +247,3 @@ def test_delete(token=token):
     assert resp.status_code == 200
     assert 204 == json.loads(
             resp.get_data(as_text=True))['status_code']
-
-
-@pytest.mark.order7
-def test_search_by_id(generic_user=generic_user, client=client, token=token):
-    data = {
-            "action": "searchByID",
-            "id": 1
-            }
-    headers = {
-       'Content-Type': 'application/json',
-       'Accept': 'application/json',
-       'Authorization': 'Basic %s' % token
-    }
-    resp = client.get(
-         '/api/gyresources/users',
-         headers=headers,
-         content_type='application/json',
-         query_string=data,
-         follow_redirects=True)
-    baseResponse = json.loads(resp.get_data(as_text=True))
-    assert baseResponse['status_code'] == 200
