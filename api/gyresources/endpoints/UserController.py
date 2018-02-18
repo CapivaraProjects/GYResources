@@ -161,17 +161,10 @@ class UserController(BaseController):
                 response=user,
                 message="User sucessfuly updated.",
                 status=204), 200
-        except exc.SQLAlchemyError as sqlerr:
-            # log
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             return self.okResponse(
                 response=err,
-                message="Internal server error",
+                message="Internal server error: " + str(err),
                 status=500)
 
     @api.response(200, 'User deleted successfuly')
@@ -200,18 +193,6 @@ class UserController(BaseController):
                     response=models.User.User(),
                     message="User deleted sucessfuly.",
                     status=204), 200
-            else:
-                return self.okResponse(
-                    response=user,
-                    message="Problem deleting user",
-                    status=500), 200
-        except exc.SQLAlchemyError as sqlerr:
-            # log
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             return self.okResponse(
                 response=err,

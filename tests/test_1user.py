@@ -264,3 +264,82 @@ def test_create_empty():
     resp = json.loads(
                 resp.get_data(as_text=True))
     assert resp['status_code'] == 500
+
+
+@pytest.mark.order9
+def test_update_wrong_id(
+        generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    data = generic_user.__dict__
+    data['action'] = 'search'
+    resp = client().get(
+            '/api/gyresources/users',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json'},
+            query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    user = object()
+    for response in pagedResponse['response']:
+        user = namedtuple("User", response.keys())(*response.values())
+
+    user = {
+                "action": "string",
+                "id": 1000,
+                idType: user.idType,
+                email: user.email,
+                username: user.username,
+                password: 'password',
+                salt: crypto.generateRandomSalt(),
+                dateInsertion: user.dateInsertion,
+                dateUpdate: user.dateUpdate
+            }
+    headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % token['token']
+            }
+    resp = client().put('/api/gyresources/users/', data=str(
+        json.dumps(user)), headers=headers)
+    resp = json.loads(
+                resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']
+
+
+@pytest.mark.order7
+def test_delete_non_existent(
+        generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    data = generic_user.__dict__
+    data['action'] = 'search'
+    resp = client().get(
+            '/api/gyresources/users',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json'},
+            query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    user = object()
+    for response in pagedResponse['response']:
+        user = namedtuple("User", response.keys())(*response.values())
+
+    user = {
+                "action": "string",
+                "id": 1000,
+            }
+    headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % token['token']
+            }
+    resp = client().delete('/api/gyresources/users/', data=str(
+        json.dumps(user)), headers=headers)
+    resp = json.loads(
+                resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']
