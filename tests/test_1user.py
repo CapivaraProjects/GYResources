@@ -124,7 +124,9 @@ def test_search(generic_user=generic_user, client=client, token=token):
             "password": generic_user.password,
             "salt": generic_user.salt,
             "dateInsertion": generic_user.dateInsertion,
-            "dateUpdate": generic_user.dateUpdate
+            "dateUpdate": generic_user.dateUpdate,
+            "pageSize": 10,
+            "offset": 0
             }
     headers = {
        'Content-Type': 'application/json',
@@ -224,3 +226,24 @@ def test_delete(token=token):
     assert resp.status_code == 200
     assert 204 == json.loads(
             resp.get_data(as_text=True))['status_code']
+
+
+@pytest.mark.order7
+def test_search_by_id(generic_user=generic_user, client=client, token=token):
+    data = {
+            "action": "searchByID",
+            "id": 1
+            }
+    headers = {
+       'Content-Type': 'application/json',
+       'Accept': 'application/json',
+       'Authorization': 'Basic %s' % token
+    }
+    resp = client.get(
+         '/api/gyresources/users',
+         headers=headers,
+         content_type='application/json',
+         query_string=data,
+         follow_redirects=True)
+    baseResponse = json.loads(resp.get_data(as_text=True))
+    assert baseResponse['status_code'] == 200
