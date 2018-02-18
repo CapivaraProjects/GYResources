@@ -385,6 +385,4 @@ def test_wrong_token(
             }
     resp = client.delete('/api/gyresources/users/', data=str(
         json.dumps(user)), headers=headers)
-    resp = json.loads(
-                resp.get_data(as_text=True))
-    assert resp['status_code'] == 401
+    assert 'Unauthorized' in resp
