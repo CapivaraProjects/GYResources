@@ -259,7 +259,7 @@ def test_create_empty():
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             }
-    resp = client().post('/api/gyresources/users/', data=str(
+    resp = client.post('/api/gyresources/users/', data=str(
         json.dumps(data)), headers=headers)
     resp = json.loads(
                 resp.get_data(as_text=True))
