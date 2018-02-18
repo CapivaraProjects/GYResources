@@ -247,3 +247,22 @@ def test_delete(token=token):
     assert resp.status_code == 200
     assert 204 == json.loads(
             resp.get_data(as_text=True))['status_code']
+
+
+@pytest.mark.order8
+def test_create_empty(generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    user = generic_user
+    user.email = ''
+    user.username = ''
+    data = user.__dict__
+    headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % token['token']
+            }
+    resp = client().post('/api/gyresources/users/', data=str(
+        json.dumps(data)), headers=headers)
+    resp = json.loads(
+                resp.get_data(as_text=True))
+    assert resp['status_code'] == 500

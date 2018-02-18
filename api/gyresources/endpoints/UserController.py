@@ -124,18 +124,13 @@ class UserController(BaseController):
 
         try:
             user.id = None
+            if not user.email or not user.username or not user.password or not user.salt:
+                raise Exception('User fields not defined')
             user = repository.create(user)
             return self.okResponse(
                 response=user,
                 message="User sucessfuly created.",
                 status=201), 200
-        except exc.SQLAlchemyError as sqlerr:
-            # log
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             return self.okResponse(
                 response=err,
