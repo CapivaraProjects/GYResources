@@ -269,7 +269,7 @@ def test_create_empty():
 @pytest.mark.order9
 def test_update_wrong_id(
         generic_user=generic_user):
-    (generic_user, token) = auth(generic_user)
+    (generic_user, token) = test_auth(generic_user)
     data = generic_user.__dict__
     data['action'] = 'search'
     resp = client().get(
@@ -312,7 +312,7 @@ def test_update_wrong_id(
 @pytest.mark.order7
 def test_delete_non_existent(
         generic_user=generic_user):
-    (generic_user, token) = auth(generic_user)
+    (generic_user, token) = test_auth(generic_user)
     data = generic_user.__dict__
     data['action'] = 'search'
     resp = client().get(
