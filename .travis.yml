@@ -29,11 +29,11 @@ cache: pip
 install:
   - pip3 install -r requirements.txt
 before_script:
-  - sleep 10
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf /usr/local/var/postgres; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then initdb /usr/local/var/postgres; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pg_ctl -D /usr/local/var/postgres start; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then createuser -s postgres; fi
+  - sleep 10
   - createuser -s -w -U postgres -e capivara
   - createdb green_eyes -U capivara
   - psql -c "ALTER USER capivara WITH PASSWORD 'test';" -U postgres
