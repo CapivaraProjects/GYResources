@@ -334,3 +334,34 @@ def test_delete(token=token):
     assert resp.status_code == 200
     assert 204 == json.loads(
             resp.get_data(as_text=True))['status_code']
+
+
+@pytest.mark.order11
+def test_wrong_auth(generic_user=generic_user):
+    crypto = Crypto()
+    generic_user.salt = crypto.generateRandomSalt()
+    generic_user.password = crypto.encrypt(
+        generic_user.salt,
+        'test')
+
+    data = {'salt': generic_user.salt}
+    creds = base64.b64encode(
+        bytes(
+            "wrong:"+generic_user.password,
+            'utf-8')).decode('utf-8')
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Basic %s' % creds
+    }
+    resp = client.post(
+        '/api/gyresources/token/',
+        headers=headers,
+        data=str(
+            json.dumps(data)),
+        follow_redirects=True)
+    resp = json.loads(resp.get_data(as_text=True))
+    token = resp['response']
+    generic_user.password = 'password'
+    assert token
+    return (generic_user, token)
