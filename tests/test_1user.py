@@ -212,44 +212,6 @@ def test_search_by_id(generic_user=generic_user, client=client, token=token):
 
 
 @pytest.mark.order7
-def test_delete(token=token):
-    data = generic_user.__dict__
-    data['action'] = 'search'
-    resp = client.get(
-            '/api/gyresources/users',
-            content_type='application/json',
-            headers={
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'dataType': 'json'},
-            query_string=data, follow_redirects=True)
-    pagedResponse = json.loads(resp.get_data(as_text=True))
-    user = object()
-    for response in pagedResponse['response']:
-        user = namedtuple("User", response.keys())(*response.values())
-
-    user = models.User.User(
-            id=user.id,
-            idType=user.idType,
-            email=user.email,
-            username=user.username,
-            password='password',
-            salt=user.salt,
-            dateInsertion=user.dateInsertion,
-            dateUpdate=user.dateUpdate)
-    headers = {
-       'Content-Type': 'application/json',
-       'Accept': 'application/json',
-       'Authorization': 'Bearer %s' % token['token']
-    }
-    resp = client.delete('/api/gyresources/users/', data=str(
-        json.dumps(user.__dict__)), headers=headers)
-    assert resp.status_code == 200
-    assert 204 == json.loads(
-            resp.get_data(as_text=True))['status_code']
-
-
-@pytest.mark.order8
 def test_create_empty():
     user = models.User.User()
     user.email = ''
@@ -266,7 +228,7 @@ def test_create_empty():
     assert resp['status_code'] == 500
 
 
-@pytest.mark.order9
+@pytest.mark.order8
 def test_update_wrong_id(
         generic_user=generic_user):
     (generic_user, token) = test_auth(generic_user)
@@ -309,7 +271,7 @@ def test_update_wrong_id(
     assert 'Internal server error' in resp['message']
 
 
-@pytest.mark.order7
+@pytest.mark.order9
 def test_delete_non_existent(
         generic_user=generic_user):
     (generic_user, token) = test_auth(generic_user)
@@ -343,3 +305,41 @@ def test_delete_non_existent(
                 resp.get_data(as_text=True))
     assert resp['status_code'] == 500
     assert 'Internal server error' in resp['message']
+
+
+@pytest.mark.order10
+def test_delete(token=token):
+    data = generic_user.__dict__
+    data['action'] = 'search'
+    resp = client.get(
+            '/api/gyresources/users',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json'},
+            query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    user = object()
+    for response in pagedResponse['response']:
+        user = namedtuple("User", response.keys())(*response.values())
+
+    user = models.User.User(
+            id=user.id,
+            idType=user.idType,
+            email=user.email,
+            username=user.username,
+            password='password',
+            salt=user.salt,
+            dateInsertion=user.dateInsertion,
+            dateUpdate=user.dateUpdate)
+    headers = {
+       'Content-Type': 'application/json',
+       'Accept': 'application/json',
+       'Authorization': 'Bearer %s' % token['token']
+    }
+    resp = client.delete('/api/gyresources/users/', data=str(
+        json.dumps(user.__dict__)), headers=headers)
+    assert resp.status_code == 200
+    assert 204 == json.loads(
+            resp.get_data(as_text=True))['status_code']
