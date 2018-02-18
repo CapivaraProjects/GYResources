@@ -272,22 +272,7 @@ def test_update_wrong_id(
 
 @pytest.mark.order9
 def test_delete_non_existent(
-        generic_user=generic_user, token=token):
-    data = generic_user.__dict__
-    data['action'] = 'search'
-    resp = client.get(
-            '/api/gyresources/users',
-            content_type='application/json',
-            headers={
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'dataType': 'json'},
-            query_string=data, follow_redirects=True)
-    pagedResponse = json.loads(resp.get_data(as_text=True))
-    user = object()
-    for response in pagedResponse['response']:
-        user = namedtuple("User", response.keys())(*response.values())
-
+        token=token):
     user = {
                 "action": "string",
                 "id": 1000,
@@ -301,6 +286,7 @@ def test_delete_non_existent(
         json.dumps(user)), headers=headers)
     resp = json.loads(
                 resp.get_data(as_text=True))
+    print(str(resp))
     assert resp['status_code'] == 500
     assert 'Internal server error' in resp['message']
 
