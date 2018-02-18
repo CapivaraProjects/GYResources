@@ -250,16 +250,14 @@ def test_delete(token=token):
 
 
 @pytest.mark.order8
-def test_create_empty(generic_user=generic_user):
-    (generic_user, token) = auth(generic_user)
-    user = generic_user
+def test_create_empty():
+    user = models.User.User()
     user.email = ''
     user.username = ''
     data = user.__dict__
     headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer %s' % token['token']
             }
     resp = client().post('/api/gyresources/users/', data=str(
         json.dumps(data)), headers=headers)
