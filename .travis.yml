@@ -1,19 +1,26 @@
 language: python
 matrix:
-    include:
-        - os: linux
-          sudo: required
-          python: 3.5
-        - os: linux
-          sudo: required
-          python: 3.6
-        - os: osx
-          language: generic
-          env: TRAVIS_OS_NAME=osx
+  allow_failures:
+    - os: osx
+  include:
+    - os: linux
+      sudo: required
+      python: 3.5
+    - os: linux
+      sudo: required
+      python: 3.6
+    - os: osx
+      language: generic
+      env: TRAVIS_OS_NAME=osx
 # python:
 #   - "3.5"
 #   - "3.6"
 # command to install dependencies
+services:
+  - postgresql 
+  - elasticsearch
+addons:
+  postgresql: "9.5"  
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install python3; fi
@@ -21,13 +28,11 @@ before_install:
 cache: pip
 install:
   - pip3 install -r requirements.txt
-services:
-  - postgresql 
-  - elasticsearch
-addons:
-  postgresql: "9.5"  
 before_script:
   - sleep 10
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf /usr/local/var/postgres; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then initdb /usr/local/var/postgres; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pg_ctl -D /usr/local/var/postgres start; fi
   - createuser -s -w -U postgres -e capivara
   - createdb green_eyes -U capivara
   - psql -c "ALTER USER capivara WITH PASSWORD 'test';" -U postgres
