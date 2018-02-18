@@ -361,5 +361,30 @@ def test_wrong_auth(generic_user=generic_user):
             json.dumps(data)),
         follow_redirects=True)
     resp = json.loads(resp.get_data(as_text=True))
-    print(str(resp))
+    assert resp['status_code'] == 401
+
+
+@pytest.mark.order12
+def test_wrong_token(
+        user=generic_user, token=token):
+    user = {
+                "action": "string",
+                "id": 1000,
+                'idType': user.idType,
+                'email': user.email,
+                'username': user.username,
+                'password': user.password,
+                'salt': user.salt,
+                'dateInsertion': user.dateInsertion,
+                'dateUpdate': user.dateUpdate
+            }
+    headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer wrongToken'
+            }
+    resp = client.delete('/api/gyresources/users/', data=str(
+        json.dumps(user)), headers=headers)
+    resp = json.loads(
+                resp.get_data(as_text=True))
     assert resp['status_code'] == 401
