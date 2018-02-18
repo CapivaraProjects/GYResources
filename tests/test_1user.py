@@ -233,7 +233,7 @@ def test_update_wrong_id(
         generic_user=generic_user, token=token):
     data = generic_user.__dict__
     data['action'] = 'search'
-    resp = client().get(
+    resp = client.get(
             '/api/gyresources/users',
             content_type='application/json',
             headers={
@@ -262,7 +262,7 @@ def test_update_wrong_id(
             'Content-Type': 'application/json',
             'Authorization': 'Bearer %s' % token['token']
             }
-    resp = client().put('/api/gyresources/users/', data=str(
+    resp = client.put('/api/gyresources/users/', data=str(
         json.dumps(user)), headers=headers)
     resp = json.loads(
                 resp.get_data(as_text=True))
@@ -275,7 +275,7 @@ def test_delete_non_existent(
         generic_user=generic_user, token=token):
     data = generic_user.__dict__
     data['action'] = 'search'
-    resp = client().get(
+    resp = client.get(
             '/api/gyresources/users',
             content_type='application/json',
             headers={
@@ -297,7 +297,7 @@ def test_delete_non_existent(
             'Content-Type': 'application/json',
             'Authorization': 'Bearer %s' % token['token']
             }
-    resp = client().delete('/api/gyresources/users/', data=str(
+    resp = client.delete('/api/gyresources/users/', data=str(
         json.dumps(user)), headers=headers)
     resp = json.loads(
                 resp.get_data(as_text=True))
