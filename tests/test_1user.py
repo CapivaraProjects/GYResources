@@ -230,8 +230,7 @@ def test_create_empty():
 
 @pytest.mark.order8
 def test_update_wrong_id(
-        generic_user=generic_user):
-    (generic_user, token) = test_auth(generic_user)
+        generic_user=generic_user, token=token):
     data = generic_user.__dict__
     data['action'] = 'search'
     resp = client().get(
@@ -253,8 +252,8 @@ def test_update_wrong_id(
                 idType: user.idType,
                 email: user.email,
                 username: user.username,
-                password: 'password',
-                salt: crypto.generateRandomSalt(),
+                password: user.password,
+                salt: user.salt,
                 dateInsertion: user.dateInsertion,
                 dateUpdate: user.dateUpdate
             }
@@ -273,8 +272,7 @@ def test_update_wrong_id(
 
 @pytest.mark.order9
 def test_delete_non_existent(
-        generic_user=generic_user):
-    (generic_user, token) = test_auth(generic_user)
+        generic_user=generic_user, token=token):
     data = generic_user.__dict__
     data['action'] = 'search'
     resp = client().get(
