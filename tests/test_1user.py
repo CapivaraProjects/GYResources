@@ -249,13 +249,13 @@ def test_update_wrong_id(
     user = {
                 "action": "string",
                 "id": 1000,
-                idType: user.idType,
-                email: user.email,
-                username: user.username,
-                password: user.password,
-                salt: user.salt,
-                dateInsertion: user.dateInsertion,
-                dateUpdate: user.dateUpdate
+                'idType': user.idType,
+                'email': user.email,
+                'username': user.username,
+                'password': user.password,
+                'salt': user.salt,
+                'dateInsertion': user.dateInsertion,
+                'dateUpdate': user.dateUpdate
             }
     headers = {
             'Accept': 'application/json',
