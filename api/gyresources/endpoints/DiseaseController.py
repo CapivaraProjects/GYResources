@@ -49,13 +49,13 @@ class DiseaseController(BaseController):
                       scientificName=request.args.get('scientificName'),
                       commonName=request.args.get('commonName'))
         pageSize = None
-        if pageSize:
+        if request.args.get('pageSize'):
             pageSize = int(request.args.get('pageSize'))
         else:
             pageSize = 10
 
         offset = None
-        if offset:
+        if request.args.get('offset'):
             offset = int(request.args.get('offset'))
         else:
             offset = 0
@@ -109,17 +109,6 @@ class DiseaseController(BaseController):
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
-                status=500)
-        except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'Internal server error',
-                                 'get()',
-                                 str(err),
-                                 flask_app.config["TYPE"])
-            return self.okResponse(
-                response=err,
-                message="Internal server error "+str(err),
                 status=500)
 
 
@@ -279,17 +268,6 @@ class DiseaseController(BaseController):
                     response=resp,
                     message="Disease deleted sucessfuly.",
                     status=204), 200
-            else:
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                     'Error',
-                                     'Problem deleting disease',
-                                     'delete()',
-                                     str(disease.__dict__),
-                                     flask_app.config["TYPE"])
-                return self.okResponse(
-                    response=disease,
-                    message="Problem deleting disease",
-                    status=500), 200
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
