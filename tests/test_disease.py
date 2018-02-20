@@ -72,7 +72,7 @@ generic_user = models.User.User(
 def test_search_by_unexistent_id():
     data = {
             "action": "searchByID",
-            "id": "1000000",
+            "id": "1000",
             }
     resp = client().get(
             '/api/gyresources/diseases',
@@ -93,7 +93,7 @@ def test_search_by_id():
                 "id": "1",
             }
     resp = client().get(
-            '/api/gyresources/plants',
+            '/api/gyresources/diseases',
             content_type='application/json',
             headers={
                 'Accept': 'application/json',
