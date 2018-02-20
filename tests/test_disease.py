@@ -183,7 +183,7 @@ def test_update(generic_disease=generic_disease, generic_user=generic_user):
     resp = client().put('/api/gyresources/diseases/', data=str(
         json.dumps(disease)), headers=headers)
     assert resp.status_code == 200
-    disease  = json.loads(
+    disease = json.loads(
                 resp.get_data(as_text=True))
     disease = namedtuple("Text", disease .keys())(*disease .values())
     assert "update" in disease.response['commonName']
