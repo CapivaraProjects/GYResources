@@ -148,6 +148,8 @@ class DiseaseController(BaseController):
                 flask_app.config["DBNAME"])
 
         try:
+            if (not disease.scientificName or not disease.commonName):
+                raise Exception('Not defined scientificName or commonName field')
             disease = repository.create(disease)
             disease.plant = disease.plant.__dict__
             Logger.Logger.create(flask_app.config["ELASTICURL"],
@@ -160,18 +162,6 @@ class DiseaseController(BaseController):
                 response=disease,
                 message="Disease sucessfuly created.",
                 status=201), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Error',
-                                 'post()',
-                                 str(sqlerr),
-                                 flask_app.config["TYPE"])
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
@@ -300,18 +290,6 @@ class DiseaseController(BaseController):
                     response=disease,
                     message="Problem deleting disease",
                     status=500), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Eror',
-                                 'delete()',
-                                 str(sqlerr),
-                                 flask_app.config["TYPE"])
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
