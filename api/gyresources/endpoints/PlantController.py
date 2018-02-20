@@ -9,6 +9,7 @@ from repository.PlantRepository import PlantRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import plant as plantSerializer
 from api.gyresources.parsers import plant_search_args
+from tools import Logger
 
 flask_app = Flask(__name__)
 flask_app.config.from_object('config.DefaultConfig')
@@ -82,7 +83,12 @@ class PlantController(BaseController):
                             offset=offset,
                             pageSize=pageSize), 200
         except (exc.SQLAlchemyError, Exception) as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'get()',
+                                 str(sqlerr),
+                                 'TEST')
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),

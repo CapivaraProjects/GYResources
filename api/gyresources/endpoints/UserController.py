@@ -155,18 +155,6 @@ class UserController(BaseController):
                 response=user,
                 message="User sucessfuly created.",
                 status=201), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Error',
-                                 'post()',
-                                 str(sqlerr),
-                                 'TEST')
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
@@ -209,18 +197,6 @@ class UserController(BaseController):
                 response=user,
                 message="User sucessfuly updated.",
                 status=204), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Error',
-                                 'put()',
-                                 str(sqlerr),
-                                 'TEST')
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
@@ -276,13 +252,6 @@ class UserController(BaseController):
                     response=user,
                     message="Problem deleting user",
                     status=500), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Error',
-                                 'delete()',
-                                 str(sqlerr),
-                                 'TEST')
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,

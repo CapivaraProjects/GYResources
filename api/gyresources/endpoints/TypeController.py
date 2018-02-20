@@ -144,13 +144,6 @@ class TypeController(BaseController):
                 response=type_model,
                 message="Type sucessfuly created.",
                 status=201), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Error',
-                                 'post()',
-                                 str(sqlerr),
-                                 'TEST')
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
