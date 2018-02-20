@@ -9,7 +9,6 @@ from repository.PlantRepository import PlantRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import plant as plantSerializer
 from api.gyresources.parsers import plant_search_args
-from tools import Logger
 
 flask_app = Flask(__name__)
 flask_app.config.from_object('config.DefaultConfig')
@@ -43,18 +42,18 @@ class PlantController(BaseController):
         result = models.Plant.Plant()
         total = 0
         action = request.args.get('action')
-        id = request.args.get('id')
+        idPlant = request.args.get('id')
         plant = models.Plant.Plant(
             scientificName=request.args.get('scientificName'),
             commonName=request.args.get('commonName'))
         pageSize = None
-        if pageSize:
+        if request.args.get('pageSize'):
             pageSize = int(request.args.get('pageSize'))
         else:
             pageSize = 10
 
         offset = None
-        if offset:
+        if request.args.get('offset'):
             offset = int(request.args.get('offset'))
         else:
             offset = 0
@@ -66,13 +65,7 @@ class PlantController(BaseController):
                 flask_app.config["DBNAME"])
         try:
             if (action == 'searchByID'):
-                result = repository.searchByID(id)
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                     'Informative',
-                                     'OK',
-                                     'get()',
-                                     str(result.__dict__),
-                                     'TEST')
+                result = repository.searchByID(idPlant)
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -81,12 +74,6 @@ class PlantController(BaseController):
                 result = repository.search(plant, pageSize, offset)
                 total = result['total']
                 result = result['content']
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                     'Informative',
-                                     'Ok',
-                                     'get()',
-                                     str(result),
-                                     'TEST')
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -95,12 +82,7 @@ class PlantController(BaseController):
                             offset=offset,
                             pageSize=pageSize), 200
         except (exc.SQLAlchemyError, Exception) as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Error',
-                                 'get()',
-                                 str(sqlerr),
-                                 'TEST')
+            # log
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
@@ -130,41 +112,19 @@ class PlantController(BaseController):
                 flask_app.config["DBNAME"])
 
         try:
+            if (not plant.scientificName or not plant.commonName):
+                raise Exception(
+                        'Not defined scientificName or commonName field')
             plant = repository.create(plant)
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Informative',
-                                 'Plant sucessfuly created',
-                                 'post()',
-                                 str(plant.__dict__),
-                                 'TEST')
             return self.okResponse(
                 response=plant,
                 message="Plant sucessfuly created.",
                 status=201), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Error',
-                                 'post()',
-                                 str(sqlerr),
-                                 'TEST')
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'Internal server Error',
-                                 'post()',
-                                 str(err),
-                                 'TEST')
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
-
 
     @api.response(200, 'Plant changed successfuly')
     @api.expect(plantSerializer)
@@ -186,40 +146,15 @@ class PlantController(BaseController):
                 flask_app.config["DBNAME"])
         try:
             plant = repository.update(plant)
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Informative',
-                                 'Plant sucessfuly updated',
-                                 'put()',
-                                 str(plant.__dict__),
-                                 'TEST')
             return self.okResponse(
                 response=plant,
                 message="Plant sucessfuly updated.",
                 status=204), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Error',
-                                 'put()',
-                                 str(sqlerr),
-                                 'TEST')
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'Internal server Error',
-                                 'put()',
-                                 str(err),
-                                 'TEST')
             return self.okResponse(
                 response=err,
-                message="Internal server error",
+                message="Internal server error" + str(err),
                 status=500)
-
 
     @api.response(200, 'Plant deleted successfuly')
     @api.expect(plantSerializer)
@@ -243,48 +178,12 @@ class PlantController(BaseController):
         try:
             status = repository.delete(plant)
             if (status):
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                     'Informative',
-                                     'Plant deleted sucessfuly',
-                                     'delete()',
-                                     'Empty',
-                                     'TEST')
                 return self.okResponse(
                     response=models.Plant.Plant(),
                     message="Plant deleted sucessfuly.",
                     status=204), 200
-            else:
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                     'Error',
-                                     'Problem deleting plant',
-                                     'delete()',
-                                     str(plant.__dict__),
-                                     'TEST')
-                return self.okResponse(
-                    response=plant,
-                    message="Problem deleting plant",
-                    status=500), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Error',
-                                 'delete()',
-                                 str(sqlerr),
-                                 'TEST')
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'Internal server Error',
-                                 'delete()',
-                                 str(err),
-                                 'TEST')
             return self.okResponse(
                 response=err,
-                message="Internal server error: "+str(err),
+                message="Internal server error: " + str(err),
                 status=500)
-
