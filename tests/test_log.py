@@ -32,7 +32,7 @@ def test_log_emptyRequiredFields(generic_log=generic_log):
             "config": ""
             }
     resp = client().post('/api/gyresources/logs/', data=str(
-        json.dumps(generic_log.__dict__)), headers={
+        json.dumps(data)), headers={
             'Accept': 'application/json',
             'Content-Type': 'application/json'},
         query_string=data, follow_redirects=True)
@@ -49,7 +49,7 @@ def test_log_incorrectFields(generic_log=generic_log):
             "config": "unknown"
             }
     resp = client().post('/api/gyresources/logs/', data=str(
-        json.dumps(generic_log.__dict__)), headers={
+        json.dumps(data)), headers={
             'Accept': 'application/json',
             'Content-Type': 'application/json'},
         query_string=data, follow_redirects=True)
