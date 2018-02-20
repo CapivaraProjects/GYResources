@@ -54,13 +54,13 @@ class UserController(BaseController):
             dateInsertion=request.args.get('dateInsertion'),
             dateUpdate=request.args.get('dateUpdate'))
         pageSize = None
-        if pageSize:
+        if request.args.get('pageSize'):
             pageSize = int(request.args.get('pageSize'))
         else:
             pageSize = 10
 
         offset = None
-        if offset:
+        if request.args.get('offset'):
             offset = int(request.args.get('offset'))
         else:
             offset = 0
@@ -112,7 +112,6 @@ class UserController(BaseController):
                 message="SQL error: "+str(sqlerr),
                 status=500)
 
-
     @api.response(200, 'User successfuly created.')
     @api.expect(userSerializer)
     def post(self):
@@ -143,6 +142,8 @@ class UserController(BaseController):
 
         try:
             user.id = None
+            if not user.email or not user.username or not user.password or not user.salt:
+                raise Exception('User fields not defined')
             user = repository.create(user)
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Informative',
@@ -177,7 +178,6 @@ class UserController(BaseController):
                 response=err,
                 message="Internal server error "+str(err),
                 status=500)
-
 
     @api.response(200, 'User changed successfuly')
     @api.expect(userSerializer)
@@ -230,7 +230,7 @@ class UserController(BaseController):
                                  'TEST')
             return self.okResponse(
                 response=err,
-                message="Internal server error",
+                message="Internal server error: " + str(err),
                 status=500)
 
     @api.response(200, 'User deleted successfuly')
@@ -299,4 +299,3 @@ class UserController(BaseController):
                 response=err,
                 message="Internal server error: "+str(err),
                 status=500)
-

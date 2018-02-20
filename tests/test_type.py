@@ -1,11 +1,12 @@
+"""Test TypeController"""
 import json
-import pytest
 import base64
+from collections import namedtuple
+import pytest
+from flask import Flask
 import models.Type
 import models.User
-from flask import Flask
 from app import initialize_app
-from collections import namedtuple
 from tools.Cryptography import Crypto
 
 
@@ -26,6 +27,7 @@ generic_user = models.User.User(
 
 
 def auth(generic_user=generic_user):
+    """Method used to authenticate user"""
     crypto = Crypto()
     generic_user.salt = crypto.generateRandomSalt()
     generic_user.password = crypto.encrypt(
@@ -72,7 +74,7 @@ def test_search_by_unexistent_id():
             "id": "1000000",
             }
     resp = client().get(
-            '/api/gyresources/texts',
+            '/api/gyresources/types',
             content_type='application/json',
             headers={
                 'Accept': 'application/json',
@@ -215,4 +217,122 @@ def test_delete(generic_type=generic_type, generic_user=generic_user):
         json.dumps(type)), headers=headers)
     assert resp.status_code == 200
     assert 204 == json.loads(
-            resp.get_data(as_text=True))['status_code']
+        resp.get_data(as_text=True))['status_code']
+
+
+@pytest.mark.order7
+def test_search_with_page_size_and_offset():
+    data = {
+                "action": "search",
+                "value": "test",
+                "description": "test",
+                "pageSize": 10,
+                "offset": 0
+            }
+    resp = client().get(
+            '/api/gyresources/types',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json'},
+            query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    assert pagedResponse['status_code'] == 200
+    for response in pagedResponse['response']:
+        assert 'large' in response['value']
+
+
+@pytest.mark.order8
+def test_create_empty(generic_type=generic_type, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    type_aux = generic_type
+    type_aux.value = ''
+    type_aux.description = ''
+    data = type_aux.__dict__
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer %s' % token['token']
+        }
+    resp = client().post('/api/gyresources/types/', data=str(
+        json.dumps(data)), headers=headers)
+    resp = json.loads(
+        resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+
+
+@pytest.mark.order9
+def test_update_wrong_id(
+        generic_type=generic_type,
+        generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    data = generic_type.__dict__
+    data['action'] = 'search'
+    resp = client().get(
+        '/api/gyresources/types',
+        content_type='application/json',
+        headers={
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'dataType': 'json'},
+        query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    type_model = object()
+    for response in pagedResponse['response']:
+        type_model = namedtuple("Type", response.keys())(*response.values())
+
+    type_model = {
+        "id": 1000,
+        "value": type_model.value,
+        "description": 'update'
+    }
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer %s' % token['token']
+    }
+    resp = client().put('/api/gyresources/types/', data=str(
+        json.dumps(type_model)), headers=headers)
+    resp = json.loads(
+        resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']
+
+
+@pytest.mark.order10
+def test_delete_non_existent(
+        generic_type=generic_type,
+        generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    data = generic_type.__dict__
+    data['action'] = 'search'
+    resp = client().get(
+        '/api/gyresources/types',
+        content_type='application/json',
+        headers={
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'dataType': 'json'},
+        query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    type_model = object()
+    for response in pagedResponse['response']:
+        type_model = namedtuple("Type", response.keys())(*response.values())
+
+    type_model = {
+        "id": 1000,
+        "value": type_model.value,
+        "description": type_model.description
+    }
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer %s' % token['token']
+    }
+    resp = client().delete('/api/gyresources/types/', data=str(
+        json.dumps(type_model)), headers=headers)
+    resp = json.loads(
+        resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']
