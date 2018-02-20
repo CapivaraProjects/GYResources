@@ -9,6 +9,7 @@ from repository.UserRepository import UserRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import user as userSerializer
 from api.gyresources.parsers import user_search_args
+from tools import Logger
 
 flask_app = Flask(__name__)
 flask_app.config.from_object('config.DefaultConfig')
@@ -72,6 +73,12 @@ class UserController(BaseController):
         try:
             if (action == 'searchByID'):
                 result = repository.searchByID(id)
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Ok',
+                                     'get()',
+                                     str(result.__dict__),
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -80,6 +87,12 @@ class UserController(BaseController):
                 result = repository.search(user, pageSize, offset)
                 total = result['total']
                 result = result['content']
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Ok',
+                                     'get()',
+                                     str(result),
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -88,7 +101,12 @@ class UserController(BaseController):
                             offset=offset,
                             pageSize=pageSize), 200
         except (exc.SQLAlchemyError, Exception) as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'get()',
+                                 str(sqlerr),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
@@ -127,11 +145,23 @@ class UserController(BaseController):
             if not user.email or not user.username or not user.password or not user.salt:
                 raise Exception('User fields not defined')
             user = repository.create(user)
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Informative',
+                                 'User sucessfuly created',
+                                 'post()',
+                                 str(user.__dict__),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=user,
                 message="User sucessfuly created.",
                 status=201), 200
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server Error',
+                                 'post()',
+                                 str(err),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
@@ -157,11 +187,23 @@ class UserController(BaseController):
                 flask_app.config["DBNAME"])
         try:
             user = repository.update(user)
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Informative',
+                                 'User sucessfuly updated',
+                                 'put()',
+                                 str(user.__dict__),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=user,
                 message="User sucessfuly updated.",
                 status=204), 200
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server Error',
+                                 'put()',
+                                 str(err),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
@@ -189,11 +231,24 @@ class UserController(BaseController):
         try:
             status = repository.delete(user)
             if (status):
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'User deleted sucessfuly',
+                                     'delete()',
+                                     str(status),
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                     response=models.User.User(),
                     message="User deleted sucessfuly.",
                     status=204), 200
+
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server Error',
+                                 'delete()',
+                                 str(err),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: "+str(err),

@@ -9,6 +9,7 @@ from repository.TextRepository import TextRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import text as textSerializer
 from api.gyresources.parsers import text_search_args
+from tools import Logger
 
 flask_app = Flask(__name__)
 flask_app.config.from_object('config.DefaultConfig')
@@ -68,6 +69,12 @@ class TextController(BaseController):
         try:
             if (action == 'searchByID'):
                 result = repository.searchByID(id)
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Ok',
+                                     'get()',
+                                     str(result.__dict__),
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -76,6 +83,12 @@ class TextController(BaseController):
                 result = repository.search(text, pageSize, offset)
                 total = result['total']
                 result = result['content']
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Ok',
+                                     'get()',
+                                     str(result),
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -84,7 +97,12 @@ class TextController(BaseController):
                             offset=offset,
                             pageSize=pageSize), 200
         except (exc.SQLAlchemyError, Exception) as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'get()',
+                                 str(sqlerr),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
@@ -118,18 +136,35 @@ class TextController(BaseController):
 
         try:
             text = repository.create(text)
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Informative',
+                                 'Text sucessfuly created',
+                                 'post()',
+                                 str(text.__dict__),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=text,
                 message="Text sucessfuly created.",
                 status=201), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'post()',
+                                 str(sqlerr),
+                                 flask_app.config["TYPE"])
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server Error',
+                                 'post()',
+                                 str(err),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
@@ -155,22 +190,40 @@ class TextController(BaseController):
                 flask_app.config["DBNAME"])
         try:
             text = repository.update(text)
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Informative',
+                                 'Text sucessfuly updated',
+                                 'put()',
+                                 str(text.__dict__),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=text,
                 message="Text sucessfuly updated.",
                 status=204), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'put()',
+                                 str(sqlerr),
+                                 flask_app.config["TYPE"])
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server Error',
+                                 'put()',
+                                 str(err),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error",
                 status=500)
+
 
     @api.response(200, 'Text deleted successfuly')
     @api.expect(textSerializer)
@@ -194,23 +247,46 @@ class TextController(BaseController):
         try:
             status = repository.delete(text)
             if (status):
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Text deleted sucessfuly',
+                                     'delete()',
+                                     'Empty',
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                     response=models.Text.Text(),
                     message="Text deleted sucessfuly.",
                     status=204), 200
             else:
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Problem deleting text',
+                                     'delete()',
+                                     str(text.__dict__),
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                     response=text,
                     message="Problem deleting text",
                     status=500), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL Error',
+                                 'delete()',
+                                 str(sqlerr),
+                                 flask_app.config["TYPE"])
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server Error',
+                                 'delete()',
+                                 str(err),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: "+str(err),
