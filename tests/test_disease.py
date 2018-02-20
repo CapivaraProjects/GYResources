@@ -224,3 +224,119 @@ def test_delete(generic_disease=generic_disease, generic_user=generic_user):
     assert resp.status_code == 200
     assert 204 == json.loads(
             resp.get_data(as_text=True))['status_code']
+
+
+@pytest.mark.order7
+def test_search_with_page_size_and_offset():
+    data = {
+                "action": "search",
+                "scientificName": "Venturia",
+                "commonName": "Apple",
+                "pageSize": 10,
+                "offset": 0
+            }
+    resp = client().get(
+            '/api/gyresources/diseases',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json'},
+            query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    assert pagedResponse['status_code'] == 200
+    for response in pagedResponse['response']:
+        assert 'Apple' in response['commonName']
+
+
+@pytest.mark.order8
+def test_create_empty(generic_disease=generic_disease, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    disease = generic_disease
+    disease.scientificName = ''
+    disease.commonName = ''
+    data = disease.__dict__
+    headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % token['token']
+            }
+    resp = client().post('/api/gyresources/diseases/', data=str(
+        json.dumps(data)), headers=headers)
+    resp = json.loads(
+                resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+
+
+@pytest.mark.order9
+def test_update_wrong_id(generic_disease=generic_disease, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    data = generic_disease.__dict__
+    data['action'] = 'search'
+    resp = client().get(
+            '/api/gyresources/diseases',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json'},
+            query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    disease = object()
+    for response in pagedResponse['response']:
+        disease = namedtuple("Disease", response.keys())(*response.values())
+
+        disease = {
+                "action": "string",
+                "id": 1000,
+                "scientificName": 'update',
+                "commonName": disease.commonName
+            }
+    headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % token['token']
+            }
+    resp = client().put('/api/gyresources/diseases/', data=str(
+        json.dumps(disease)), headers=headers)
+    resp = json.loads(
+                resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']
+
+
+@pytest.mark.order10
+def test_delete_non_existent(generic_disease=generic_disease, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    data = generic_disease.__dict__
+    data['action'] = 'search'
+    resp = client().get(
+            '/api/gyresources/diseases',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json'},
+            query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    disease = object()
+    for response in pagedResponse['response']:
+        disease = namedtuple("Disease", response.keys())(*response.values())
+
+        disease = {
+                "action": "string",
+                "id": 1000,
+                "scientificName": disease.scientificName,
+                "commonName": disease.commonName
+            }
+    headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % token['token']
+            }
+    resp = client().delete('/api/gyresources/diseases/', data=str(
+        json.dumps(disease)), headers=headers)
+    resp = json.loads(
+                resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']
