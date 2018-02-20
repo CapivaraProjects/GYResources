@@ -1,5 +1,6 @@
 from api.gyresources.parsers import log_post_args
 from api.gyresources.endpoints.BaseController import BaseController
+from collections import namedtuple
 from tools.Logger import Logger
 from flask import Flask
 from flask import request
@@ -24,13 +25,15 @@ class LoggerController(BaseController):
         """
         Method used to create the log from the action
         """
+        log = request.json
+        log = namedtuple("Log", log.keys()(*log.values()))
         try:
             Logger.create(url=flask_app.config["ELASTICURL"],
-                          type=request.args.get('type'),
-                          message=request.args.get('message'),
-                          function=request.args.get('function'),
-                          obs=request.args.get('obs'),
-                          config=request.args.get('config'))
+                          type=log.type,
+                          message=log.message,
+                          function=log.function,
+                          obs=log.obs,
+                          config=log.config)
             return self.okResponse(
                 response='',
                 message="OK",
