@@ -63,3 +63,4 @@ docker run \
     -it \
     --rm capivaraprojects/gyresources /usr/bin/zsh
 ```
+trevis
