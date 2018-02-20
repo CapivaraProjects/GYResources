@@ -46,7 +46,7 @@ def test_log_incorrectFields(generic_log=generic_log):
     data = {
             "type": "",
             "function": "null",
-            "config": "unknow"
+            "config": "unknown"
             }
     resp = client().post('/api/gyresources/logs/', data=str(
         json.dumps(generic_log.__dict__)), headers={

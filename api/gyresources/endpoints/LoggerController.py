@@ -5,6 +5,7 @@ from tools.Logger import Logger
 from flask import Flask
 from flask import request
 from api.restplus import api
+import models.Logger
 
 
 flask_app = Flask(__name__)
@@ -35,7 +36,7 @@ class LoggerController(BaseController):
                           obs=log.obs,
                           config=log.config)
             return self.okResponse(
-                response='',
+                response=models.Logger.Logger(log.type, log.message, log.function, log.obs, log.config),
                 message="OK",
                 status=201), 200
         except Exception as err:
