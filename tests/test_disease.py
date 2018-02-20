@@ -287,10 +287,12 @@ def test_update_wrong_id(generic_disease=generic_disease, generic_user=generic_u
         disease = namedtuple("Disease", response.keys())(*response.values())
 
         disease = {
-                "action": "string",
+
                 "id": 1000,
+                "idPlant": disease.plant["id"],
                 "scientificName": 'update',
-                "commonName": disease.commonName
+                "commonName": disease.commonName,
+                "images": disease.images
             }
     headers = {
             'Accept': 'application/json',
@@ -324,10 +326,11 @@ def test_delete_non_existent(generic_disease=generic_disease, generic_user=gener
         disease = namedtuple("Disease", response.keys())(*response.values())
 
         disease = {
-                "action": "string",
                 "id": 1000,
+                "idPlant": disease.plant["id"],
                 "scientificName": disease.scientificName,
-                "commonName": disease.commonName
+                "commonName": disease.commonName,
+                "images": disease.images
             }
     headers = {
             'Accept': 'application/json',
