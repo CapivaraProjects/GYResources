@@ -19,6 +19,7 @@ def test_log(generic_log=generic_log):
         json.dumps(generic_log.__dict__)), headers={
             'Accept': 'application/json',
             'Content-Type': 'application/json'})
+    resp = json.loads(resp.get_data(as_text=True))
     print(str(resp))
     assert resp['status_code'] == 201
 
@@ -36,9 +37,9 @@ def test_log_emptyRequiredFields(generic_log=generic_log):
             'Content-Type': 'application/json'},
         query_string=data, follow_redirects=True)
     print(str(resp))
-    aux = json.loads.__dict__
+    aux = json.loads(resp.get_data(as_text=True))
     print(str(aux))
-    assert json.loads(resp.get_data(as_text=True))['status_code'] == 400
+    assert json.loads(resp.get_data(as_text=True))['status_code'] == 500
 
 @pytest.mark.order3
 def test_log_incorrectFields(generic_log=generic_log):
