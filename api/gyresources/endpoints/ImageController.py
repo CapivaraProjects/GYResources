@@ -10,6 +10,7 @@ from repository.DiseaseRepository import DiseaseRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import image as imageSerializer
 from api.gyresources.parsers import image_search_args
+from tools import Logger
 
 flask_app = Flask(__name__)
 flask_app.config.from_object('config.DefaultConfig')
@@ -78,6 +79,12 @@ class ImageController(BaseController):
                 result = repository.searchByID(id)
                 result.disease.plant = result.disease.plant.__dict__
                 result.disease = result.disease.__dict__
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Ok',
+                                     'get()',
+                                     str(result.__dict__),
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                         response=result,
                         message="Ok",
@@ -90,6 +97,12 @@ class ImageController(BaseController):
                     content.disease.plant = content.disease.plant.__dict__
                     content.disease = content.disease.__dict__
                     response.append(content)
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                        'Informative',
+                                        'Ok',
+                                        'get()',
+                                        str(response),
+                                        flask_app.config["TYPE"])
                 return self.okResponse(
                         response=response,
                         message="Ok",
@@ -104,16 +117,34 @@ class ImageController(BaseController):
                         flask_app.config["IMAGESPATH"])
                 result.disease.plant = result.disease.plant.__dict__
                 result.disease = result.disease.__dict__
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Ok',
+                                     'get()',
+                                     str(result.__dict__),
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                         response=result,
                         message="Ok",
                         status=200)
         except exc.SQLAlchemyError as sqlerr:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL error ',
+                                 'get()',
+                                 str(sqlerr),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: " + str(sqlerr),
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server error ',
+                                 'get()',
+                                 str(err),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
@@ -160,17 +191,34 @@ class ImageController(BaseController):
             image = repository.create(image)
             image.disease.plant = image.disease.plant.__dict__
             image.disease = image.disease.__dict__
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Informative',
+                                 'Image sucessfuly created',
+                                 'post()',
+                                 str(image.__dict__),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=image,
                 message="Image sucessfuly created.",
                 status=201), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL eror ',
+                                 'post()',
+                                 str(sqlerr),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server error ',
+                                 'post()',
+                                 str(err),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
@@ -213,22 +261,40 @@ class ImageController(BaseController):
             image = repository.update(image)
             image.disease.plant = image.disease.plant.__dict__
             image.disease = image.disease.__dict__
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Informative',
+                                 'Image sucessfuly updated',
+                                 'put()',
+                                 str(image.__dict__),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=image,
                 message="Image sucessfuly updated.",
                 status=204), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL eror',
+                                 'put()',
+                                 str(sqlerr),
+                                 flask_app.config["TYPE"])
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server error',
+                                 'put()',
+                                 str(err),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
                 status=500)
+
 
     @api.response(200, 'Image deleted successfuly')
     @api.expect(imageSerializer)
@@ -256,6 +322,12 @@ class ImageController(BaseController):
                 image = models.Image.Image()
                 image.disease.plant = image.disease.plant.__dict__
                 image.disease = image.disease.__dict__
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Informative',
+                                     'Image deleted sucessfuly',
+                                     'delete()',
+                                     str(image.__dict__),
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                     response=image,
                     message="Image deleted sucessfuly.",
@@ -263,19 +335,37 @@ class ImageController(BaseController):
             else:
                 image.disease.plant = image.disease.plant.__dict__
                 image.disease = image.disease.__dict__
+                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                     'Error',
+                                     'Problem deleting plant',
+                                     'delete()',
+                                     str(image.__dict__),
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                     response=image,
                     message="Problem deleting plant",
                     status=500), 200
         except exc.SQLAlchemyError as sqlerr:
-            # log
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'SQL eror',
+                                 'put()',
+                                 str(sqlerr),
+                                 flask_app.config["TYPE"])
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror" + str(sqlerr),
                 status=500)
         except Exception as err:
+            Logger.Logger.create(flask_app.config["ELASTICURL"],
+                                 'Error',
+                                 'Internal server error',
+                                 'put()',
+                                 str(err),
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
                 status=500)
+
