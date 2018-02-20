@@ -144,11 +144,6 @@ class TypeController(BaseController):
                 response=type_model,
                 message="Type sucessfuly created.",
                 status=201), 200
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',

@@ -241,22 +241,6 @@ class UserController(BaseController):
                     response=models.User.User(),
                     message="User deleted sucessfuly.",
                     status=204), 200
-            else:
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                     'Error',
-                                     'Problem deleting user',
-                                     'delete()',
-                                     str(user.__dict__),
-                                     'TEST')
-                return self.okResponse(
-                    response=user,
-                    message="Problem deleting user",
-                    status=500), 200
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
