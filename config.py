@@ -14,7 +14,7 @@ class DefaultConfig(object):
     RESTPLUS_VALIDATE = True
     RESTPLUS_MASK_SWAGGER = False
     RESTPLUS_ERROR_404_HELP = False
-    TYPE = 'TEST'
+    TYPE = 'DEV'
     ELASTICURL = 'http://127.0.0.1:9200'
     SECRET_KEY = 'testing gyresources api'
     IMAGESPATH = os.getcwd()
@@ -23,4 +23,3 @@ class DefaultConfig(object):
 class TestConfig(object):
     # test settings
     TYPE = 'TEST'
-    pass

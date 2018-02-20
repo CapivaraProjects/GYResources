@@ -78,7 +78,7 @@ class UserController(BaseController):
                                      'Ok',
                                      'get()',
                                      str(result.__dict__),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -92,7 +92,7 @@ class UserController(BaseController):
                                      'Ok',
                                      'get()',
                                      str(result),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -106,7 +106,7 @@ class UserController(BaseController):
                                  'SQL Error',
                                  'get()',
                                  str(sqlerr),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
@@ -150,7 +150,7 @@ class UserController(BaseController):
                                  'User sucessfuly created',
                                  'post()',
                                  str(user.__dict__),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=user,
                 message="User sucessfuly created.",
@@ -161,7 +161,7 @@ class UserController(BaseController):
                                  'Internal server Error',
                                  'post()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
@@ -192,7 +192,7 @@ class UserController(BaseController):
                                  'User sucessfuly updated',
                                  'put()',
                                  str(user.__dict__),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=user,
                 message="User sucessfuly updated.",
@@ -203,7 +203,7 @@ class UserController(BaseController):
                                  'Internal server Error',
                                  'put()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
@@ -236,18 +236,19 @@ class UserController(BaseController):
                                      'User deleted sucessfuly',
                                      'delete()',
                                      str(status),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                     response=models.User.User(),
                     message="User deleted sucessfuly.",
                     status=204), 200
+
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
                                  'Internal server Error',
                                  'delete()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: "+str(err),

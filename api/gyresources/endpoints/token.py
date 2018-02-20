@@ -2,6 +2,7 @@ import time
 from flask import Flask, g
 from api.restplus import api, auth, generate_auth_token
 from api.gyresources.endpoints.BaseController import BaseController
+from tools import Logger
 
 flask_app = Flask(__name__)
 flask_app.config.from_object('config.DefaultConfig')
@@ -28,7 +29,12 @@ class TokenController(BaseController):
         """
         self.startTime = time.time()
         token = generate_auth_token(600, g.user.id)
-
+        Logger.Logger.create(flask_app.config["ELASTICURL"],
+                             'Informative',
+                             'Token sucessfully created',
+                             'post()',
+                             token.decode('utf-8'),
+                             flask_app.config["TYPE"])
         return self.okResponse(
                     response=Token(token.decode('utf-8'), 600),
                     message='Ok',

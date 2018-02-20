@@ -74,7 +74,7 @@ class TextController(BaseController):
                                      'Ok',
                                      'get()',
                                      str(result.__dict__),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -88,7 +88,7 @@ class TextController(BaseController):
                                      'Ok',
                                      'get()',
                                      str(result),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -102,7 +102,7 @@ class TextController(BaseController):
                                  'SQL Error',
                                  'get()',
                                  str(sqlerr),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
@@ -141,7 +141,7 @@ class TextController(BaseController):
                                  'Text sucessfuly created',
                                  'post()',
                                  str(text.__dict__),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=text,
                 message="Text sucessfuly created.",
@@ -152,7 +152,7 @@ class TextController(BaseController):
                                  'SQL Error',
                                  'post()',
                                  str(sqlerr),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
@@ -164,7 +164,7 @@ class TextController(BaseController):
                                  'Internal server Error',
                                  'post()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
@@ -195,7 +195,7 @@ class TextController(BaseController):
                                  'Text sucessfuly updated',
                                  'put()',
                                  str(text.__dict__),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=text,
                 message="Text sucessfuly updated.",
@@ -206,7 +206,7 @@ class TextController(BaseController):
                                  'SQL Error',
                                  'put()',
                                  str(sqlerr),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
@@ -218,7 +218,7 @@ class TextController(BaseController):
                                  'Internal server Error',
                                  'put()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error",
@@ -252,7 +252,7 @@ class TextController(BaseController):
                                      'Text deleted sucessfuly',
                                      'delete()',
                                      'Empty',
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                     response=models.Text.Text(),
                     message="Text deleted sucessfuly.",
@@ -263,7 +263,7 @@ class TextController(BaseController):
                                      'Problem deleting text',
                                      'delete()',
                                      str(text.__dict__),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                     response=text,
                     message="Problem deleting text",
@@ -274,7 +274,7 @@ class TextController(BaseController):
                                  'SQL Error',
                                  'delete()',
                                  str(sqlerr),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
@@ -286,7 +286,7 @@ class TextController(BaseController):
                                  'Internal server Error',
                                  'delete()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: "+str(err),

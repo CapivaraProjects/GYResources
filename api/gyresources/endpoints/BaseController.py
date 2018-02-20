@@ -27,7 +27,7 @@ class BaseController(Resource):
                              'Calculated elapsed time by request',
                              'calculateElapsedTime()',
                              'Empty',
-                             'TEST')
+                             flask_app.config["TYPE"])
         return time.time() - start
 
     def okResponse(self, response, message, status, total=0, pageSize=0,
@@ -61,5 +61,5 @@ class BaseController(Resource):
                              str(resp.__dict__),
                              'okResponse()',
                              message,
-                             'TEST')
+                             flask_app.config["TYPE"])
         return resp.__dict__  # json.dumps(resp, indent=4, cls=CustomEncoder)

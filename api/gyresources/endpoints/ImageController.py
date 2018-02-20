@@ -84,7 +84,7 @@ class ImageController(BaseController):
                                      'Ok',
                                      'get()',
                                      str(result.__dict__),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                         response=result,
                         message="Ok",
@@ -102,7 +102,7 @@ class ImageController(BaseController):
                                         'Ok',
                                         'get()',
                                         str(response),
-                                        'TEST')
+                                        flask_app.config["TYPE"])
                 return self.okResponse(
                         response=response,
                         message="Ok",
@@ -122,7 +122,7 @@ class ImageController(BaseController):
                                      'Ok',
                                      'get()',
                                      str(result.__dict__),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                         response=result,
                         message="Ok",
@@ -133,7 +133,7 @@ class ImageController(BaseController):
                                  'SQL error ',
                                  'get()',
                                  str(sqlerr),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: " + str(sqlerr),
@@ -144,7 +144,7 @@ class ImageController(BaseController):
                                  'Internal server error ',
                                  'get()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
@@ -196,7 +196,7 @@ class ImageController(BaseController):
                                  'Image sucessfuly created',
                                  'post()',
                                  str(image.__dict__),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=image,
                 message="Image sucessfuly created.",
@@ -207,7 +207,7 @@ class ImageController(BaseController):
                                  'SQL eror ',
                                  'post()',
                                  str(sqlerr),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=sqlerr,
                 message="SQL eror",
@@ -218,7 +218,7 @@ class ImageController(BaseController):
                                  'Internal server error ',
                                  'post()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
@@ -266,7 +266,7 @@ class ImageController(BaseController):
                                  'Image sucessfuly updated',
                                  'put()',
                                  str(image.__dict__),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=image,
                 message="Image sucessfuly updated.",
@@ -277,7 +277,7 @@ class ImageController(BaseController):
                                  'SQL eror',
                                  'put()',
                                  str(sqlerr),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
@@ -289,7 +289,7 @@ class ImageController(BaseController):
                                  'Internal server error',
                                  'put()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
@@ -327,7 +327,7 @@ class ImageController(BaseController):
                                      'Image deleted sucessfuly',
                                      'delete()',
                                      str(image.__dict__),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                     response=image,
                     message="Image deleted sucessfuly.",
@@ -340,7 +340,7 @@ class ImageController(BaseController):
                                      'Problem deleting plant',
                                      'delete()',
                                      str(image.__dict__),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                     response=image,
                     message="Problem deleting plant",
@@ -351,7 +351,7 @@ class ImageController(BaseController):
                                  'SQL eror',
                                  'put()',
                                  str(sqlerr),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
@@ -363,7 +363,7 @@ class ImageController(BaseController):
                                  'Internal server error',
                                  'put()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),

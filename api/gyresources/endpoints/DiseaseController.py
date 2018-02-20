@@ -74,7 +74,7 @@ class DiseaseController(BaseController):
                                      'Ok',
                                      'get()',
                                      str(result.__dict__),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -91,7 +91,7 @@ class DiseaseController(BaseController):
                                      'Ok',
                                      'get()',
                                      str(response),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                             response=response,
                             message="Ok",
@@ -105,7 +105,7 @@ class DiseaseController(BaseController):
                                  'SQL error',
                                  'get()',
                                  str(sqlerr),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
@@ -116,7 +116,7 @@ class DiseaseController(BaseController):
                                  'Internal server error',
                                  'get()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
@@ -155,7 +155,7 @@ class DiseaseController(BaseController):
                                  'Disease sucessfuly created',
                                  'post()',
                                  str(disease.__dict__),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=disease,
                 message="Disease sucessfuly created.",
@@ -166,7 +166,7 @@ class DiseaseController(BaseController):
                                  'SQL Error',
                                  'post()',
                                  str(sqlerr),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
@@ -178,7 +178,7 @@ class DiseaseController(BaseController):
                                  'Internal server error ',
                                  'post()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
@@ -216,7 +216,7 @@ class DiseaseController(BaseController):
                                  'Disease sucessfuly updated',
                                  'put()',
                                  str(disease.__dict__),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=disease,
                 message="Disease sucessfuly updated.",
@@ -227,7 +227,7 @@ class DiseaseController(BaseController):
                                  'SQL Error',
                                  'put()',
                                  str(sqlerr),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
@@ -239,7 +239,7 @@ class DiseaseController(BaseController):
                                  'Internal server error',
                                  'put()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
@@ -249,7 +249,7 @@ class DiseaseController(BaseController):
                              'Disease sucessfuly updated',
                              'put()',
                              str(disease.__dict__),
-                             'TEST')
+                             flask_app.config["TYPE"])
         return self.okResponse(
                 response=disease,
                 message="Disease sucessfuly updated.",
@@ -284,7 +284,7 @@ class DiseaseController(BaseController):
                                      'Disease deleted sucessfuly',
                                      'delete()',
                                      str(resp),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                     response=resp,
                     message="Disease deleted sucessfuly.",
@@ -295,7 +295,7 @@ class DiseaseController(BaseController):
                                      'Problem deleting disease',
                                      'delete()',
                                      str(disease.__dict__),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                     response=disease,
                     message="Problem deleting disease",
@@ -306,7 +306,7 @@ class DiseaseController(BaseController):
                                  'SQL Eror',
                                  'delete()',
                                  str(sqlerr),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             print(str(sqlerr))
             return self.okResponse(
                 response=sqlerr,
@@ -318,7 +318,7 @@ class DiseaseController(BaseController):
                                  'Internal server error',
                                  'delete()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: "+str(err),

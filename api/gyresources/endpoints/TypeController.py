@@ -72,7 +72,7 @@ class TypeController(BaseController):
                                      'Ok',
                                      'get()',
                                      str(result.__dict__),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                     response=result,
                     message="Ok",
@@ -86,7 +86,7 @@ class TypeController(BaseController):
                                      'Ok',
                                      'get()',
                                      str(result),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                     response=result,
                     message="Ok",
@@ -100,7 +100,7 @@ class TypeController(BaseController):
                                  'SQL Error',
                                  'get()',
                                  str(sqlerr),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
@@ -139,7 +139,7 @@ class TypeController(BaseController):
                                  'Type sucessfuly created',
                                  'post()',
                                  str(type.__dict__),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=type_model,
                 message="Type sucessfuly created.",
@@ -150,7 +150,7 @@ class TypeController(BaseController):
                                  'Internal server error',
                                  'post()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: "+str(err),
@@ -179,9 +179,9 @@ class TypeController(BaseController):
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Informative',
                                  'Type sucessfuly updated',
-                                 'post()',
+                                 'put()',
                                  str(type.__dict__),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=type_model,
                 message="Type sucessfuly updated.",
@@ -192,7 +192,7 @@ class TypeController(BaseController):
                                  'Internal server error',
                                  'put()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
@@ -223,9 +223,9 @@ class TypeController(BaseController):
                 Logger.Logger.create(flask_app.config["ELASTICURL"],
                                      'Informative',
                                      'Type deleted sucessfuly',
-                                     'post()',
+                                     'delete()',
                                      str(status),
-                                     'TEST')
+                                     flask_app.config["TYPE"])
                 return self.okResponse(
                     response=models.Type.Type(),
                     message="Type deleted sucessfuly.",
@@ -236,7 +236,7 @@ class TypeController(BaseController):
                                  'Internal server error',
                                  'delete()',
                                  str(err),
-                                 'TEST')
+                                 flask_app.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: "+str(err),
