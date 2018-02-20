@@ -26,7 +26,7 @@ class LoggerController(BaseController):
         Method used to create the log from the action
         """
         log = request.json
-        log = namedtuple("Log", log.keys()(*log.values()))
+        log = namedtuple("Log", log.keys())(*log.values())
         try:
             Logger.create(url=flask_app.config["ELASTICURL"],
                           type=log.type,
