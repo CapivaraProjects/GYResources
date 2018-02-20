@@ -15,7 +15,7 @@ class DefaultConfig(object):
     RESTPLUS_MASK_SWAGGER = False
     RESTPLUS_ERROR_404_HELP = False
     TYPE = 'TEST'
-    ELASTICURL = '127.0.0.1:9200'
+    ELASTICURL = 'https://127.0.0.1:9200'
     SECRET_KEY = 'testing gyresources api'
     IMAGESPATH = os.getcwd()
 
