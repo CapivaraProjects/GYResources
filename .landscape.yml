@@ -1,11 +1,5 @@
-doc-warnings: true
-test-warnings: false
-strictness: veryhigh
-max-line-length: 120
-pep8:
-  full: true
-uses:
-  - flask
-autodetect: true
-python-targets:
-  - 3
+max-line-length: 80
+strictness: medium
+ignore-patterns:
+  - ^[\w\/]*__init__.py$
+  - ^config.py$

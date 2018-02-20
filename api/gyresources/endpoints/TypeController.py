@@ -1,14 +1,14 @@
 import time
-import models.Type
+from collections import namedtuple
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
 from api.restplus import api, token_auth
-from collections import namedtuple
 from repository.TypeRepository import TypeRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import type as typeSerializer
 from api.gyresources.parsers import type_search_args
+import models.Type
 
 flask_app = Flask(__name__)
 flask_app.config.from_object('config.DefaultConfig')
@@ -36,51 +36,51 @@ class TypeController(BaseController):
 
         If action=search:
             you can use value or description to search,
-            please define pageSize and offset parameters
+            please define page_size and offset parameters
         """
         self.startTime = time.time()
         result = models.Type.Type()
         total = 0
         action = request.args.get('action')
-        id = request.args.get('id')
-        type = models.Type.Type(
-                      value=request.args.get('value'),
-                      description=request.args.get('description'))
-        pageSize = None
-        if pageSize:
-            pageSize = int(request.args.get('pageSize'))
+        id_type = request.args.get('id')
+        type_model = models.Type.Type(
+            value=request.args.get('value'),
+            description=request.args.get('description'))
+        page_size = None
+        if request.args.get('pageSize'):
+            page_size = int(request.args.get('pageSize'))
         else:
-            pageSize = 10
+            page_size = 10
 
         offset = None
-        if offset:
+        if request.args.get('offset'):
             offset = int(request.args.get('offset'))
         else:
             offset = 0
         repository = TypeRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+            flask_app.config["DBUSER"],
+            flask_app.config["DBPASS"],
+            flask_app.config["DBHOST"],
+            flask_app.config["DBPORT"],
+            flask_app.config["DBNAME"])
         try:
-            if (action == 'searchByID'):
-                result = repository.searchByID(id)
+            if action == 'searchByID':
+                result = repository.searchByID(id_type)
                 return self.okResponse(
-                            response=result,
-                            message="Ok",
-                            status=200)
-            elif (action == 'search'):
-                result = repository.search(type, pageSize, offset)
+                    response=result,
+                    message="Ok",
+                    status=200)
+            elif action == 'search':
+                result = repository.search(type_model, page_size, offset)
                 total = result['total']
                 result = result['content']
                 return self.okResponse(
-                            response=result,
-                            message="Ok",
-                            status=200,
-                            total=total,
-                            offset=offset,
-                            pageSize=pageSize), 200
+                    response=result,
+                    message="Ok",
+                    status=200,
+                    total=total,
+                    offset=offset,
+                    pageSize=page_size), 200
         except (exc.SQLAlchemyError, Exception) as sqlerr:
             # log
             return self.okResponse(
@@ -97,38 +97,33 @@ class TypeController(BaseController):
         receives in body request a type model
         action should be anything
         """
-        type = request.json
+        type_model = request.json
 
-        type = namedtuple("Type", type.keys())(*type.values())
-        type = models.Type.Type(
+        type_model = namedtuple("Type", type_model.keys())(*type_model.values())
+        type_model = models.Type.Type(
             id=None,
-            value=type.value,
-            description=type.description)
+            value=type_model.value,
+            description=type_model.description)
 
         repository = TypeRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+            flask_app.config["DBUSER"],
+            flask_app.config["DBPASS"],
+            flask_app.config["DBHOST"],
+            flask_app.config["DBPORT"],
+            flask_app.config["DBNAME"])
 
         try:
-            type = repository.create(type)
+            if not type_model.value:
+                raise Exception('value field from type model not defined')
+            type_model = repository.create(type_model)
             return self.okResponse(
-                response=type,
+                response=type_model,
                 message="Type sucessfuly created.",
                 status=201), 200
-        except exc.SQLAlchemyError as sqlerr:
-            # log
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             return self.okResponse(
                 response=err,
-                message="Internal server error "+str(err),
+                message="Internal server error: "+str(err),
                 status=500)
 
     @api.response(200, 'Type changed successfuly')
@@ -140,32 +135,25 @@ class TypeController(BaseController):
         receives in body request a type model
         action should be anything
         """
-        type = request.json
+        type_model = request.json
 
-        type = namedtuple("Type", type.keys())(*type.values())
+        type_model = namedtuple("Type", type_model.keys())(*type_model.values())
         repository = TypeRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+            flask_app.config["DBUSER"],
+            flask_app.config["DBPASS"],
+            flask_app.config["DBHOST"],
+            flask_app.config["DBPORT"],
+            flask_app.config["DBNAME"])
         try:
-            type = repository.update(type)
+            type_model = repository.update(type_model)
             return self.okResponse(
-                response=type,
+                response=type_model,
                 message="Type sucessfuly updated.",
                 status=204), 200
-        except exc.SQLAlchemyError as sqlerr:
-            # log
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             return self.okResponse(
                 response=err,
-                message="Internal server error",
+                message="Internal server error: " + str(err),
                 status=500)
 
     @api.response(200, 'Type deleted successfuly')
@@ -177,35 +165,23 @@ class TypeController(BaseController):
         receives in body request a type model
         action should be anything
         """
-        type = request.json
+        type_model = request.json
 
-        type = namedtuple("Type", type.keys())(*type.values())
+        type_model = namedtuple("Type", type_model.keys())(*type_model.values())
         repository = TypeRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+            flask_app.config["DBUSER"],
+            flask_app.config["DBPASS"],
+            flask_app.config["DBHOST"],
+            flask_app.config["DBPORT"],
+            flask_app.config["DBNAME"])
 
         try:
-            status = repository.delete(type)
-            if (status):
+            status = repository.delete(type_model)
+            if status:
                 return self.okResponse(
                     response=models.Type.Type(),
                     message="Type deleted sucessfuly.",
                     status=204), 200
-            else:
-                return self.okResponse(
-                    response=type,
-                    message="Problem deleting type",
-                    status=500), 200
-        except exc.SQLAlchemyError as sqlerr:
-            # log
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             return self.okResponse(
                 response=err,
