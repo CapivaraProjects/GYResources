@@ -200,18 +200,6 @@ class DiseaseController(BaseController):
                 response=disease,
                 message="Disease sucessfuly updated.",
                 status=204), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Error',
-                                 'put()',
-                                 str(sqlerr),
-                                 flask_app.config["TYPE"])
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
@@ -223,16 +211,7 @@ class DiseaseController(BaseController):
                 response=err,
                 message="Internal server error: " + str(err),
                 status=500)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Error',
-                             'Disease sucessfuly updated',
-                             'put()',
-                             str(disease.__dict__),
-                             flask_app.config["TYPE"])
-        return self.okResponse(
-                response=disease,
-                message="Disease sucessfuly updated.",
-                status=204), 200
+
 
     @api.response(200, 'Disease deleted successfuly')
     @api.expect(diseaseSerializer)
