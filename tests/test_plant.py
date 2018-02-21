@@ -299,7 +299,7 @@ def test_update_wrong_id(
     assert 'Internal server error' in resp['message']
 
 
-@pytest.mark.order7
+@pytest.mark.order10
 def test_delete_non_existent(
         generic_plant=generic_plant,
         generic_user=generic_user):
