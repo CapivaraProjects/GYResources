@@ -99,7 +99,7 @@ class DiseaseController(BaseController):
                             total=total,
                             offset=offset,
                             pageSize=pageSize), 200
-        except (exc.SQLAlchemyError) as sqlerr:
+        except (exc.SQLAlchemyError, Exception) as sqlerr:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
                                  'SQL error',
