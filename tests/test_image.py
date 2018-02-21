@@ -273,3 +273,126 @@ def test_save(generic_image=generic_image, generic_user=generic_user):
     generic_image = img
     assert resp.status_code == 200
     assert "JPG" in json.loads(resp.get_data(as_text=True))['response']['url']
+
+
+@pytest.mark.order9
+def test_search_with_page_size_and_offset():
+    data = {
+                "action": "search",
+                "url": "DSC04057_resized.JPG",
+                "description": "Healthy leaf, photographed in field/outside, " +
+                "Rock Springs Research Center, Penn State, PA",
+                "source": "PlantVillage",
+                "pageSize": 10,
+                "offset": 0
+            }
+    resp = client().get(
+            '/api/gyresources/images',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json'},
+            query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    assert pagedResponse['status_code'] == 200
+    for response in pagedResponse['response']:
+        assert 'PlantVillage' in response['source']
+
+
+@pytest.mark.order10
+def test_create_empty(generic_image=generic_image, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    image = generic_image
+    image.url = ''
+    image.description = ''
+    image.source = ''
+    data = image.__dict__
+    headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % token['token']
+            }
+    resp = client().post('/api/gyresources/images/', data=str(
+        json.dumps(data)), headers=headers)
+    resp = json.loads(
+                resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+
+
+@pytest.mark.order11
+def test_update_wrong_id(generic_image=generic_image, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    data = generic_image.__dict__
+    data['action'] = 'search'
+    resp = client().get(
+            '/api/gyresources/images',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json'},
+            query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    image = object()
+    for response in pagedResponse['response']:
+        image = namedtuple("Image", response.keys())(*response.values())
+
+        image = {
+                "id": 1000,
+                "description": image.url,
+                "idDisease": image.disease["id"],
+                "size": image.size,
+                "source": image.source,
+                "url": 'update'
+        }
+    headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % token['token']
+    }
+    resp = client().put('/api/gyresources/images/', data=str(
+        json.dumps(image)), headers=headers)
+    resp = json.loads(
+                resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']
+
+
+@pytest.mark.order12
+def test_delete_non_existent(generic_image=generic_image, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    data = generic_image.__dict__
+    data['action'] = 'search'
+    resp = client().get(
+            '/api/gyresources/images',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json'},
+            query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    image = object()
+    for response in pagedResponse['response']:
+        image = namedtuple("Image", response.keys())(*response.values())
+
+        image = {
+                "id": 1000,
+                "description": image.url,
+                "idDisease": image.disease["id"],
+                "size": image.size,
+                "source": image.source,
+                "url": image.url
+            }
+    headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % token['token']
+            }
+    resp = client().delete('/api/gyresources/images/', data=str(
+        json.dumps(image)), headers=headers)
+    resp = json.loads(
+                resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']

@@ -56,17 +56,16 @@ class ImageController(BaseController):
                 source=request.args.get('source'),
                 size=request.args.get('size'))
         pageSize = None
-        if pageSize:
+        if request.args.get('pageSize'):
             pageSize = int(request.args.get('pageSize'))
         else:
             pageSize = 10
 
         offset = None
-        if offset:
+        if request.args.get('offset'):
             offset = int(request.args.get('offset'))
         else:
             offset = 0
-
         repository = ImageRepository(
                 flask_app.config["DBUSER"],
                 flask_app.config["DBPASS"],
@@ -127,18 +126,7 @@ class ImageController(BaseController):
                         response=result,
                         message="Ok",
                         status=200)
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL error ',
-                                 'get()',
-                                 str(sqlerr),
-                                 flask_app.config["TYPE"])
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL error: " + str(sqlerr),
-                status=500)
-        except Exception as err:
+        except (exc.SQLAlchemyError, Exception) as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error ',
@@ -183,7 +171,7 @@ class ImageController(BaseController):
 
         try:
             # if image is base 64 encoded save in a file
-            if (image.url.strip()[-1] == '='):
+            if (image.url.strip()[-1] == '=' and (not image.url or not image.description or not image.source or not image.size)):
                 image.disease = diseaseRepository.searchByID(image.disease.id)
                 image = repository.saveImage(
                         image,
@@ -201,17 +189,6 @@ class ImageController(BaseController):
                 response=image,
                 message="Image sucessfuly created.",
                 status=201), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL eror ',
-                                 'post()',
-                                 str(sqlerr),
-                                 flask_app.config["TYPE"])
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
@@ -332,31 +309,6 @@ class ImageController(BaseController):
                     response=image,
                     message="Image deleted sucessfuly.",
                     status=204), 200
-            else:
-                image.disease.plant = image.disease.plant.__dict__
-                image.disease = image.disease.__dict__
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                     'Error',
-                                     'Problem deleting plant',
-                                     'delete()',
-                                     str(image.__dict__),
-                                     flask_app.config["TYPE"])
-                return self.okResponse(
-                    response=image,
-                    message="Problem deleting plant",
-                    status=500), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL eror',
-                                 'put()',
-                                 str(sqlerr),
-                                 flask_app.config["TYPE"])
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror" + str(sqlerr),
-                status=500)
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
