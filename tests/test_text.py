@@ -191,6 +191,31 @@ def test_update(generic_text=generic_text, generic_user=generic_user):
 
 
 @pytest.mark.order6
+def test_search_with_page_size_and_offset():
+    data = {
+                "action": "search",
+                "language": "test",
+                "tag": "test",
+                "value": "test",
+                "description": "test",
+                "pageSize": 10,
+                "offset": 0
+            }
+    resp = client().get(
+            '/api/gyresources/texts',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json'},
+            query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    assert pagedResponse['status_code'] == 200
+    for response in pagedResponse['response']:
+        assert 'test' in response['description']
+
+
+@pytest.mark.order7
 def test_delete(generic_text=generic_text, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     data = generic_text.__dict__
@@ -226,3 +251,98 @@ def test_delete(generic_text=generic_text, generic_user=generic_user):
     assert resp.status_code == 200
     assert 204 == json.loads(
             resp.get_data(as_text=True))['status_code']
+
+
+@pytest.mark.order8
+def test_create_empty(generic_text=generic_text, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    text = generic_text
+    text.value = ''
+    text.description = ''
+    data = text.__dict__
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer %s' % token['token']
+        }
+    resp = client().post('/api/gyresources/texts/', data=str(
+        json.dumps(data)), headers=headers)
+    resp = json.loads(
+        resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+
+
+@pytest.mark.order9
+def test_update_wrong_id(generic_text=generic_text, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    data = generic_text.__dict__
+    data['action'] = 'search'
+    resp = client().get(
+        '/api/gyresources/texts',
+        content_type='application/json',
+        headers={
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'dataType': 'json'},
+        query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    text = object()
+    for response in pagedResponse['response']:
+        text = namedtuple("Type", response.keys())(*response.values())
+
+    text = {
+        "id": 1000,
+        "language": text.language,
+        "tag": text.tag,
+        "value": text.value,
+        "description": 'update'
+    }
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer %s' % token['token']
+    }
+    resp = client().put('/api/gyresources/texts/', data=str(
+        json.dumps(text)), headers=headers)
+    resp = json.loads(
+        resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']
+
+
+@pytest.mark.order10
+def test_delete_non_existent(generic_text=generic_text, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    data = generic_text.__dict__
+    data['action'] = 'search'
+    resp = client().get(
+        '/api/gyresources/texts',
+        content_type='application/json',
+        headers={
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'dataType': 'json'},
+        query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    text = object()
+    for response in pagedResponse['response']:
+        text = namedtuple("Type", response.keys())(*response.values())
+
+    text = {
+        "id": 1000,
+        "language": text.language,
+        "tag": text.tag,
+        "value": text.value,
+        "description": text.description
+    }
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer %s' % token['token']
+    }
+    resp = client().delete('/api/gyresources/texts/', data=str(
+        json.dumps(text)), headers=headers)
+    resp = json.loads(
+        resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']
