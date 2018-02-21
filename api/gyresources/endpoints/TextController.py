@@ -50,13 +50,13 @@ class TextController(BaseController):
                       value=request.args.get('value'),
                       description=request.args.get('description'))
         pageSize = None
-        if pageSize:
+        if request.args.get('pageSize'):
             pageSize = int(request.args.get('pageSize'))
         else:
             pageSize = 10
 
         offset = None
-        if offset:
+        if request.args.get('offset'):
             offset = int(request.args.get('offset'))
         else:
             offset = 0
@@ -135,6 +135,8 @@ class TextController(BaseController):
             flask_app.config["DBNAME"])
 
         try:
+            if (not text.language or not text.tag or not text.value or not text.description):
+                raise Exception('Not defined language, tag, value or description field')
             text = repository.create(text)
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Informative',
@@ -146,18 +148,6 @@ class TextController(BaseController):
                 response=text,
                 message="Text sucessfuly created.",
                 status=201), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Error',
-                                 'post()',
-                                 str(sqlerr),
-                                 flask_app.config["TYPE"])
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
@@ -200,18 +190,6 @@ class TextController(BaseController):
                 response=text,
                 message="Text sucessfuly updated.",
                 status=204), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Error',
-                                 'put()',
-                                 str(sqlerr),
-                                 flask_app.config["TYPE"])
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
@@ -257,29 +235,6 @@ class TextController(BaseController):
                     response=models.Text.Text(),
                     message="Text deleted sucessfuly.",
                     status=204), 200
-            else:
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                     'Informative',
-                                     'Problem deleting text',
-                                     'delete()',
-                                     str(text.__dict__),
-                                     flask_app.config["TYPE"])
-                return self.okResponse(
-                    response=text,
-                    message="Problem deleting text",
-                    status=500), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Error',
-                                 'delete()',
-                                 str(sqlerr),
-                                 flask_app.config["TYPE"])
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
