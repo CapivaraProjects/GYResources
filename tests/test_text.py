@@ -288,7 +288,7 @@ def test_update_wrong_id(generic_text=generic_text, generic_user=generic_user):
     pagedResponse = json.loads(resp.get_data(as_text=True))
     text = object()
     for response in pagedResponse['response']:
-        text = namedtuple("Type", response.keys())(*response.values())
+        text = namedtuple("Text", response.keys())(*response.values())
 
     text = {
         "id": 1000,
@@ -326,7 +326,7 @@ def test_delete_non_existent(generic_text=generic_text, generic_user=generic_use
     pagedResponse = json.loads(resp.get_data(as_text=True))
     text = object()
     for response in pagedResponse['response']:
-        text = namedtuple("Type", response.keys())(*response.values())
+        text = namedtuple("Text", response.keys())(*response.values())
 
     text = {
         "id": 1000,
