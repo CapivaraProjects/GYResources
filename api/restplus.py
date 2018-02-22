@@ -17,7 +17,7 @@ token_auth = HTTPTokenAuth('Bearer')
 multi_auth = MultiAuth(auth, token_auth)
 
 
-def generate_auth_token(expiration=FLASK_APP.config['EXPIRATION_TOKEN'], user_id=0):
+def generate_auth_token(expiration=600, user_id=0):
     """(int, int) -> (token)
     Method used to generate auth token
     """
@@ -28,7 +28,7 @@ def generate_auth_token(expiration=FLASK_APP.config['EXPIRATION_TOKEN'], user_id
                          'generate_auth_token()',
                          str(user_id),
                          FLASK_APP.config["TYPE"])
-    return serializer.dumps({'id': id})
+    return serializer.dumps({'id': user_id})
 
 
 def verify_auth_token(token):
