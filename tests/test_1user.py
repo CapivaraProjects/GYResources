@@ -386,3 +386,9 @@ def test_wrong_token(
     resp = client.delete('/api/gyresources/users/', data=str(
         json.dumps(user)), headers=headers)
     assert 'UNAUTHORIZED' in str(resp)
+
+
+@pytest.mark.order13
+def test_unhandled_exception():
+    resp = client.get('/api/gyresources/token/')
+    assert 'unhandled exception' in str(resp)
