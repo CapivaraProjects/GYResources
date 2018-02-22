@@ -21,6 +21,7 @@ def generate_auth_token(expiration=600, user_id=0):
     """(int, int) -> (token)
     Method used to generate auth token
     """
+    print(FLASK_APP.config['SECRET_KEY'])
     serializer = Serializer(FLASK_APP.config['SECRET_KEY'], expires_in=expiration)
     Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                          'Informative',

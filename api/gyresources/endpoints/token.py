@@ -34,6 +34,7 @@ class TokenController(BaseController):
         Method used to get auth token
         """
         self.startTime = time.time()
+        print(FLASK_APP.config["EXPIRATION_TOKEN"])
         token = generate_auth_token(FLASK_APP.config["EXPIRATION_TOKEN"], g.user.id)
         Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                              'Informative',
