@@ -219,6 +219,8 @@ def test_search_with_page_size_and_offset():
 def test_create_empty(generic_text=generic_text, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     text = generic_text
+    text.language = ''
+    text.tag = ''
     text.value = ''
     text.description = ''
     data = text.__dict__
