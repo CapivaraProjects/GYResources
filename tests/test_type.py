@@ -354,6 +354,4 @@ def test_expire_token(generic_type=generic_type, generic_user=generic_user):
         }
     resp = client().post('/api/gyresources/types/', data=str(
         json.dumps(data)), headers=headers)
-    resp = json.loads(
-        resp.get_data(as_text=True))
-    assert resp['status_code'] == 400
+    assert 'Unauthorized' in resp
