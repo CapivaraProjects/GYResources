@@ -4,12 +4,9 @@ from collections import namedtuple
 from tools.Logger import Logger
 from flask import Flask
 from flask import request
-from api.restplus import api
+from api.restplus import api, FLASK_APP
 import models.Logger
 
-
-flask_app = Flask(__name__)
-flask_app.config.from_object('config.DefaultConfig')
 
 ns = api.namespace('gyresources/logs',
                    description='Operations related to logs')
@@ -29,7 +26,7 @@ class LoggerController(BaseController):
         log = request.json
         log = namedtuple("Log", log.keys())(*log.values())
         try:
-            Logger.create(url=flask_app.config["ELASTICURL"],
+            Logger.create(url=FLASK_APP.config["ELASTICURL"],
                           type=log.type,
                           message=log.message,
                           function=log.function,

@@ -40,4 +40,4 @@ class TestConfig(object):
     ELASTICURL = 'http://127.0.0.1:9200'
     SECRET_KEY = 'testing gyresources api'
     IMAGESPATH = os.getcwd()
-    EXPIRATION_TOKEN = 30
+    EXPIRATION_TOKEN = 10

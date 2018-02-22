@@ -3,7 +3,7 @@ import models.User
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
-from api.restplus import api, token_auth
+from api.restplus import api, token_auth, FLASK_APP
 from collections import namedtuple
 from repository.UserRepository import UserRepository
 from api.gyresources.endpoints.BaseController import BaseController
@@ -11,8 +11,6 @@ from api.gyresources.serializers import user as userSerializer
 from api.gyresources.parsers import user_search_args
 from tools import Logger
 
-flask_app = Flask(__name__)
-flask_app.config.from_object('config.DefaultConfig')
 
 ns = api.namespace('gyresources/users',
                    description='Operations related to users')
@@ -65,20 +63,20 @@ class UserController(BaseController):
         else:
             offset = 0
         repository = UserRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
         try:
             if (action == 'searchByID'):
                 result = repository.searchByID(id)
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Ok',
                                      'get()',
                                      str(result.__dict__),
-                                     flask_app.config["TYPE"])
+                                     FLASK_APP.config["TYPE"])
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -87,12 +85,12 @@ class UserController(BaseController):
                 result = repository.search(user, pageSize, offset)
                 total = result['total']
                 result = result['content']
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Ok',
                                      'get()',
                                      str(result),
-                                     flask_app.config["TYPE"])
+                                     FLASK_APP.config["TYPE"])
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -101,12 +99,12 @@ class UserController(BaseController):
                             offset=offset,
                             pageSize=pageSize), 200
         except (exc.SQLAlchemyError, Exception) as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'SQL Error',
                                  'get()',
                                  str(sqlerr),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
@@ -134,34 +132,34 @@ class UserController(BaseController):
             dateUpdate=user.dateUpdate)
 
         repository = UserRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
 
         try:
             user.id = None
             if not user.email or not user.username or not user.password or not user.salt:
                 raise Exception('User fields not defined')
             user = repository.create(user)
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'User sucessfuly created',
                                  'post()',
                                  str(user.__dict__),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=user,
                 message="User sucessfuly created.",
                 status=201), 200
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server Error',
                                  'post()',
                                  str(err),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
@@ -180,30 +178,30 @@ class UserController(BaseController):
 
         user = namedtuple("User", user.keys())(*user.values())
         repository = UserRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
         try:
             user = repository.update(user)
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'User sucessfuly updated',
                                  'put()',
                                  str(user.__dict__),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=user,
                 message="User sucessfuly updated.",
                 status=204), 200
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server Error',
                                  'put()',
                                  str(err),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
@@ -222,33 +220,33 @@ class UserController(BaseController):
 
         user = namedtuple("User", user.keys())(*user.values())
         repository = UserRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
 
         try:
             status = repository.delete(user)
             if (status):
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'User deleted sucessfuly',
                                      'delete()',
                                      str(status),
-                                     flask_app.config["TYPE"])
+                                     FLASK_APP.config["TYPE"])
                 return self.okResponse(
                     response=models.User.User(),
                     message="User deleted sucessfuly.",
                     status=204), 200
 
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server Error',
                                  'delete()',
                                  str(err),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: "+str(err),
