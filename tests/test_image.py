@@ -339,8 +339,8 @@ def test_update_wrong_id(generic_image=generic_image, generic_user=generic_user)
         image = namedtuple("Image", response.keys())(*response.values())
 
         image = {
-                "id": 1000,
-                "description": image.url,
+                "id": 1000000,
+                "description": image.description,
                 "idDisease": image.disease["id"],
                 "size": image.size,
                 "source": image.source,
