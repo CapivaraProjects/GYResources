@@ -21,13 +21,6 @@ class TokenController(BaseController):
     Class used to generate token
     """
 
-    def get(self):
-        """
-        This class is used to generate error
-        """
-        raise Exception('go horse')
-
-
     @auth.login_required
     def post(self):
         """

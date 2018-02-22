@@ -144,15 +144,3 @@ def unauthorized():
                          str(response.__dict__),
                          FLASK_APP.config["TYPE"])
     return response
-
-
-@api.errorhandler
-def default_error_handler(e):
-    message = 'An unhandled exception occurred.'
-    Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
-                         'Error',
-                         'Internal server error',
-                         'default_error_handler()',
-                         message,
-                         FLASK_APP.config["TYPE"])
-    return {'message': message}, 500
