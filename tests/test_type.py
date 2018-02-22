@@ -354,4 +354,4 @@ def test_expire_token(generic_type=generic_type, generic_user=generic_user):
         }
     resp = client().post('/api/gyresources/types/', data=str(
         json.dumps(data)), headers=headers)
-    assert 'Unauthorized' in resp
+    assert 'UNAUTHORIZED' in str(resp)
