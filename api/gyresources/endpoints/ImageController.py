@@ -248,18 +248,6 @@ class ImageController(BaseController):
                 response=image,
                 message="Image sucessfuly updated.",
                 status=204), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL eror',
-                                 'put()',
-                                 str(sqlerr),
-                                 flask_app.config["TYPE"])
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
