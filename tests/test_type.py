@@ -1,6 +1,7 @@
 """Test TypeController"""
 import json
 import base64
+import time
 from collections import namedtuple
 import pytest
 from flask import Flask
@@ -336,3 +337,21 @@ def test_delete_non_existent(
         resp.get_data(as_text=True))
     assert resp['status_code'] == 500
     assert 'Internal server error' in resp['message']
+
+
+@pytest.mark.order11
+def test_expire_token(generic_type=generic_type, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    time.sleep(41)
+    type_aux = generic_type
+    type_aux.value = ''
+    type_aux.description = ''
+    data = type_aux.__dict__
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer %s' % token['token']
+        }
+    resp = client().post('/api/gyresources/types/', data=str(
+        json.dumps(data)), headers=headers)
+    assert 'UNAUTHORIZED' in str(resp)

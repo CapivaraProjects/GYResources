@@ -3,7 +3,7 @@ import models.Plant
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
-from api.restplus import api, token_auth
+from api.restplus import api, token_auth, FLASK_APP
 from collections import namedtuple
 from repository.PlantRepository import PlantRepository
 from api.gyresources.endpoints.BaseController import BaseController
@@ -11,8 +11,6 @@ from api.gyresources.serializers import plant as plantSerializer
 from api.gyresources.parsers import plant_search_args
 from tools import Logger
 
-flask_app = Flask(__name__)
-flask_app.config.from_object('config.DefaultConfig')
 
 ns = api.namespace('gyresources/plants',
                    description='Operations related to plants')
@@ -59,11 +57,11 @@ class PlantController(BaseController):
         else:
             offset = 0
         repository = PlantRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
         try:
             if (action == 'searchByID'):
                 result = repository.searchByID(idPlant)
@@ -83,12 +81,12 @@ class PlantController(BaseController):
                             offset=offset,
                             pageSize=pageSize), 200
         except (exc.SQLAlchemyError, Exception) as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'SQL Error',
                                  'get()',
                                  str(sqlerr),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
@@ -111,34 +109,34 @@ class PlantController(BaseController):
             commonName=plant.commonName)
 
         repository = PlantRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
 
         try:
             if (not plant.scientificName or not plant.commonName):
                 raise Exception(
                         'Not defined scientificName or commonName field')
             plant = repository.create(plant)
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'User sucessfuly created',
                                  'post()',
                                  str(plant.__dict__),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=plant,
                 message="Plant sucessfuly created.",
                 status=201), 200
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error',
                                  'post()',
                                  str(err),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
@@ -157,30 +155,30 @@ class PlantController(BaseController):
 
         plant = namedtuple("Plant", plant.keys())(*plant.values())
         repository = PlantRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
         try:
             plant = repository.update(plant)
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'Type sucessfuly updated',
                                  'put()',
                                  str(plant.__dict__),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=plant,
                 message="Plant sucessfuly updated.",
                 status=204), 200
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error',
                                  'put()',
                                  str(err),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error" + str(err),
@@ -199,32 +197,32 @@ class PlantController(BaseController):
 
         plant = namedtuple("Plant", plant.keys())(*plant.values())
         repository = PlantRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
 
         try:
             status = repository.delete(plant)
             if (status):
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Type deleted sucessfuly',
                                      'delete()',
                                      str(status),
-                                     flask_app.config["TYPE"])
+                                     FLASK_APP.config["TYPE"])
                 return self.okResponse(
                     response=models.Plant.Plant(),
                     message="Plant deleted sucessfuly.",
                     status=204), 200
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error',
                                  'delete()',
                                  str(err),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),

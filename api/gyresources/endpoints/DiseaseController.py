@@ -4,7 +4,7 @@ import models.Plant
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
-from api.restplus import api, token_auth
+from api.restplus import api, token_auth, FLASK_APP
 from collections import namedtuple
 from repository.DiseaseRepository import DiseaseRepository
 from api.gyresources.endpoints.BaseController import BaseController
@@ -12,8 +12,6 @@ from api.gyresources.serializers import disease as diseaseSerializer
 from api.gyresources.parsers import disease_search_args
 from tools import Logger
 
-flask_app = Flask(__name__)
-flask_app.config.from_object('config.DefaultConfig')
 
 ns = api.namespace('gyresources/diseases',
                    description='Operations related to diseases')
@@ -60,21 +58,21 @@ class DiseaseController(BaseController):
         else:
             offset = 0
         repository = DiseaseRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
         try:
             if (action == 'searchByID'):
                 result = repository.searchByID(id)
                 result.plant = result.plant.__dict__
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative.',
                                      'Ok',
                                      'get()',
                                      str(result.__dict__),
-                                     flask_app.config["TYPE"])
+                                     FLASK_APP.config["TYPE"])
                 return self.okResponse(
                             response=result,
                             message="Ok",
@@ -86,12 +84,12 @@ class DiseaseController(BaseController):
                 for content in result['content']:
                     content.plant = content.plant.__dict__
                     response.append(content)
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Ok',
                                      'get()',
                                      str(response),
-                                     flask_app.config["TYPE"])
+                                     FLASK_APP.config["TYPE"])
                 return self.okResponse(
                             response=response,
                             message="Ok",
@@ -100,12 +98,12 @@ class DiseaseController(BaseController):
                             offset=offset,
                             pageSize=pageSize), 200
         except (exc.SQLAlchemyError, Exception) as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'SQL error',
                                  'get()',
                                  str(sqlerr),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
@@ -130,34 +128,34 @@ class DiseaseController(BaseController):
                       commonName=disease.commonName,
                       plant=models.Plant.Plant(id=disease.idPlant))
         repository = DiseaseRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
 
         try:
             if (not disease.scientificName or not disease.commonName):
                 raise Exception('Not defined scientificName or commonName field')
             disease = repository.create(disease)
             disease.plant = disease.plant.__dict__
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'Disease sucessfuly created',
                                  'post()',
                                  str(disease.__dict__),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=disease,
                 message="Disease sucessfuly created.",
                 status=201), 200
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error ',
                                  'post()',
                                  str(err),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
@@ -182,31 +180,31 @@ class DiseaseController(BaseController):
                       commonName=disease.commonName,
                       plant=models.Plant.Plant(id=disease.idPlant))
         repository = DiseaseRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
         try:
             disease = repository.update(disease)
             disease.plant = disease.plant.__dict__
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'Disease sucessfuly updated',
                                  'put()',
                                  str(disease.__dict__),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=disease,
                 message="Disease sucessfuly updated.",
                 status=204), 200
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error',
                                  'put()',
                                  str(err),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
@@ -226,34 +224,34 @@ class DiseaseController(BaseController):
 
         disease = namedtuple("Disease", disease.keys())(*disease.values())
         repository = DiseaseRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
 
         try:
             status = repository.delete(disease)
             if (status):
                 resp = models.Disease.Disease()
                 resp.plant = resp.plant.__dict__
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Disease deleted sucessfuly',
                                      'delete()',
                                      str(resp),
-                                     flask_app.config["TYPE"])
+                                     FLASK_APP.config["TYPE"])
                 return self.okResponse(
                     response=resp,
                     message="Disease deleted sucessfuly.",
                     status=204), 200
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error',
                                  'delete()',
                                  str(err),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: "+str(err),

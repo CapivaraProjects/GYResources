@@ -3,7 +3,7 @@ import models.Image
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
-from api.restplus import api, token_auth
+from api.restplus import api, token_auth, FLASK_APP
 from collections import namedtuple
 from repository.ImageRepository import ImageRepository
 from repository.DiseaseRepository import DiseaseRepository
@@ -12,8 +12,6 @@ from api.gyresources.serializers import image as imageSerializer
 from api.gyresources.parsers import image_search_args
 from tools import Logger
 
-flask_app = Flask(__name__)
-flask_app.config.from_object('config.DefaultConfig')
 
 ns = api.namespace(
         'gyresources/images',
@@ -67,23 +65,23 @@ class ImageController(BaseController):
         else:
             offset = 0
         repository = ImageRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
 
         try:
             if (action == 'searchByID'):
                 result = repository.searchByID(id)
                 result.disease.plant = result.disease.plant.__dict__
                 result.disease = result.disease.__dict__
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Ok',
                                      'get()',
                                      str(result.__dict__),
-                                     flask_app.config["TYPE"])
+                                     FLASK_APP.config["TYPE"])
                 return self.okResponse(
                         response=result,
                         message="Ok",
@@ -96,12 +94,12 @@ class ImageController(BaseController):
                     content.disease.plant = content.disease.plant.__dict__
                     content.disease = content.disease.__dict__
                     response.append(content)
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                         'Informative',
                                         'Ok',
                                         'get()',
                                         str(response),
-                                        flask_app.config["TYPE"])
+                                        FLASK_APP.config["TYPE"])
                 return self.okResponse(
                         response=response,
                         message="Ok",
@@ -113,26 +111,26 @@ class ImageController(BaseController):
                 image = repository.searchByID(id)
                 result = repository.getImageBase64(
                         image,
-                        flask_app.config["IMAGESPATH"])
+                        FLASK_APP.config["IMAGESPATH"])
                 result.disease.plant = result.disease.plant.__dict__
                 result.disease = result.disease.__dict__
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Ok',
                                      'get()',
                                      str(result.__dict__),
-                                     flask_app.config["TYPE"])
+                                     FLASK_APP.config["TYPE"])
                 return self.okResponse(
                         response=result,
                         message="Ok",
                         status=200)
         except (exc.SQLAlchemyError, Exception) as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error ',
                                  'get()',
                                  str(err),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
@@ -157,17 +155,17 @@ class ImageController(BaseController):
             size=image.size)
 
         repository = ImageRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
         diseaseRepository = DiseaseRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
 
         try:
             # if image is base 64 encoded save in a file
@@ -175,27 +173,27 @@ class ImageController(BaseController):
                 image.disease = diseaseRepository.searchByID(image.disease.id)
                 image = repository.saveImage(
                         image,
-                        flask_app.config["IMAGESPATH"])
+                        FLASK_APP.config["IMAGESPATH"])
             image = repository.create(image)
             image.disease.plant = image.disease.plant.__dict__
             image.disease = image.disease.__dict__
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'Image sucessfuly created',
                                  'post()',
                                  str(image.__dict__),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=image,
                 message="Image sucessfuly created.",
                 status=201), 200
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error ',
                                  'post()',
                                  str(err),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error "+str(err),
@@ -215,17 +213,17 @@ class ImageController(BaseController):
         image = namedtuple("Image", image.keys())(*image.values())
 
         disease = DiseaseRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
         repository = ImageRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
         try:
             diesase = disease.searchByID(image.idDisease)
             image = models.Image.Image(
@@ -238,23 +236,23 @@ class ImageController(BaseController):
             image = repository.update(image)
             image.disease.plant = image.disease.plant.__dict__
             image.disease = image.disease.__dict__
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'Image sucessfuly updated',
                                  'put()',
                                  str(image.__dict__),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=image,
                 message="Image sucessfuly updated.",
                 status=204), 200
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error',
                                  'put()',
                                  str(err),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
@@ -275,11 +273,11 @@ class ImageController(BaseController):
         image = namedtuple("Image", image.keys())(*image.values())
         image = models.Image.Image(id=image.id)
         repository = ImageRepository(
-                flask_app.config["DBUSER"],
-                flask_app.config["DBPASS"],
-                flask_app.config["DBHOST"],
-                flask_app.config["DBPORT"],
-                flask_app.config["DBNAME"])
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
 
         try:
             status = repository.delete(image)
@@ -287,23 +285,23 @@ class ImageController(BaseController):
                 image = models.Image.Image()
                 image.disease.plant = image.disease.plant.__dict__
                 image.disease = image.disease.__dict__
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Image deleted sucessfuly',
                                      'delete()',
                                      str(image.__dict__),
-                                     flask_app.config["TYPE"])
+                                     FLASK_APP.config["TYPE"])
                 return self.okResponse(
                     response=image,
                     message="Image deleted sucessfuly.",
                     status=204), 200
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error',
                                  'put()',
                                  str(err),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),

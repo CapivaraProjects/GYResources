@@ -1,13 +1,12 @@
 import time
 from flask_restplus import Resource
+from api.restplus import FLASK_APP
 from flask import Flask
 from flask import request
 import models.BaseResponse as BaseResponse
 import models.PagedResponse as PagedResponse
 from tools import Logger
 
-flask_app = Flask(__name__)
-flask_app.config.from_object('config.DefaultConfig')
 
 class BaseController(Resource):
     """
@@ -22,12 +21,12 @@ class BaseController(Resource):
         (int) -> (int)
         Method used to calculate elapsed time by request
         """
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
+        Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                              'Informative.',
                              'Calculated elapsed time by request',
                              'calculateElapsedTime()',
                              'Empty',
-                             flask_app.config["TYPE"])
+                             FLASK_APP.config["TYPE"])
         return time.time() - start
 
     def okResponse(self, response, message, status, total=0, pageSize=0,
@@ -56,10 +55,10 @@ class BaseController(Resource):
                     total=total,
                     offset=offset,
                     page_size=pageSize)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
+        Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                              'Informative',
                              str(resp.__dict__),
                              'okResponse()',
                              message,
-                             flask_app.config["TYPE"])
+                             FLASK_APP.config["TYPE"])
         return resp.__dict__  # json.dumps(resp, indent=4, cls=CustomEncoder)

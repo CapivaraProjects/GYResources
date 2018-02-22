@@ -3,7 +3,7 @@ import models.Type
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
-from api.restplus import api, token_auth
+from api.restplus import api, token_auth, FLASK_APP
 from collections import namedtuple
 from repository.TypeRepository import TypeRepository
 from api.gyresources.endpoints.BaseController import BaseController
@@ -11,8 +11,6 @@ from api.gyresources.serializers import type as typeSerializer
 from api.gyresources.parsers import type_search_args
 from tools import Logger
 
-flask_app = Flask(__name__)
-flask_app.config.from_object('config.DefaultConfig')
 
 ns = api.namespace('gyresources/types',
                    description='Operations related to types')
@@ -59,20 +57,20 @@ class TypeController(BaseController):
         else:
             offset = 0
         repository = TypeRepository(
-            flask_app.config["DBUSER"],
-            flask_app.config["DBPASS"],
-            flask_app.config["DBHOST"],
-            flask_app.config["DBPORT"],
-            flask_app.config["DBNAME"])
+            FLASK_APP.config["DBUSER"],
+            FLASK_APP.config["DBPASS"],
+            FLASK_APP.config["DBHOST"],
+            FLASK_APP.config["DBPORT"],
+            FLASK_APP.config["DBNAME"])
         try:
             if action == 'searchByID':
                 result = repository.searchByID(id_type)
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Ok',
                                      'get()',
                                      str(result.__dict__),
-                                     flask_app.config["TYPE"])
+                                     FLASK_APP.config["TYPE"])
                 return self.okResponse(
                     response=result,
                     message="Ok",
@@ -81,12 +79,12 @@ class TypeController(BaseController):
                 result = repository.search(type_model, page_size, offset)
                 total = result['total']
                 result = result['content']
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Ok',
                                      'get()',
                                      str(result),
-                                     flask_app.config["TYPE"])
+                                     FLASK_APP.config["TYPE"])
                 return self.okResponse(
                     response=result,
                     message="Ok",
@@ -95,12 +93,12 @@ class TypeController(BaseController):
                     offset=offset,
                     pageSize=page_size), 200
         except (exc.SQLAlchemyError, Exception) as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'SQL Error',
                                  'get()',
                                  str(sqlerr),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
@@ -124,33 +122,33 @@ class TypeController(BaseController):
             description=type_model.description)
 
         repository = TypeRepository(
-            flask_app.config["DBUSER"],
-            flask_app.config["DBPASS"],
-            flask_app.config["DBHOST"],
-            flask_app.config["DBPORT"],
-            flask_app.config["DBNAME"])
+            FLASK_APP.config["DBUSER"],
+            FLASK_APP.config["DBPASS"],
+            FLASK_APP.config["DBHOST"],
+            FLASK_APP.config["DBPORT"],
+            FLASK_APP.config["DBNAME"])
 
         try:
             if not type_model.value:
                 raise Exception('value field from type model not defined')
             type_model = repository.create(type_model)
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'Type sucessfuly created',
                                  'post()',
                                  str(type.__dict__),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=type_model,
                 message="Type sucessfuly created.",
                 status=201), 200
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error',
                                  'post()',
                                  str(err),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: "+str(err),
@@ -169,30 +167,30 @@ class TypeController(BaseController):
 
         type_model = namedtuple("Type", type_model.keys())(*type_model.values())
         repository = TypeRepository(
-            flask_app.config["DBUSER"],
-            flask_app.config["DBPASS"],
-            flask_app.config["DBHOST"],
-            flask_app.config["DBPORT"],
-            flask_app.config["DBNAME"])
+            FLASK_APP.config["DBUSER"],
+            FLASK_APP.config["DBPASS"],
+            FLASK_APP.config["DBHOST"],
+            FLASK_APP.config["DBPORT"],
+            FLASK_APP.config["DBNAME"])
         try:
             type_model = repository.update(type_model)
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'Type sucessfuly updated',
                                  'put()',
                                  str(type.__dict__),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=type_model,
                 message="Type sucessfuly updated.",
                 status=204), 200
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error',
                                  'put()',
                                  str(err),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
@@ -211,32 +209,32 @@ class TypeController(BaseController):
 
         type_model = namedtuple("Type", type_model.keys())(*type_model.values())
         repository = TypeRepository(
-            flask_app.config["DBUSER"],
-            flask_app.config["DBPASS"],
-            flask_app.config["DBHOST"],
-            flask_app.config["DBPORT"],
-            flask_app.config["DBNAME"])
+            FLASK_APP.config["DBUSER"],
+            FLASK_APP.config["DBPASS"],
+            FLASK_APP.config["DBHOST"],
+            FLASK_APP.config["DBPORT"],
+            FLASK_APP.config["DBNAME"])
 
         try:
             status = repository.delete(type_model)
             if status:
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
+                Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Type deleted sucessfuly',
                                      'delete()',
                                      str(status),
-                                     flask_app.config["TYPE"])
+                                     FLASK_APP.config["TYPE"])
                 return self.okResponse(
                     response=models.Type.Type(),
                     message="Type deleted sucessfuly.",
                     status=204), 200
         except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
+            Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error',
                                  'delete()',
                                  str(err),
-                                 flask_app.config["TYPE"])
+                                 FLASK_APP.config["TYPE"])
             return self.okResponse(
                 response=err,
                 message="Internal server error: "+str(err),
