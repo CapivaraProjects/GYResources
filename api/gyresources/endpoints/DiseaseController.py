@@ -49,13 +49,13 @@ class DiseaseController(BaseController):
                       scientificName=request.args.get('scientificName'),
                       commonName=request.args.get('commonName'))
         pageSize = None
-        if pageSize:
+        if request.args.get('pageSize'):
             pageSize = int(request.args.get('pageSize'))
         else:
             pageSize = 10
 
         offset = None
-        if offset:
+        if request.args.get('offset'):
             offset = int(request.args.get('offset'))
         else:
             offset = 0
@@ -99,7 +99,7 @@ class DiseaseController(BaseController):
                             total=total,
                             offset=offset,
                             pageSize=pageSize), 200
-        except (exc.SQLAlchemyError) as sqlerr:
+        except (exc.SQLAlchemyError, Exception) as sqlerr:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
                                  'SQL error',
@@ -109,17 +109,6 @@ class DiseaseController(BaseController):
             return self.okResponse(
                 response=sqlerr,
                 message="SQL error: "+str(sqlerr),
-                status=500)
-        except Exception as err:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'Internal server error',
-                                 'get()',
-                                 str(err),
-                                 flask_app.config["TYPE"])
-            return self.okResponse(
-                response=err,
-                message="Internal server error "+str(err),
                 status=500)
 
 
@@ -148,6 +137,8 @@ class DiseaseController(BaseController):
                 flask_app.config["DBNAME"])
 
         try:
+            if (not disease.scientificName or not disease.commonName):
+                raise Exception('Not defined scientificName or commonName field')
             disease = repository.create(disease)
             disease.plant = disease.plant.__dict__
             Logger.Logger.create(flask_app.config["ELASTICURL"],
@@ -160,18 +151,6 @@ class DiseaseController(BaseController):
                 response=disease,
                 message="Disease sucessfuly created.",
                 status=201), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Error',
-                                 'post()',
-                                 str(sqlerr),
-                                 flask_app.config["TYPE"])
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
@@ -221,18 +200,6 @@ class DiseaseController(BaseController):
                 response=disease,
                 message="Disease sucessfuly updated.",
                 status=204), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Error',
-                                 'put()',
-                                 str(sqlerr),
-                                 flask_app.config["TYPE"])
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
@@ -244,16 +211,7 @@ class DiseaseController(BaseController):
                 response=err,
                 message="Internal server error: " + str(err),
                 status=500)
-        Logger.Logger.create(flask_app.config["ELASTICURL"],
-                             'Error',
-                             'Disease sucessfuly updated',
-                             'put()',
-                             str(disease.__dict__),
-                             flask_app.config["TYPE"])
-        return self.okResponse(
-                response=disease,
-                message="Disease sucessfuly updated.",
-                status=204), 200
+
 
     @api.response(200, 'Disease deleted successfuly')
     @api.expect(diseaseSerializer)
@@ -289,29 +247,6 @@ class DiseaseController(BaseController):
                     response=resp,
                     message="Disease deleted sucessfuly.",
                     status=204), 200
-            else:
-                Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                     'Error',
-                                     'Problem deleting disease',
-                                     'delete()',
-                                     str(disease.__dict__),
-                                     flask_app.config["TYPE"])
-                return self.okResponse(
-                    response=disease,
-                    message="Problem deleting disease",
-                    status=500), 200
-        except exc.SQLAlchemyError as sqlerr:
-            Logger.Logger.create(flask_app.config["ELASTICURL"],
-                                 'Error',
-                                 'SQL Eror',
-                                 'delete()',
-                                 str(sqlerr),
-                                 flask_app.config["TYPE"])
-            print(str(sqlerr))
-            return self.okResponse(
-                response=sqlerr,
-                message="SQL eror",
-                status=500)
         except Exception as err:
             Logger.Logger.create(flask_app.config["ELASTICURL"],
                                  'Error',
