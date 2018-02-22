@@ -25,7 +25,7 @@ class TokenController(BaseController):
         """
         This class is used to generate error
         """
-        return a + b
+        raise Exception('go horse')
 
 
     @auth.login_required
