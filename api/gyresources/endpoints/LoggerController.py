@@ -2,7 +2,6 @@ from api.gyresources.parsers import log_post_args
 from api.gyresources.endpoints.BaseController import BaseController
 from collections import namedtuple
 from tools.Logger import Logger
-from flask import Flask
 from flask import request
 from api.restplus import api, FLASK_APP
 import models.Logger

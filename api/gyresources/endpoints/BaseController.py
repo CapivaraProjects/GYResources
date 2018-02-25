@@ -1,8 +1,6 @@
 import time
 from flask_restplus import Resource
 from api.restplus import FLASK_APP
-from flask import Flask
-from flask import request
 import models.BaseResponse as BaseResponse
 import models.PagedResponse as PagedResponse
 from tools import Logger
