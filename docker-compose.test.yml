@@ -1,3 +1,5 @@
 sut:
-  build: GYResources
-  command: cd GYResources && python3 setup.py test
+  working_dir: ./GYResources
+  build: .
+  dockerfile: Dockerfile
+  command: python3 setup.py test
