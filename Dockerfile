@@ -13,3 +13,4 @@ RUN apt update && apt install elasticsearch
 WORKDIR /root/git
 RUN git clone https://github.com/CapivaraProjects/GYResources && \
         pip3 install -r GYResources/requirements.txt
+WORKDIR /root/git/GYResources
