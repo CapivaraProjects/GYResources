@@ -14,4 +14,4 @@ WORKDIR /root/git
 RUN git clone https://github.com/CapivaraProjects/GYResources && \
         pip3 install -r GYResources/requirements.txt
 WORKDIR /root/git/GYResources
-ENV PYTHONPATH=$(pwd)
+RUN export PYTHONPATH=$PYTHONPATH:$(pwd)
