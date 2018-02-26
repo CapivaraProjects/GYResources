@@ -14,4 +14,6 @@ WORKDIR /root/git
 RUN git clone https://github.com/CapivaraProjects/GYResources && \
         pip3 install -r GYResources/requirements.txt
 WORKDIR /root/git/GYResources
-RUN export PYTHONPATH=$PYTHONPATH:/root/git/GYResources
+RUN git submodule update --init --recursive && \
+        git submodule foreach git pull origin master && \
+        export PYTHONPATH=$PYTHONPATH:/root/git/GYResources
