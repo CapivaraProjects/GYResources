@@ -1,0 +1,5 @@
+sut:
+  build: .
+  environment:
+    - PYTHONPATH=${PYTHONPATH}
+  command: /etc/init.d/postgresql start && /etc/init.d/elasticsearch start && python3 setup.py test

@@ -2,7 +2,6 @@ import time
 import models.Text
 from sqlalchemy import exc
 from flask import request
-from flask import Flask
 from api.restplus import api, token_auth, FLASK_APP
 from collections import namedtuple
 from repository.TextRepository import TextRepository

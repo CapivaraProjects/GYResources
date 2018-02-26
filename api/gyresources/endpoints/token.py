@@ -1,5 +1,5 @@
 import time
-from flask import Flask, g
+from flask import g
 from api.restplus import api, auth, generate_auth_token, FLASK_APP
 from api.gyresources.endpoints.BaseController import BaseController
 from tools import Logger
