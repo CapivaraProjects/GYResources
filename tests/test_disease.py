@@ -165,7 +165,7 @@ def test_update(generic_disease=generic_disease, generic_user=generic_user):
     pagedResponse = json.loads(resp.get_data(as_text=True))
     disease = object()
     for response in pagedResponse['response']:
-        disease = namedtuple("Text", response.keys())(*response.values())
+        disease = namedtuple("Disease", response.keys())(*response.values())
 
     disease = {
                 "id": disease.id,
@@ -185,7 +185,7 @@ def test_update(generic_disease=generic_disease, generic_user=generic_user):
     assert resp.status_code == 200
     disease = json.loads(
                 resp.get_data(as_text=True))
-    disease = namedtuple("Text", disease .keys())(*disease .values())
+    disease = namedtuple("Disease", disease .keys())(*disease .values())
     assert "update" in disease.response['commonName']
 
 
