@@ -1,5 +1,5 @@
 sut:
   build: .
   environment:
-    - PYTHONPATH=/root/git/GYResources
+    - PYTHONPATH=${PYTHONPATH}
   command: python3 setup.py test
