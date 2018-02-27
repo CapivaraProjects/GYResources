@@ -1,8 +1,9 @@
 # GYResources
 [![Build Status](https://travis-ci.org/CapivaraProjects/GYResources.svg?branch=master)](https://travis-ci.org/CapivaraProjects/GYResources) 
 [![Coverage Status](https://coveralls.io/repos/github/CapivaraProjects/GYResources/badge.svg?branch=master)](https://coveralls.io/github/CapivaraProjects/GYResources?branch=master)
-[![Code Health](https://landscape.io/github/CapivaraProjects/GYResources/master/landscape.svg?style=flat)](https://landscape.io/github/CapivaraProjects/GYResources/master) <br />
-This repository is dedicated to turn available green eyes resources in a API and website project
+[![Code Health](https://landscape.io/github/CapivaraProjects/GYResources/master/landscape.svg?style=flat)](https://landscape.io/github/CapivaraProjects/GYResources/master) 
+[![Docker Automated Build](https://img.shields.io/docker/automated/capivaraprojects/gyresources.svg)](https://hub.docker.com/r/capivaraprojects/gyresources/)
+<br /> This repository is dedicated to turn available green eyes resources in a API and website project
 
 # Dependences
 
