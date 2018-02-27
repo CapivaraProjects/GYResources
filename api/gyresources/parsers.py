@@ -141,3 +141,37 @@ log_post_args.add_argument('obs', type=str, required=False, default='No observat
                            help='Observation of method')
 log_post_args.add_argument('config', type=str, required=True, default='',
                            help='Ambient that you are working (EX: TEST, PRODUCTION)')
+
+analysis_search_args = reqparse.RequestParser()
+analysis_search_args.add_argument('action', type=str, required=True,
+                              default='searchByID',
+                              help='Defines what kind of search you gonna do.',
+                              choices=['searchByID', 'search'])
+analysis_search_args.add_argument('id', type=int, required=False, default=1,
+                              help='Analysis ID, used when action=searchByID')
+analysis_search_args.add_argument('idImage', type=int, required=False,
+                              default='', help='Image ID')
+analysis_search_args.add_argument('pageSize', type=int, required=False,
+                              default=10,
+                              help='Quantity of elements required')
+analysis_search_args.add_argument('offset', type=int, required=False, default=10,
+                              help='Quantity of elements to be jumped')
+
+analysisResult_search_args = reqparse.RequestParser()
+analysisResult_search_args.add_argument('action', type=str, required=True,
+                              default='searchByID',
+                              help='Defines what kind of search you gonna do.',
+                              choices=['searchByID', 'search'])
+analysisResult_search_args.add_argument('id', type=int, required=False, default=1,
+                              help='AnalysisResult ID, used when action=searchByID')
+analysisResult_search_args.add_argument('idAnalysis', type=int, required=False,
+                              default='', help='Analysis ID')
+analysisResult_search_args.add_argument('idDisease', type=int, required=False,
+                              default='', help='Disease ID')
+analysisResult_search_args.add_argument('score', type=float, required=False,
+                              default='', help='predicted score')
+analysisResult_search_args.add_argument('pageSize', type=int, required=False,
+                              default=10,
+                              help='Quantity of elements required')
+analysisResult_search_args.add_argument('offset', type=int, required=False, default=10,
+                              help='Quantity of elements to be jumped')

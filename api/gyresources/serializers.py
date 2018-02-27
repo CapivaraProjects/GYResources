@@ -94,3 +94,27 @@ user = api.model('User', {
         required=True,
         description='User last update'),
     })
+
+analysis = api.model('Analysis', {
+    'id': fields.Integer(
+        readOlny=True,
+        description='Analysis identification'),
+    'idImage': fields.Integer(
+        required=True,
+        description='Image identification')
+    })
+
+analysisResult = api.model('AnalysisResult', {
+    'id': fields.Integer(
+        readOnly=True,
+        description='Analysis result identification'),
+    'idAnalysis': fields.Integer(
+        required=True,
+        description='Analysis identification'),
+    'idDisease': fields.Integer(
+        required=True,
+        description='Disease identification'),
+    'score': fields.Float(
+        required=True,
+        description='score of analysis')
+    })
