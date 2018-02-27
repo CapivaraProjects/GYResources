@@ -1,8 +1,7 @@
 import json
 import pytest
 import base64
-import models.Disease
-import models.Plant
+import models.Analysis
 from flask import Flask
 from app import initialize_app
 from collections import namedtuple
@@ -12,11 +11,9 @@ from tools.Cryptography import Crypto
 app = Flask(__name__)
 app = initialize_app(app)
 client = app.test_client
-generic_disease = models.Disease.Disease(
-        plant=models.Plant.Plant(id=1),
-        scientificName="test1",
-        commonName="test1",
-        images=[])
+generic_analysis = models.Analysis.Analysis(
+        id=1,
+        idImage=1)
 
 generic_user = models.User.User(
         idType=1,
@@ -57,25 +54,14 @@ def auth(generic_user=generic_user):
     return (generic_user, token)
 
 
-generic_user = models.User.User(
-    id=generic_user.id,
-    idType=generic_user.idType,
-    email=generic_user.email,
-    username=generic_user.username,
-    password='test',
-    salt=generic_user.salt,
-    dateInsertion=generic_user.dateInsertion,
-    dateUpdate=generic_user.dateUpdate)
-
-
 @pytest.mark.order1
 def test_search_by_unexistent_id():
     data = {
             "action": "searchByID",
-            "id": "1000",
+            "id": 1000
             }
     resp = client().get(
-            '/api/gyresources/diseases',
+            '/api/gyresources/analysis',
             content_type='application/json',
             headers={
                 'Accept': 'application/json',
@@ -87,13 +73,33 @@ def test_search_by_unexistent_id():
 
 
 @pytest.mark.order2
+def test_create(generic_analysis=generic_analysis, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    aux = generic_analysis.idImage
+    data = generic_analysis.__dict__
+    headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % token['token']
+            }
+    resp = client().post('/api/gyresources/analysis/', data=str(
+        json.dumps(data)), headers=headers)
+    analysis = json.loads(resp.get_data(as_text=True))['response']
+    analysis = namedtuple("Analysis", analysis.keys())(*analysis.values())
+    generic_analysis = analysis
+    assert resp.status_code == 200
+    assert "'id': 0" not in json.loads(
+            resp.get_data(as_text=True))['response']
+
+
+@pytest.mark.order3
 def test_search_by_id():
     data = {
                 "action": "searchByID",
-                "id": "1",
+                "id": 1
             }
     resp = client().get(
-            '/api/gyresources/diseases',
+            '/api/gyresources/analysis',
             content_type='application/json',
             headers={
                 'Accept': 'application/json',
@@ -104,17 +110,16 @@ def test_search_by_id():
     assert json.loads(resp.get_data(as_text=True))['status_code'] == 200
 
 
-@pytest.mark.order3
+@pytest.mark.order4
 def test_search():
     data = {
                 "action": "search",
-                "scientificName": "Venturia",
-                "commonName": "Apple",
+                "idImage": 1,
                 "pageSize": 10,
                 "offset": 0
             }
     resp = client().get(
-            '/api/gyresources/diseases',
+            '/api/gyresources/analysis',
             content_type='application/json',
             headers={
                 'Accept': 'application/json',
@@ -124,38 +129,16 @@ def test_search():
     pagedResponse = json.loads(resp.get_data(as_text=True))
     assert pagedResponse['status_code'] == 200
     for response in pagedResponse['response']:
-        assert 'Venturia' in response['scientificName']
-
-
-@pytest.mark.order4
-def test_create(generic_disease=generic_disease, generic_user=generic_user):
-    (generic_user, token) = auth(generic_user)
-    aux = generic_disease.plant
-    generic_disease.plant = generic_disease.plant.__dict__
-    data = generic_disease.__dict__
-    data["idPlant"] = aux.id
-    headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer %s' % token['token']
-            }
-    resp = client().post('/api/gyresources/diseases/', data=str(
-        json.dumps(data)), headers=headers)
-    disease = json.loads(resp.get_data(as_text=True))['response']
-    disease = namedtuple("Disease", disease.keys())(*disease.values())
-    generic_disease = disease
-    assert resp.status_code == 200
-    assert "'id': 0" not in json.loads(
-            resp.get_data(as_text=True))['response']
+        assert response['idImage'] == 1
 
 
 @pytest.mark.order5
-def test_update(generic_disease=generic_disease, generic_user=generic_user):
+def test_update(generic_analysis=generic_analysis, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
-    data = generic_disease.__dict__
+    data = generic_analysis.__dict__
     data['action'] = 'search'
     resp = client().get(
-            '/api/gyresources/diseases',
+            '/api/gyresources/analysis',
             content_type='application/json',
             headers={
                 'Accept': 'application/json',
@@ -163,39 +146,35 @@ def test_update(generic_disease=generic_disease, generic_user=generic_user):
                 'dataType': 'json'},
             query_string=data, follow_redirects=True)
     pagedResponse = json.loads(resp.get_data(as_text=True))
-    disease = object()
+    analysis = object()
     for response in pagedResponse['response']:
-        disease = namedtuple("Disease", response.keys())(*response.values())
-
-    disease = {
-                "id": disease.id,
-                "idPlant": disease.plant["id"],
-                "scientificName": disease.scientificName,
-                "commonName": 'update',
-                "images": disease.images
-            }
-    generic_disease.commonName = 'update'
+        analysis = namedtuple("Analysis", response.keys())(*response.values())
+        analysis = {
+                "id": analysis.id,
+                "idImage": 9999
+                }
+    generic_analysis.idImage = 9999
     headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'Authorization': 'Bearer %s' % token['token']
             }
-    resp = client().put('/api/gyresources/diseases/', data=str(
-        json.dumps(disease)), headers=headers)
+    resp = client().put('/api/gyresources/analysis/', data=str(
+        json.dumps(analysis)), headers=headers)
     assert resp.status_code == 200
-    disease = json.loads(
+    analysis = json.loads(
                 resp.get_data(as_text=True))
-    disease = namedtuple("Disease", disease .keys())(*disease .values())
-    assert "update" in disease.response['commonName']
+    analysis = namedtuple("Analysis", analysis.keys())(*analysis.values())
+    assert 9999 == analysis.response['idImage']
 
 
 @pytest.mark.order6
-def test_delete(generic_disease=generic_disease, generic_user=generic_user):
+def test_update_wrong_id(generic_analysis=generic_analysis, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
-    data = generic_disease.__dict__
+    data = generic_analysis.__dict__
     data['action'] = 'search'
     resp = client().get(
-            '/api/gyresources/diseases',
+            '/api/gyresources/analysis',
             content_type='application/json',
             headers={
                 'Accept': 'application/json',
@@ -203,40 +182,37 @@ def test_delete(generic_disease=generic_disease, generic_user=generic_user):
                 'dataType': 'json'},
             query_string=data, follow_redirects=True)
     pagedResponse = json.loads(resp.get_data(as_text=True))
-    disease = object()
+    analysis = object()
     for response in pagedResponse['response']:
-        disease = namedtuple("Disease", response.keys())(*response.values())
+        analysis = namedtuple("Analysis", response.keys())(*response.values())
+        analysis = {
+                "id": 1000,
+                "idImage": analysis.idImage
+                }
 
-    disease = {
-                "id": disease.id,
-                "idPlant": disease.plant["id"],
-                "scientificName": disease.scientificName,
-                "commonName": disease.commonName,
-                "images": disease.images
-            }
     headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'Authorization': 'Bearer %s' % token['token']
             }
-    resp = client().delete('/api/gyresources/diseases/', data=str(
-        json.dumps(disease)), headers=headers)
-    assert resp.status_code == 200
-    assert 204 == json.loads(
-            resp.get_data(as_text=True))['status_code']
+    resp = client().put('/api/gyresources/analysis/', data=str(
+        json.dumps(analysis)), headers=headers)
+    resp = json.loads(
+                resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']
 
 
 @pytest.mark.order7
 def test_search_with_page_size_and_offset():
     data = {
                 "action": "search",
-                "scientificName": "Venturia",
-                "commonName": "Apple",
+                "idImage": 9999,
                 "pageSize": 10,
                 "offset": 0
             }
     resp = client().get(
-            '/api/gyresources/diseases',
+            '/api/gyresources/analysis',
             content_type='application/json',
             headers={
                 'Accept': 'application/json',
@@ -246,100 +222,87 @@ def test_search_with_page_size_and_offset():
     pagedResponse = json.loads(resp.get_data(as_text=True))
     assert pagedResponse['status_code'] == 200
     for response in pagedResponse['response']:
-        assert 'Apple' in response['commonName']
-
+        assert response['idImage'] == 9999
 
 @pytest.mark.order8
-def test_create_empty(generic_disease=generic_disease, generic_user=generic_user):
+def test_delete_non_existent(generic_analysis=generic_analysis, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
-    disease = generic_disease
-    disease.scientificName = ''
-    disease.commonName = ''
-    data = disease.__dict__
+    data = generic_analysis.__dict__
+    data['action'] = 'search'
+    resp = client().get(
+            '/api/gyresources/analysis',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json'},
+            query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    analysis = object()
+    for response in pagedResponse['response']:
+        analysis = namedtuple("Analysis", response.keys())(*response.values())
+        analysis = {
+                "id": 1000,
+                "idImage": analysis.idImage
+            }
     headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
             'Authorization': 'Bearer %s' % token['token']
             }
-    resp = client().post('/api/gyresources/diseases/', data=str(
+    resp = client().delete('/api/gyresources/analysis/', data=str(json.dumps(analysis)), headers=headers)
+    resp = json.loads(resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']
+
+
+@pytest.mark.order9
+def test_delete(generic_analysis=generic_analysis, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    data = generic_analysis.__dict__
+    data['action'] = 'search'
+    resp = client().get(
+            '/api/gyresources/analysis',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json'},
+            query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    analysis = object()
+    for response in pagedResponse['response']:
+        analysis = namedtuple("Analysis", response.keys())(*response.values())
+
+        analysis = {
+                "id": analysis.id,
+                "idImage": analysis.idImage
+                }
+    headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % token['token']
+            }
+    resp = client().delete('/api/gyresources/analysis/', data=str(
+        json.dumps(analysis)), headers=headers)
+    assert resp.status_code == 200
+    assert 204 == json.loads(
+            resp.get_data(as_text=True))['status_code']
+
+
+@pytest.mark.order10
+def test_create_empty(generic_analysis=generic_analysis, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    analysis = generic_analysis
+    analysis.idImage = 0
+    data = analysis.__dict__
+    headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % token['token']
+            }
+    resp = client().post('/api/gyresources/analysis/', data=str(
         json.dumps(data)), headers=headers)
     resp = json.loads(
                 resp.get_data(as_text=True))
     assert resp['status_code'] == 500
-
-
-@pytest.mark.order9
-def test_update_wrong_id(generic_disease=generic_disease, generic_user=generic_user):
-    (generic_user, token) = auth(generic_user)
-    data = generic_disease.__dict__
-    data['action'] = 'search'
-    resp = client().get(
-            '/api/gyresources/diseases',
-            content_type='application/json',
-            headers={
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'dataType': 'json'},
-            query_string=data, follow_redirects=True)
-    pagedResponse = json.loads(resp.get_data(as_text=True))
-    disease = object()
-    for response in pagedResponse['response']:
-        disease = namedtuple("Disease", response.keys())(*response.values())
-
-        disease = {
-
-                "id": 1000,
-                "idPlant": disease.plant["id"],
-                "scientificName": 'update',
-                "commonName": disease.commonName,
-                "images": disease.images
-            }
-    headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer %s' % token['token']
-            }
-    resp = client().put('/api/gyresources/diseases/', data=str(
-        json.dumps(disease)), headers=headers)
-    resp = json.loads(
-                resp.get_data(as_text=True))
-    assert resp['status_code'] == 500
-    assert 'Internal server error' in resp['message']
-
-
-@pytest.mark.order10
-def test_delete_non_existent(generic_disease=generic_disease, generic_user=generic_user):
-    (generic_user, token) = auth(generic_user)
-    data = generic_disease.__dict__
-    data['action'] = 'search'
-    resp = client().get(
-            '/api/gyresources/diseases',
-            content_type='application/json',
-            headers={
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'dataType': 'json'},
-            query_string=data, follow_redirects=True)
-    pagedResponse = json.loads(resp.get_data(as_text=True))
-    disease = object()
-    for response in pagedResponse['response']:
-        disease = namedtuple("Disease", response.keys())(*response.values())
-
-        disease = {
-                "id": 1000,
-                "idPlant": disease.plant["id"],
-                "scientificName": disease.scientificName,
-                "commonName": disease.commonName,
-                "images": disease.images
-            }
-    headers = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer %s' % token['token']
-            }
-    resp = client().delete('/api/gyresources/diseases/', data=str(
-        json.dumps(disease)), headers=headers)
-    resp = json.loads(
-                resp.get_data(as_text=True))
-    assert resp['status_code'] == 500
-    assert 'Internal server error' in resp['message']
