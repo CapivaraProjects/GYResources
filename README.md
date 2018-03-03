@@ -1,5 +1,5 @@
 # GYResources
-This repository is dedicated to turn available green eyes resources in a API and website project
+This repository is dedicated to turn available green eyes resources in a API and website project.
 
 # Dependences
 
@@ -44,3 +44,4 @@ Install dependences from project:
 ```zsh
 pip3 install -r requirements.txt
 ```
+
