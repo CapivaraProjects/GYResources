@@ -101,7 +101,10 @@ analysis = api.model('Analysis', {
         description='Analysis identification'),
     'idImage': fields.Integer(
         required=True,
-        description='Image identification')
+        description='Image identification'),
+    'idClassifier': fields.Integer(
+        required=True,
+        description='Classifier identification')
     })
 
 analysisResult = api.model('AnalysisResult', {

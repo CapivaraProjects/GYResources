@@ -28,7 +28,7 @@ class AnalysisController(BaseController):
     @api.response(200, 'Analysis searched.')
     def get(self):
         """
-        Return a list of analyzes based on action.
+        Return a list of analyses based on action.
 
         If action=searchByID:
             please set id parameter.
@@ -38,31 +38,41 @@ class AnalysisController(BaseController):
             please define pageSize and offset parameters
         """
         self.startTime = time.time()
-        result = models.Analysis.Analysis()
+
         total = 0
+        result = models.Analysis.Analysis()
         action = request.args.get('action')
         id = request.args.get('id')
-        analysis = models.Analysis.Analysis(idImage=request.args.get('idImage'))
-        pageSize = None
+
+        analysis = models.Analysis.Analysis(
+                            image=models.Image.Image(
+                                    id=request.args.get('idImage')),
+                            classifier=models.Classifier.Classifier(
+                                        id=request.args.get('idClassifier')))
+
+        pageSize = 10
         if request.args.get('pageSize'):
             pageSize = int(request.args.get('pageSize'))
-        else:
-            pageSize = 10
 
-        offset = None
+        offset = 0
         if request.args.get('offset'):
             offset = int(request.args.get('offset'))
-        else:
-            offset = 0
+
         repository = AnalysisRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
                 FLASK_APP.config["DBHOST"],
                 FLASK_APP.config["DBPORT"],
                 FLASK_APP.config["DBNAME"])
+
         try:
             if (action == 'searchByID'):
                 result = repository.searchByID(id)
+                result.image.disease.plant = result.image.disease.plant.__dict__
+                result.image.disease = result.image.disease.__dict__
+                result.image = result.image.__dict__
+                result.classifier.plant = result.classifier.plant.__dict__
+                result.classifier = result.classifier.__dict__
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Ok',
@@ -74,10 +84,15 @@ class AnalysisController(BaseController):
                             message="Ok",
                             status=200)
             elif (action == 'search'):
-                result = repository.search(analysis, pageSize, offset)
+                result = repository.search(analysis, pageSize, offset)# retorna um dicionario2
                 total = result['total']
                 response = []
                 for content in result['content']:
+                    content.image.disease.plant = content.image.disease.plant.__dict__
+                    content.image.disease = content.image.disease.__dict__
+                    content.image = content.image.__dict__
+                    content.classifier.plant = content.classifier.plant.__dict__
+                    content.classifier = content.classifier.__dict__
                     response.append(content)
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
@@ -114,11 +129,13 @@ class AnalysisController(BaseController):
         receives in body request a analysis model
         action should be anything
         """
-        analysis = request.json
-        analysis = namedtuple("Analysis", analysis.keys())(*analysis.values())
+        analysis_request = request.json
+        analysis_request = namedtuple("Analysis", analysis_request.keys())(*analysis_request.values())
         analysis = models.Analysis.Analysis(
                       id=None,
-                      idImage=analysis.idImage)
+                      image=models.Image.Image(id=analysis_request.idImage),
+                      classifier=models.Classifier.Classifier(id=analysis_request.idClassifier))
+
         repository = AnalysisRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
@@ -127,9 +144,15 @@ class AnalysisController(BaseController):
                 FLASK_APP.config["DBNAME"])
 
         try:
-            if not analysis.idImage:
+            if not analysis.image.id or not analysis.classifier.id :
                 raise Exception('Analysis fields not defined')
             analysis = repository.create(analysis)
+            analysis.image.disease.plant = analysis.image.disease.plant.__dict__
+            analysis.image.disease = analysis.image.disease.__dict__
+            analysis.image = analysis.image.__dict__
+            analysis.classifier.plant = analysis.classifier.plant.__dict__
+            analysis.classifier = analysis.classifier.__dict__
+
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'Analysis sucessfuly created',
@@ -162,12 +185,14 @@ class AnalysisController(BaseController):
         receives in body request a analysis model
         action should be anything
         """
-        analysis = request.json
+        analysis_request = request.json
 
-        analysis = namedtuple("Analysis", analysis.keys())(*analysis.values())
         analysis = models.Analysis.Analysis(
-                      id=analysis.id,
-                      idImage=analysis.idImage)
+                              id=analysis_request['id'],
+                      image=models.Image.Image(
+                                      id=analysis_request['idImage']),
+                      classifier=models.Classifier.Classifier(
+                                            id=analysis_request['idClassifier']))
         repository = AnalysisRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
@@ -176,6 +201,11 @@ class AnalysisController(BaseController):
                 FLASK_APP.config["DBNAME"])
         try:
             analysis = repository.update(analysis)
+            analysis.image.disease.plant = analysis.image.disease.plant.__dict__
+            analysis.image.disease = analysis.image.disease.__dict__
+            analysis.image = analysis.image.__dict__
+            analysis.classifier.plant = analysis.classifier.plant.__dict__
+            analysis.classifier = analysis.classifier.__dict__
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'Analysis sucessfuly updated',
@@ -208,9 +238,13 @@ class AnalysisController(BaseController):
         receives in body request a analysis model
         action should be anything
         """
-        analysis = request.json
-
-        analysis = namedtuple("Analysis", analysis.keys())(*analysis.values())
+        analysis_request = request.json
+        analysis = models.Analysis.Analysis(
+                              id=analysis_request['id'],
+                      image=models.Image.Image(
+                                      id=analysis_request['idImage']),
+                      classifier=models.Classifier.Classifier(
+                                            id=analysis_request['idClassifier']))
         repository = AnalysisRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
@@ -221,15 +255,20 @@ class AnalysisController(BaseController):
         try:
             status = repository.delete(analysis)
             if (status):
-                resp = models.Analysis.Analysis()
+                analysis = models.Analysis.Analysis()
+                analysis.image.disease.plant = analysis.image.disease.plant.__dict__
+                analysis.image.disease = analysis.image.disease.__dict__
+                analysis.image = analysis.image.__dict__
+                analysis.classifier.plant = analysis.classifier.plant.__dict__
+                analysis.classifier = analysis.classifier.__dict__
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Analysis deleted sucessfuly',
                                      'delete()',
-                                     str(resp),
+                                     str(analysis),
                                      FLASK_APP.config["TYPE"])
                 return self.okResponse(
-                    response=resp,
+                    response=analysis,
                     message="Analysis deleted sucessfuly.",
                     status=204), 200
         except Exception as err:
