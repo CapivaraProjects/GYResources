@@ -147,7 +147,6 @@ def test_search(generic_user=generic_user, client=client, token=token):
 
 @pytest.mark.order5
 def test_update(generic_user=generic_user, token=token):
-    token['duration'] = 120
     data = generic_user.__dict__
     data['action'] = 'search'
     resp = client.get(
@@ -232,7 +231,6 @@ def test_create_empty():
 @pytest.mark.order8
 def test_update_wrong_id(
         generic_user=generic_user, token=token):
-    token['duration'] = 120
     data = generic_user.__dict__
     data['action'] = 'search'
     resp = client.get(
@@ -275,7 +273,6 @@ def test_update_wrong_id(
 @pytest.mark.order9
 def test_delete_non_existent(
         user=generic_user, token=token):
-    token['duration'] = 120
     user = {
                 "action": "string",
                 "id": 1000,
@@ -303,7 +300,6 @@ def test_delete_non_existent(
 
 @pytest.mark.order10
 def test_delete(token=token):
-    token['duration'] = 120
     data = generic_user.__dict__
     data['action'] = 'search'
     resp = client.get(
