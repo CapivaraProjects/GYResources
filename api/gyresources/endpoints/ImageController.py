@@ -296,7 +296,7 @@ class ImageController(BaseController):
                     message="Image deleted sucessfuly.",
                     status=204), 200
         except Exception as err:
-			print("ImageController | {}".format(err))
+            print("ImageController | {}".format(err))
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error',
