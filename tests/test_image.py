@@ -222,6 +222,7 @@ def test_delete(generic_image=generic_image, generic_user=generic_user):
                 "source": image.source,
                 "url": image.url
             }
+    print(image)
     headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -229,6 +230,7 @@ def test_delete(generic_image=generic_image, generic_user=generic_user):
             }
     resp = client().delete('/api/gyresources/images/', data=str(
         json.dumps(image)), headers=headers)
+    print(resp)
     assert resp.status_code == 200
     assert 204 == json.loads(
             resp.get_data(as_text=True))['status_code']
