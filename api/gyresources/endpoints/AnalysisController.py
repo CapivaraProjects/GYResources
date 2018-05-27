@@ -272,6 +272,7 @@ class AnalysisController(BaseController):
                     message="Analysis deleted sucessfuly.",
                     status=204), 200
         except Exception as err:
+			print(err)
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error',
