@@ -290,11 +290,13 @@ class ImageController(BaseController):
                                      'delete()',
                                      str(image.__dict__),
                                      FLASK_APP.config["TYPE"])
+                print("ImageController | {}".format(image.__dict__))
                 return self.okResponse(
                     response=image,
                     message="Image deleted sucessfuly.",
                     status=204), 200
         except Exception as err:
+			print("ImageController | {}".format(err))
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error',

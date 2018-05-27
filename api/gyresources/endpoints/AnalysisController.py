@@ -267,12 +267,13 @@ class AnalysisController(BaseController):
                                      'delete()',
                                      str(analysis),
                                      FLASK_APP.config["TYPE"])
+                print("AnalysisController | {}".format(analysis.__dict__))
                 return self.okResponse(
                     response=analysis,
                     message="Analysis deleted sucessfuly.",
                     status=204), 200
         except Exception as err:
-			print(err)
+			print("AnalysisController | {}".format(err))
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error',
