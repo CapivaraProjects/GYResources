@@ -11,7 +11,9 @@ from api.gyresources.serializers import analysis as analysisSerializer
 from api.gyresources.parsers import analysis_search_args
 from tools import Logger
 import sys, os
+import logging
 
+log = logging.getLogger(__name__)
 
 ns = api.namespace('gyresources/analysis',
                    description='Operations related to analysis')
@@ -246,6 +248,8 @@ class AnalysisController(BaseController):
                                       id=analysis_request['idImage']),
                       classifier=models.Classifier.Classifier(
                                             id=analysis_request['idClassifier']))
+        
+        log.info('AnalysisController request: {}'.format(analysis_request))
         repository = AnalysisRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
@@ -255,18 +259,30 @@ class AnalysisController(BaseController):
 
         try:
             status = repository.delete(analysis)
+            log.info('AnalysisController deleted 1: {}'.format(status))
             if (status):
+
+                analysis = models.AnalysisResult.Analysis()
+                analysis.image.disease.plant = analysis.image.disease.plant.__dict__
+                analysis.image.disease = analysis.image.disease.__dict__
+                analysis.image = analysis.image.__dict__
+                analysis.classifier.plant = analysis.classifier.plant.__dict__
+                analysis.classifier = analysis.classifier.__dict__
+
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Analysis deleted sucessfuly',
                                      'delete()',
-                                     str({"deleted":status}),
+                                     str(status),
                                      FLASK_APP.config["TYPE"])
                 return self.okResponse(
                     response=analysis,
                     message="Analysis deleted sucessfuly.",
                     status=204), 200
         except Exception as err:
+            log.error('Error to open tf server chanel')
+            log.error('{}'.format(err))
+            log.error('{}'.format(sys.exc_info()[0]))
             print("AnalysisController exception | {}".format(err))
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]

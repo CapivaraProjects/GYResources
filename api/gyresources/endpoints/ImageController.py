@@ -281,11 +281,14 @@ class ImageController(BaseController):
         try:
             status = repository.delete(image)
             if (status):
+                image = models.Image.Image()
+                image.disease.plant = image.disease.plant.__dict__
+                image.disease = image.disease.__dict__
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Image deleted sucessfuly',
                                      'delete()',
-                                     str({"deleted":status}),
+                                     str(status),
                                      FLASK_APP.config["TYPE"])
                 return self.okResponse(
                     response=image,

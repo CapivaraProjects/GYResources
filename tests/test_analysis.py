@@ -279,8 +279,6 @@ def test_delete(generic_analysis=generic_analysis, generic_user=generic_user):
             "idImage": get_response.response['image']['id'],
             "idClassifier": get_response.response['classifier']['id']
             }
-
-    print(analysis)
     headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -288,7 +286,8 @@ def test_delete(generic_analysis=generic_analysis, generic_user=generic_user):
             }
     resp = client().delete('/api/gyresources/analysis/', data=str(
         json.dumps(analysis)), headers=headers)
-    print(json.loads(resp.get_data(as_text=True)))
+    print("resp as text: {}".format(json.loads(resp.get_data(as_text=True))))
+    print("resp as text: {}".format(resp))
     assert resp.status_code == 200
     assert 204 == json.loads(
             resp.get_data(as_text=True))['status_code']
