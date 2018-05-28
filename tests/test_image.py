@@ -380,7 +380,7 @@ def test_delete_non_existent(generic_image=generic_image, generic_user=generic_u
         image = namedtuple("Image", response.keys())(*response.values())
 
         image = {
-                "id": 1000,
+                "id": 0,
                 "description": image.url,
                 "idDisease": image.disease["id"],
                 "size": image.size,
