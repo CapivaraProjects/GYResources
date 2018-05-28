@@ -263,7 +263,10 @@ class AnalysisController(BaseController):
             if (status):
 
                 analysis = models.Analysis.Analysis()
-                print(analysis)
+                print(analysis.image)
+                print(analysis.image)
+                print(analysis.image.disease)
+                print(analysis.image.disease.plant)
                 analysis.image.disease.plant = analysis.image.disease.plant.__dict__
                 print(analysis)
                 analysis.image.disease = analysis.image.disease.__dict__
