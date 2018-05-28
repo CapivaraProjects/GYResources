@@ -268,7 +268,7 @@ class ImageController(BaseController):
         action should be anything
         """
         image = request.json
-
+        print("ImageController exception | {}".format(image))
         image = namedtuple("Image", image.keys())(*image.values())
         image = models.Image.Image(id=image.id)
         repository = ImageRepository(
@@ -277,7 +277,7 @@ class ImageController(BaseController):
                 FLASK_APP.config["DBHOST"],
                 FLASK_APP.config["DBPORT"],
                 FLASK_APP.config["DBNAME"])
-
+        print("ImageController exception | {}".format(image.__dict__))
         try:
             status = repository.delete(image)
             if (status):

@@ -248,7 +248,7 @@ class AnalysisController(BaseController):
                                       id=analysis_request['idImage']),
                       classifier=models.Classifier.Classifier(
                                             id=analysis_request['idClassifier']))
-        
+        print('AnalysisController request: {}'.format(analysis_request))
         log.info('AnalysisController request: {}'.format(analysis_request))
         repository = AnalysisRepository(
                 FLASK_APP.config["DBUSER"],
@@ -259,7 +259,7 @@ class AnalysisController(BaseController):
 
         try:
             status = repository.delete(analysis)
-            log.info('AnalysisController deleted 1: {}'.format(status))
+            print('AnalysisController deleted 1: {}'.format(status))
             if (status):
 
                 analysis = models.Analysis.Analysis()
