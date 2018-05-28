@@ -151,6 +151,8 @@ analysis_search_args.add_argument('id', type=int, required=False, default=1,
                               help='Analysis ID, used when action=searchByID')
 analysis_search_args.add_argument('idImage', type=int, required=False,
                               default='', help='Image ID')
+analysis_search_args.add_argument('idClassifier', type=int, required=False,
+                              default='', help='Classifier ID')
 analysis_search_args.add_argument('pageSize', type=int, required=False,
                               default=10,
                               help='Quantity of elements required')
