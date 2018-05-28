@@ -10,6 +10,7 @@ from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import analysis as analysisSerializer
 from api.gyresources.parsers import analysis_search_args
 from tools import Logger
+import sys, os
 
 
 ns = api.namespace('gyresources/analysis',
@@ -265,15 +266,15 @@ class AnalysisController(BaseController):
                                      'Informative',
                                      'Analysis deleted sucessfuly',
                                      'delete()',
-                                     str(analysis),
+                                     str({"deleted":status}),
                                      FLASK_APP.config["TYPE"])
-                print("AnalysisController | {}".format(analysis.__dict__))
+                print("AnalysisController return | {}".format(analysis.__dict__))
                 return self.okResponse(
                     response=analysis,
                     message="Analysis deleted sucessfuly.",
                     status=204), 200
         except Exception as err:
-            print("AnalysisController | {}".format(err))
+            print("AnalysisController exception | {}".format(err))
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)

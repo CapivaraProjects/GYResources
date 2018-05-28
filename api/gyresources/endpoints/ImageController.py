@@ -290,13 +290,13 @@ class ImageController(BaseController):
                                      'delete()',
                                      str(image.__dict__),
                                      FLASK_APP.config["TYPE"])
-                print("ImageController | {}".format(image.__dict__))
+                print("ImageController return | {}".format(image.__dict__))
                 return self.okResponse(
                     response=image,
                     message="Image deleted sucessfuly.",
                     status=204), 200
         except Exception as err:
-            print("ImageController | {}".format(err))
+            print("ImageController exception | {}".format(err))
             exc_type, exc_obj, exc_tb = sys.exc_info()
             fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
             print(exc_type, fname, exc_tb.tb_lineno)
