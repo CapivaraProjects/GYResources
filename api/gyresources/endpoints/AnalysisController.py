@@ -262,13 +262,16 @@ class AnalysisController(BaseController):
             log.info('AnalysisController deleted 1: {}'.format(status))
             if (status):
 
-                analysis = models.AnalysisResult.Analysis()
+                analysis = models.Analysis.Analysis()
+                print(analysis)
                 analysis.image.disease.plant = analysis.image.disease.plant.__dict__
+                print(analysis)
                 analysis.image.disease = analysis.image.disease.__dict__
                 analysis.image = analysis.image.__dict__
+                print(analysis)
                 analysis.classifier.plant = analysis.classifier.plant.__dict__
                 analysis.classifier = analysis.classifier.__dict__
-
+                print(analysis)
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Analysis deleted sucessfuly',
