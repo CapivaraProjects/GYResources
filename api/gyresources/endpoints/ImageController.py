@@ -283,10 +283,10 @@ class ImageController(BaseController):
             if (status):
                 image = models.Image.Image()
                 print(image)
-                print(image.disease)
-                print(image.disease.plant)
-                image.disease.plant = image.disease.plant.__dict__
-                print(image)
+                #print(image.disease)
+                #print(image.disease.plant)
+                #image.disease.plant = image.disease.plant.__dict__
+                #print(image)
                 image.disease = image.disease.__dict__
                 print(image)
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
