@@ -27,7 +27,6 @@ generic_user = models.User.User(
         dateInsertion='03/02/2018',
         dateUpdate='10/02/2018')
 
-
 def auth(generic_user=generic_user):
     crypto = Crypto()
     generic_user.salt = crypto.generateRandomSalt()
@@ -55,6 +54,7 @@ def auth(generic_user=generic_user):
     token = resp['response']
     generic_user.password = 'password'
     return (generic_user, token)
+
 @pytest.mark.order1
 def test_search_by_unexistent_id():
     data = {
@@ -149,8 +149,6 @@ def test_update(generic_analysis=generic_analysis, generic_user=generic_user):
                 'dataType': 'json'},
             query_string=data, follow_redirects=True)
     get_response = json.loads(resp.get_data(as_text=True))
-    #analysis = object()
-    #for response in pagedResponse['response']:
     get_response = namedtuple("Analysis", get_response.keys())(*get_response.values())
     analysis = {
             "id": get_response.response["id"],
@@ -185,8 +183,6 @@ def test_update_wrong_id(generic_analysis=generic_analysis, generic_user=generic
                 'dataType': 'json'},
             query_string=data, follow_redirects=True)
     get_response = json.loads(resp.get_data(as_text=True))
-    #analysis = object()
-    #for response in pagedResponse['response']:
     get_response = namedtuple("Analysis", get_response.keys())(*get_response.values())
     analysis = {
             "id": 1000,
@@ -286,8 +282,7 @@ def test_delete(generic_analysis=generic_analysis, generic_user=generic_user):
             }
     resp = client().delete('/api/gyresources/analysis/', data=str(
         json.dumps(analysis)), headers=headers)
-    print("resp as text: {}".format(json.loads(resp.get_data(as_text=True))))
-    print("resp as text: {}".format(resp))
+
     assert resp.status_code == 200
     assert 204 == json.loads(
             resp.get_data(as_text=True))['status_code']

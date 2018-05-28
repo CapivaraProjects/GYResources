@@ -10,7 +10,7 @@ from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import image as imageSerializer
 from api.gyresources.parsers import image_search_args
 from tools import Logger
-import sys, os
+
 
 ns = api.namespace(
         'gyresources/images',
@@ -268,48 +268,42 @@ class ImageController(BaseController):
         action should be anything
         """
         image = request.json
-        print("ImageController exception | {}".format(image))
         image = namedtuple("Image", image.keys())(*image.values())
         image = models.Image.Image(id=image.id)
+
         repository = ImageRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
                 FLASK_APP.config["DBHOST"],
                 FLASK_APP.config["DBPORT"],
                 FLASK_APP.config["DBNAME"])
-        print("ImageController exception | {}".format(image.__dict__))
+
         try:
             status = repository.delete(image)
             if (status):
                 image = models.Image.Image()
-                print(image.__dict__)
-                #print(image.disease)
-                #print(image.disease.plant)
-                #image.disease.plant = image.disease.plant.__dict__
-                #print(image)
                 image.disease = image.disease.__dict__
-                print(image.__dict__)
+
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Image deleted sucessfuly',
                                      'delete()',
                                      str(status),
                                      FLASK_APP.config["TYPE"])
+
                 return self.okResponse(
                     response=image,
                     message="Image deleted sucessfuly.",
                     status=204), 200
         except Exception as err:
-            print("ImageController exception | {}".format(err))
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            print(exc_type, fname, exc_tb.tb_lineno)
+
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error',
                                  'put()',
                                  str(err),
                                  FLASK_APP.config["TYPE"])
+
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
