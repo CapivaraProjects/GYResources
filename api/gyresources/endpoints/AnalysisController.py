@@ -256,19 +256,12 @@ class AnalysisController(BaseController):
         try:
             status = repository.delete(analysis)
             if (status):
-                analysis = models.Analysis.Analysis()
-                analysis.image.disease.plant = analysis.image.disease.plant.__dict__
-                analysis.image.disease = analysis.image.disease.__dict__
-                analysis.image = analysis.image.__dict__
-                analysis.classifier.plant = analysis.classifier.plant.__dict__
-                analysis.classifier = analysis.classifier.__dict__
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Analysis deleted sucessfuly',
                                      'delete()',
                                      str({"deleted":status}),
                                      FLASK_APP.config["TYPE"])
-                print("AnalysisController return | {}".format(analysis.__dict__))
                 return self.okResponse(
                     response=analysis,
                     message="Analysis deleted sucessfuly.",
