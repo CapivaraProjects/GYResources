@@ -128,6 +128,25 @@ disease_search_args.add_argument('offset', type=int, required=False,
                                  default=10,
                                  help='Quantity of elements to be jumped')
 
+classifier_search_args = reqparse.RequestParser()
+classifier_search_args.add_argument(
+        'action', type=str, required=True,
+        default='searchByID',
+        help='Defines what kind of search you gonna do',
+        choices=['searchByID', 'search'])
+classifier_search_args.add_argument('id', type=int, required=False, default=1,
+                                 help='Plant ID, used when action=searchByID')
+classifier_search_args.add_argument('tag', type=str, required=False,
+                                 default='', help='tag version of classifier')
+classifier_search_args.add_argument('path', type=str, required=False,
+                                 default='', help='model path')
+classifier_search_args.add_argument('pageSize', type=int, required=False,
+                                 default=10,
+                                 help='Quantity of elements required')
+classifier_search_args.add_argument('offset', type=int, required=False,
+                                 default=0,
+                                 help='Quantity of elements to be jumped')
+
 log_post_args = reqparse.RequestParser()
 log_post_args.add_argument('url', type=str, required=True, default='',
                            help='URL from the ambient that you running')
