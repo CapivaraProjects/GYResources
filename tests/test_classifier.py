@@ -240,3 +240,78 @@ def test_create_empty(generic_classifier=generic_classifier, generic_user=generi
     resp = json.loads(
                 resp.get_data(as_text=True))
     assert resp['status_code'] == 500
+
+
+@pytest.mark.order9
+def test_update_wrong_id(generic_classifier=generic_classifier, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    data = generic_classifier.__dict__
+    data['action'] = 'search'
+    resp = client().get(
+            '/api/gyresources/classifiers',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json'},
+            query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    classifier = object()
+    for response in pagedResponse['response']:
+        classifier = namedtuple("Disease", response.keys())(*response.values())
+
+        classifier = {
+
+                "id": 1000,
+                "idPlant": classifier.plant["id"],
+                "tag": '2',
+                "path": classifier.path
+            }
+    headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % token['token']
+            }
+    resp = client().put('/api/gyresources/classifiers/', data=str(
+        json.dumps(classifier)), headers=headers)
+    resp = json.loads(
+                resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']
+
+
+@pytest.mark.order10
+def test_delete_non_existent(generic_classifier=generic_classifier, generic_user=generic_user):
+    (generic_user, token) = auth(generic_user)
+    data = generic_classifier.__dict__
+    data['action'] = 'search'
+    resp = client().get(
+            '/api/gyresources/classifiers',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json'},
+            query_string=data, follow_redirects=True)
+    pagedResponse = json.loads(resp.get_data(as_text=True))
+    classifier = object()
+    for response in pagedResponse['response']:
+        classifier = namedtuple("Disease", response.keys())(*response.values())
+
+        classifier = {
+                "id": 1000,
+                "idPlant": classifier.plant["id"],
+                "tag": classifier.tag,
+                "path": classifier.path
+            }
+    headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer %s' % token['token']
+            }
+    resp = client().delete('/api/gyresources/classifiers/', data=str(
+        json.dumps(classifier)), headers=headers)
+    resp = json.loads(
+                resp.get_data(as_text=True))
+    assert resp['status_code'] == 500
+    assert 'Internal server error' in resp['message']
