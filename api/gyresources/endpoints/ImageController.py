@@ -168,7 +168,7 @@ class ImageController(BaseController):
 
         try:
             # if image is base 64 encoded save in a file
-            if (image.url.strip()[-1] == '=' and (not image.url or not image.description or not image.source or not image.size)):
+            if (image.url.strip()[-1] == '=' and (not image.description or not image.source or not image.size)):
                 image.disease = diseaseRepository.searchByID(image.disease.id)
                 image = repository.saveImage(
                         image,
