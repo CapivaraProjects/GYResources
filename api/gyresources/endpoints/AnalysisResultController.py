@@ -28,7 +28,7 @@ class AnalysisResultController(BaseController):
     @api.response(200, 'AnalysisResult searched.')
     def get(self):
         """
-        Return a list of analyzes based on action.
+        Return a list of analysis based on action.
 
         If action=searchByID:
             please set id parameter.
@@ -43,20 +43,19 @@ class AnalysisResultController(BaseController):
         action = request.args.get('action')
         id = request.args.get('id')
         analysisResult = models.AnalysisResult.AnalysisResult(
-                        idAnalysis=request.args.get('idAnalysis'),
-                        idDisease=request.args.get('idDisease'),
+                        analysis=models.Analysis.Analysis(
+                                        id=request.args.get('idAnalysis')),
+                        disease=models.Disease.Disease(
+                                        id=request.args.get('idDisease')),
                         score=request.args.get('score'))
-        pageSize = None
+        pageSize = 10
         if request.args.get('pageSize'):
             pageSize = int(request.args.get('pageSize'))
-        else:
-            pageSize = 10
 
-        offset = None
+        offset = 0
         if request.args.get('offset'):
             offset = int(request.args.get('offset'))
-        else:
-            offset = 0
+
         repository = AnalysisResultRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
@@ -66,6 +65,16 @@ class AnalysisResultController(BaseController):
         try:
             if (action == 'searchByID'):
                 result = repository.searchByID(id)
+
+                result.disease.plant = result.disease.plant.__dict__
+                result.disease = result.disease.__dict__
+                result.analysis.image.disease.plant = result.analysis.image.disease.plant.__dict__
+                result.analysis.image.disease = result.analysis.image.disease.__dict__
+                result.analysis.image = result.analysis.image.__dict__
+                result.analysis.classifier.plant = result.analysis.classifier.plant.__dict__
+                result.analysis.classifier = result.analysis.classifier.__dict__
+                result.analysis = result.analysis.__dict__
+
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative.',
                                      'Ok',
@@ -81,6 +90,14 @@ class AnalysisResultController(BaseController):
                 total = result['total']
                 response = []
                 for content in result['content']:
+                    content.disease.plant = content.disease.plant.__dict__
+                    content.disease = content.disease.__dict__
+                    content.analysis.image.disease.plant = content.analysis.image.disease.plant.__dict__
+                    content.analysis.image.disease = content.analysis.image.disease.__dict__
+                    content.analysis.image = content.analysis.image.__dict__
+                    content.analysis.classifier.plant = content.analysis.classifier.plant.__dict__
+                    content.analysis.classifier = content.analysis.classifier.__dict__
+                    content.analysis = content.analysis.__dict__
                     response.append(content)
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
@@ -117,13 +134,15 @@ class AnalysisResultController(BaseController):
         receives in body request a analysisResult model
         action should be anything
         """
-        analysisResult = request.json
-        analysisResult = namedtuple("AnalysisResult", analysisResult.keys())(*analysisResult.values())                  
+        analysisResult_request = request.json
+        analysisResult_request = namedtuple("AnalysisResult", analysisResult_request.keys())(*analysisResult_request.values())
         analysisResult = models.AnalysisResult.AnalysisResult(
                                 id=None,
-                                idAnalysis=analysisResult.idAnalysis,
-                                idDisease=analysisResult.idDisease,
-                                score=analysisResult.score)
+                                analysis=models.Analysis.Analysis(
+                                                id=analysisResult_request.idAnalysis),
+                                disease=models.Disease.Disease(
+                                                id=analysisResult_request.idDisease),
+                                score=analysisResult_request.score)
         repository = AnalysisResultRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
@@ -131,18 +150,27 @@ class AnalysisResultController(BaseController):
                 FLASK_APP.config["DBPORT"],
                 FLASK_APP.config["DBNAME"])
         try:
-            if (not analysisResult.idAnalysis or not analysisResult.idDisease):
-                 # or not analysisResult.score pega o caso de score=0.0
+            if (not analysisResult.analysis.id or not analysisResult.disease.id):
                 raise Exception('AnalysisResult fields not defined')
-            analysisResult = repository.create(analysisResult)
+            result = repository.create(analysisResult)
+            result.disease.plant = result.disease.plant.__dict__
+            result.disease = result.disease.__dict__
+            result.analysis.image.disease.plant = result.analysis.image.disease.plant.__dict__
+            result.analysis.image.disease = result.analysis.image.disease.__dict__
+            result.analysis.image = result.analysis.image.__dict__
+            result.analysis.classifier.plant = result.analysis.classifier.plant.__dict__
+            result.analysis.classifier = result.analysis.classifier.__dict__
+            result.analysis = result.analysis.__dict__
+
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'AnalysisResult sucessfuly created',
                                  'post()',
-                                 str(analysisResult.__dict__),
+                                 str(result.__dict__),
                                  FLASK_APP.config["TYPE"])
+
             return self.okResponse(
-                response=analysisResult,
+                response=result,
                 message="AnalysisResult sucessfuly created.",
                 status=201), 200
         except Exception as err:
@@ -167,14 +195,15 @@ class AnalysisResultController(BaseController):
         receives in body request a analysisResult model
         action should be anything
         """
-        analysisResult = request.json
-
-        analysisResult = namedtuple("AnalysisResult", analysisResult.keys())(*analysisResult.values())
+        analysisResult_request = request.json
+        analysisResult_request = namedtuple("AnalysisResult", analysisResult_request.keys())(*analysisResult_request.values())
         analysisResult = models.AnalysisResult.AnalysisResult(
-                      id=analysisResult.id,
-                      idAnalysis=analysisResult.idAnalysis,
-                      idDisease=analysisResult.idDisease,
-                      score=analysisResult.score)
+                                id=analysisResult_request.id,
+                                analysis=models.Analysis.Analysis(
+                                                id=analysisResult_request.idAnalysis),
+                                disease=models.Disease.Disease(
+                                                id=analysisResult_request.idDisease),
+                                score=analysisResult_request.score)
         repository = AnalysisResultRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
@@ -182,15 +211,24 @@ class AnalysisResultController(BaseController):
                 FLASK_APP.config["DBPORT"],
                 FLASK_APP.config["DBNAME"])
         try:
-            analysisResult = repository.update(analysisResult)
+            result = repository.update(analysisResult)
+            result.disease.plant = result.disease.plant.__dict__
+            result.disease = result.disease.__dict__
+            result.analysis.image.disease.plant = result.analysis.image.disease.plant.__dict__
+            result.analysis.image.disease = result.analysis.image.disease.__dict__
+            result.analysis.image = result.analysis.image.__dict__
+            result.analysis.classifier.plant = result.analysis.classifier.plant.__dict__
+            result.analysis.classifier = result.analysis.classifier.__dict__
+            result.analysis = result.analysis.__dict__
+
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'AnalysisResult sucessfuly updated',
                                  'put()',
-                                 str(analysisResult.__dict__),
+                                 str(result.__dict__),
                                  FLASK_APP.config["TYPE"])
             return self.okResponse(
-                response=analysisResult,
+                response=result,
                 message="AnalysisResult sucessfuly updated.",
                 status=204), 200
         except Exception as err:
@@ -215,9 +253,15 @@ class AnalysisResultController(BaseController):
         receives in body request a analysisResult model
         action should be anything
         """
-        analysisResult = request.json
-
-        analysisResult = namedtuple("AnalysisResult", analysisResult.keys())(*analysisResult.values())
+        analysisResult_request = request.json
+        analysisResult_request = namedtuple("AnalysisResult", analysisResult_request.keys())(*analysisResult_request.values())
+        analysisResult = models.AnalysisResult.AnalysisResult(
+                                id=analysisResult_request.id,
+                                analysis=models.Analysis.Analysis(
+                                                id=analysisResult_request.idAnalysis),
+                                disease=models.Disease.Disease(
+                                                id=analysisResult_request.idDisease),
+                                score=analysisResult_request.score)
         repository = AnalysisResultRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
@@ -228,15 +272,25 @@ class AnalysisResultController(BaseController):
         try:
             status = repository.delete(analysisResult)
             if (status):
-                resp = models.AnalysisResult.AnalysisResult()
+
+                result = models.AnalysisResult.AnalysisResult()
+                result.disease.plant = result.disease.plant.__dict__
+                result.disease = result.disease.__dict__
+                result.analysis.image.disease.plant = result.analysis.image.disease.plant.__dict__
+                result.analysis.image.disease = result.analysis.image.disease.__dict__
+                result.analysis.image = result.analysis.image.__dict__
+                result.analysis.classifier.plant = result.analysis.classifier.plant.__dict__
+                result.analysis.classifier = result.analysis.classifier.__dict__
+                result.analysis = result.analysis.__dict__
+
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'AnalysisResult deleted sucessfuly',
                                      'delete()',
-                                     str(resp),
+                                     str(result),
                                      FLASK_APP.config["TYPE"])
                 return self.okResponse(
-                    response=resp,
+                    response=result,
                     message="AnalysisResult deleted sucessfuly.",
                     status=204), 200
         except Exception as err:
