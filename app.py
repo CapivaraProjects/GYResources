@@ -32,11 +32,8 @@ def initialize_app(flask_app):
     api.add_namespace(token_namespace)
     api.add_namespace(analysis_namespace)
     api.add_namespace(analysisResult_namespace)
-<<<<<<< HEAD
     api.add_namespace(message_namespace)
-=======
     api.add_namespace(classifier_namespace)
->>>>>>> 4178f22770b32579c95786d01089f3aaf2c02696
     flask_app.register_blueprint(blueprint)
     return flask_app
 
