@@ -20,6 +20,13 @@ class DefaultConfig(object):
     SECRET_KEY = 'testing gyresources api'
     IMAGESPATH = os.getcwd()
     EXPIRATION_TOKEN = 600
+    # Email setting
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USE_SSL = False
+    MAIL_USERNAME = 'green.eyescorporate@gmail.com'
+    MAIL_PASSWORD = 'ohhjxhswxjdanxvs'
 
 
 class TestConfig(object):

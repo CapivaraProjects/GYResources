@@ -11,7 +11,7 @@ from itsdangerous import (TimedJSONWebSignatureSerializer
 api = Api(version='1.0', title='GYResources-API',
           description='Services application used by Green Eyes applications')
 FLASK_APP = Flask(__name__)
-FLASK_APP.config.from_object('config.TestConfig')
+FLASK_APP.config.from_object('config.DefaultConfig')
 auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth('Bearer')
 multi_auth = MultiAuth(auth, token_auth)
