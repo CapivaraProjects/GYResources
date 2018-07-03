@@ -6,3 +6,4 @@ itsdangerous
 pytest
 psycopg2-binary
 coveralls
+flask_mail
