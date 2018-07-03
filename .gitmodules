@@ -7,6 +7,3 @@
 [submodule "repository"]
 	path = repository
 	url = https://github.com/CapivaraProjects/repository.git
-[submodule "tools"]
-	path = tools
-	url = https://github.com/CapivaraProjects/tools.git
