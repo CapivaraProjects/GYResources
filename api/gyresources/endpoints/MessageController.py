@@ -36,7 +36,7 @@ class MessageController(BaseController):
             msg = Message('Seu codigo de acesso ao App GreenEyes! (Nao responda esse e-mail)',
                 sender = 'green.eyescorporate@gmail.com',
                 recipients = [userEmail])
-            msg.body = 'Seu codigo para cadastro no aplicativo: '+str(codeVerification)
+            msg.body = 'Seu codigo: '+str(codeVerification)
             mail.send(msg)
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                 'Informative',
