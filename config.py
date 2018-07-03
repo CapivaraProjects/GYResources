@@ -23,6 +23,13 @@ class DefaultConfig(object):
     # TF Serving server
     TFSHOST = '172.17.0.2'
     TFSPORT = '7000'
+    # Email setting
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USE_SSL = False
+    MAIL_USERNAME = 'green.eyescorporate@gmail.com'
+    MAIL_PASSWORD = 'ohhjxhswxjdanxvs'
 
 
 class TestConfig(object):
@@ -47,3 +54,10 @@ class TestConfig(object):
     # TF Serving server
     TFSHOST = '172.17.0.2'
     TFSPORT = '7000'
+    # Email setting
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USE_SSL = False
+    MAIL_USERNAME = 'green.eyescorporate@gmail.com'
+    MAIL_PASSWORD = 'ohhjxhswxjdanxvs'

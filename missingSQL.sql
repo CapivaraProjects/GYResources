@@ -16,15 +16,3 @@ CREATE TABLE USERS (
    date_insertion VARCHAR(100),
    date_last_update VARCHAR(100)
 );
-
-CREATE TABLE ANALYSIS (
-    id SERIAL PRIMARY KEY,
-    id_image SERIAL
-);
-
-CREATE TABLE ANALYSIS_RESULT (
-    id SERIAL PRIMARY KEY,
-    id_analysis SERIAL,
-    id_disease SERIAL,
-    score DECIMAL(10,6)
-);
