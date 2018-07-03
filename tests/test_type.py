@@ -342,7 +342,7 @@ def test_delete_non_existent(
 @pytest.mark.order11
 def test_expire_token(generic_type=generic_type, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
-    time.sleep(241)
+    time.sleep(61)
     type_aux = generic_type
     type_aux.value = ''
     type_aux.description = ''
