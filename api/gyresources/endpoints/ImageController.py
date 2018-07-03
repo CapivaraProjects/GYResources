@@ -268,9 +268,9 @@ class ImageController(BaseController):
         action should be anything
         """
         image = request.json
+
         image = namedtuple("Image", image.keys())(*image.values())
         image = models.Image.Image(id=image.id)
-
         repository = ImageRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
@@ -282,28 +282,25 @@ class ImageController(BaseController):
             status = repository.delete(image)
             if (status):
                 image = models.Image.Image()
+                image.disease.plant = image.disease.plant.__dict__
                 image.disease = image.disease.__dict__
-
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Image deleted sucessfuly',
                                      'delete()',
-                                     str(status),
+                                     str(image.__dict__),
                                      FLASK_APP.config["TYPE"])
-
                 return self.okResponse(
                     response=image,
                     message="Image deleted sucessfuly.",
                     status=204), 200
         except Exception as err:
-
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error',
                                  'put()',
                                  str(err),
                                  FLASK_APP.config["TYPE"])
-
             return self.okResponse(
                 response=err,
                 message="Internal server error: " + str(err),
