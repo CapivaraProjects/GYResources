@@ -33,20 +33,6 @@ disease = api.model('Disease', {
     'images': fields.List(fields.Nested(image)),
     })
 
-classifier = api.model('Classifier', {
-    'id': fields.Integer(readOnly=True, description='Classifier identification'),
-    'idPlant': fields.Integer(
-        required=True,
-        attribute='plant.id',
-        description='Plant ID'),
-    'tag': fields.String(
-        required=True,
-        description='classifier version tag'),
-    'path': fields.String(
-        required=True,
-        description='model path'),
-    })
-
 plant = api.model('Plant', {
     'id': fields.Integer(readOnly=True, description='Plant identification'),
     'scientificName': fields.String(
