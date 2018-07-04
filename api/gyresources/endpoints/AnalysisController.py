@@ -1,11 +1,15 @@
+import os
+import uuid
 import time
 import logging
-import models.Analysis
+import cv2
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
-from api.restplus import api, token_auth, FLASK_APP
 from collections import namedtuple
+
+import models.Analysis
+from api.restplus import api, token_auth, FLASK_APP
 from repository.AnalysisRepository import AnalysisRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.logic.tf_serving_client import make_prediction
@@ -159,14 +163,32 @@ class AnalysisController(BaseController):
             analysisDict = analysis.__dict__
 
             try:
-                daemon_thread = ThreadWithReturnValue(name='make_prediction',
-                                     target=make_prediction,
-                                     daemon=True,
-                                     args=(analysisDict,
-                                           FLASK_APP.config["TFSHOST"],
-                                           FLASK_APP.config["TFSPORT"]))
-                logging.info("Iniciando threading")
-                daemon_thread.start()
+                img = cv2.imread(analysisDict['image']['url'])
+                y = 0
+                while y + FLASK_APP.config['WINDOW_SIZE'] < img.shape[0]:
+                    x = 0
+                    while x + FLASK_APP.config['WINDOW_SIZE'] < img.shape[1]:
+                        crop = img[y:y + FLASK_APP.config['WINDOW_SIZE'], x: x + FLASK_APP.config['WINDOW_SIZE'] ]
+                        if crop.shape[0] != FLASK_APP.config['WINDOW_SIZE'] or crop.shape[1] !=  FLASK_APP.config['WINDOW_SIZE']:
+                            continue
+                        crop_filepath = os.path.join(
+                            'tmp',
+                            str(uuid.uuid4()) + '.jpg'),
+                        cv2.imwrite(
+                            crop_filepath,
+                            crop)
+                        analysisDict['image']['url'] = crop_filepath
+                        daemon_thread = ThreadWithReturnValue(
+                            name='make_prediction',
+                            target=make_prediction,
+                            daemon=True,
+                            args=(analysisDict,
+                                  FLASK_APP.config["TFSHOST"],
+                                  FLASK_APP.config["TFSPORT"]))
+                        logging.info("Iniciando threading")
+                        daemon_thread.start()
+                        x += FLASK_APP.config['WINDOW_SIZE']
+                    y += FLASK_APP.config['WINDOW_SIZE']
             except Exception as exc:
                 logging.info("Erro ao tentar make_prediction")
                 logging.info("{}".format(str(exc)))
