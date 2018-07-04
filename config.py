@@ -61,3 +61,4 @@ class TestConfig(object):
     MAIL_USE_SSL = False
     MAIL_USERNAME = 'green.eyescorporate@gmail.com'
     MAIL_PASSWORD = 'ohhjxhswxjdanxvs'
+    WINDOW_SIZE = 28
