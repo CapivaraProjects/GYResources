@@ -20,6 +20,9 @@ class DefaultConfig(object):
     SECRET_KEY = 'testing gyresources api'
     IMAGESPATH = os.getcwd()
     EXPIRATION_TOKEN = 600
+    # TF Serving server
+    TFSHOST = '172.17.0.2'
+    TFSPORT = '7000'
     # Email setting
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 587
@@ -48,6 +51,10 @@ class TestConfig(object):
     SECRET_KEY = 'testing gyresources api'
     IMAGESPATH = os.getcwd()
     EXPIRATION_TOKEN = 240
+    # TF Serving server
+    TFSHOST = '172.17.0.2'
+    TFSPORT = '7000'
+    # Email setting
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True

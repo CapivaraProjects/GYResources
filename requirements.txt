@@ -6,4 +6,6 @@ itsdangerous
 pytest
 psycopg2-binary
 coveralls
+grpcio==1.11.0
+tensorflow==1.7.0
 flask_mail
