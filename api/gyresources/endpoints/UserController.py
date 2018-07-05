@@ -10,10 +10,8 @@ from api.gyresources.serializers import user as userSerializer
 from api.gyresources.parsers import user_search_args
 from tools import Logger
 
-
 ns = api.namespace('gyresources/users',
                    description='Operations related to users')
-
 
 @ns.route('/')
 class UserController(BaseController):
@@ -129,14 +127,12 @@ class UserController(BaseController):
             salt=user.salt,
             dateInsertion=user.dateInsertion,
             dateUpdate=user.dateUpdate)
-
         repository = UserRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
                 FLASK_APP.config["DBHOST"],
                 FLASK_APP.config["DBPORT"],
                 FLASK_APP.config["DBNAME"])
-
         try:
             user.id = None
             if not user.email or not user.username or not user.password or not user.salt:
