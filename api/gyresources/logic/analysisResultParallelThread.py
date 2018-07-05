@@ -1,31 +1,44 @@
 from threading import Thread
 import logging
+
 import models.Analysis
-import requests
 from repository.DiseaseRepository import DiseaseRepository
 from repository.AnalysisResultRepository import AnalysisResultRepository
 from api.restplus import FLASK_APP
 
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s] (%(threadName)-10s) %(message)s',)
+logging.basicConfig(
+    level=logging.INFO,
+    format='[%(levelname)s] (%(threadName)-10s) %(message)s',)
+
 
 class ThreadWithReturnValue(Thread):
-    def __init__(self, group=None, target=None, name=None, args=(), kwargs=None, *, daemon=None):
+
+    def __init__(
+            self,
+            group=None,
+            target=None,
+            name=None,
+            args=(),
+            kwargs=None,
+            *,
+            daemon=None):
         Thread.__init__(self, group, target, name, args, kwargs, daemon=daemon)
         self._return = None
 
     def run(self):
         if self._target is not None:
-            
+
             logging.info("Inicia processo da thread...")
             self._return = self._target(*self._args, **self._kwargs)
             logging.info("Fim do make_prediction")
             # obtem o resultado da analise
             response = self._return
             logging.info("response={}".format(response))
-            # atributos para o AnalysisResult 
+            # atributos para o AnalysisResult
             analysis = self._args[0]
             disease = models.Disease.Disease(
-                                    plant=models.Plant.Plant(id=analysis['classifier']['plant']['id']),
+                                    plant=models.Plant.Plant(
+                                        id=analysis['classifier']['plant']['id']),
                                     scientificName=response[0][0].capitalize())
             score = response[0][1]
 
@@ -58,4 +71,3 @@ class ThreadWithReturnValue(Thread):
 
             result = analysisResultRepo.create(analysisResult)
             logging.info("analysisresult={}".format(result))
-            
