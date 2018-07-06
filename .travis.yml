@@ -31,8 +31,8 @@ before_install:
   - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
   - sudo apt-get update
   - sudo apt-get -y install docker-ce
-  - sudo docker pull capivaraprojects/tensorflow-serving-gyclassifier
-  - sudo docker run --name=gykernel -d -p 7000:7000 capivaraprojects/tensorflow-serving-gyclassifier
+  - sudo docker pull capivaraprojects/tensorflow-serving-gyclassifier:v1.0
+  - sudo docker run --name=gykernel -d -p 7000:7000 capivaraprojects/tensorflow-serving-gyclassifier:v1.0
   - sudo docker exec $(docker ps -a | grep gykernels | awk "{print $1}") tensorflow_model_server --port=7000 --model_name=inception --model_base_path=/root/saved_models &> tf_server.log &
 cache: pip
 install:
