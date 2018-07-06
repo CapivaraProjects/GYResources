@@ -19,6 +19,7 @@ matrix:
 services:
   - postgresql 
   - elasticsearch
+  - docker
 addons:
   postgresql: "9.5"  
 before_install:
@@ -26,6 +27,9 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install python3; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install elasticsearch; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew postinstall python3; fi
+  - docker pull capivaraprojects/tensorflow-serving-gyclassifier
+  - docker run --name=gykernel -d -p 7000:7000 capivaraprojects/tensorflow-serving-gyclassifier
+  - docker exec $(docker ps -a | grep gykernels | awk "{print $1}") tensorflow_model_server --port=7000 --model_name=inception --model_base_path=/root/saved_models &> tf_server.log &
 cache: pip
 install:
   - pip3 install -r requirements.txt
