@@ -129,7 +129,7 @@ class AnalysisController(BaseController):
 
     @api.response(200,'Analysis successfuly created.')
     @api.expect(analysisSerializer)
-    @token_auth.login_required
+    #@token_auth.login_required
     def post(self):
         """
         Method used to insert analysis in database
@@ -163,34 +163,39 @@ class AnalysisController(BaseController):
             analysisDict = analysis.__dict__
 
             try:
+                logging.info("image url={}".format(analysisDict['image']['url']))
                 img = cv2.imread(analysisDict['image']['url'])
                 y = 0
                 while y + FLASK_APP.config['WINDOW_SIZE'] < img.shape[0]:
                     x = 0
                     while x + FLASK_APP.config['WINDOW_SIZE'] < img.shape[1]:
                         crop = img[y:y + FLASK_APP.config['WINDOW_SIZE'], x: x + FLASK_APP.config['WINDOW_SIZE'] ]
+
                         if crop.shape[0] != FLASK_APP.config['WINDOW_SIZE'] or crop.shape[1] !=  FLASK_APP.config['WINDOW_SIZE']:
                             continue
-                        crop_filepath = os.path.join(
-                            'tmp',
-                            str(uuid.uuid4()) + '.jpg'),
-                        cv2.imwrite(
-                            crop_filepath,
-                            crop)
+
+                        crop_filepath = os.path.join('/tmp',str(uuid.uuid4()) + '.jpg')
+
+                        ok = cv2.imwrite(crop_filepath,crop)
+
                         analysisDict['image']['url'] = crop_filepath
-                        daemon_thread = ThreadWithReturnValue(
-                            name='make_prediction',
-                            target=make_prediction,
-                            daemon=True,
-                            args=(analysisDict,
-                                  FLASK_APP.config["TFSHOST"],
-                                  FLASK_APP.config["TFSPORT"]))
-                        logging.info("Iniciando threading")
-                        daemon_thread.start()
+                        try:
+                            daemon_thread = ThreadWithReturnValue(
+                                              name='make_prediction_'+str(x)+'_'+str(y),
+                                              target=make_prediction,
+                                              daemon=True,
+                                              args=(analysisDict,
+                                                    FLASK_APP.config["TFSHOST"],
+                                                    FLASK_APP.config["TFSPORT"]))
+                            logging.info("Iniciando threading")
+                            daemon_thread.start()
+                        except Exception as exception:
+                            logging.info("Erro ao tentar make_prediction")
+                            raise exception
                         x += FLASK_APP.config['WINDOW_SIZE']
                     y += FLASK_APP.config['WINDOW_SIZE']
             except Exception as exc:
-                logging.info("Erro ao tentar make_prediction")
+                logging.info("Erro ao processar imagem")
                 logging.info("{}".format(str(exc)))
                 pass
 

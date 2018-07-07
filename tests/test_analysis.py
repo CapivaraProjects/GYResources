@@ -15,7 +15,7 @@ app = initialize_app(app)
 client = app.test_client
 generic_analysis = models.Analysis.Analysis(
         id=1,
-        image = models.Image.Image(id=1),
+        image = models.Image.Image(id=3264),
         classifier = models.Classifier.Classifier(id=1))
 
 generic_user = models.User.User(

@@ -33,13 +33,28 @@ class ThreadWithReturnValue(Thread):
             logging.info("Fim do make_prediction")
             # obtem o resultado da analise
             response = self._return
+            # gambiarra por falta de padronização no banco
+            disease_name=""
             logging.info("response={}".format(response))
+            if response[0][0].capitalize() == "Noise":
+                logging.info("Noise detected, ignoring prediction!")
+                return
+            elif response[0][0].capitalize() == "None":
+                logging.info("Error to predict!")
+                return
+            else:
+                if response[0][0] == "healthy":
+                    disease_name=response[0][0]
+                else:
+                    disease_name=response[0][0].capitalize()
+
+
             # atributos para o AnalysisResult
             analysis = self._args[0]
             disease = models.Disease.Disease(
                                     plant=models.Plant.Plant(
                                         id=analysis['classifier']['plant']['id']),
-                                    scientificName=response[0][0].capitalize())
+                                    scientificName=disease_name)
             score = response[0][1]
 
             # obtem a doença a partir do nome
