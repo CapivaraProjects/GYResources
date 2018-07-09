@@ -94,7 +94,7 @@ def make_prediction(analysis, host, port):
     image = read_tensor_from_image_file(analysis['image']['url'])
     logging.info("tentando build_request")
     request = build_request(image)
-
+    response = [("None",0)]
     try:
         start_time = time.time()
         logging.info("tentando predict")
@@ -107,6 +107,8 @@ def make_prediction(analysis, host, port):
                          'make_prediction()',
                          '',
                          FLASK_APP.config["TYPE"])
+        response = get_response(result)
+        logging.info("{}".format(response))
     except Exception as exception:
         logging.info("erro ao tentar predict")
         Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
@@ -116,6 +118,6 @@ def make_prediction(analysis, host, port):
                          '{}'.format(exception),
                          FLASK_APP.config["TYPE"])
 
-    response = get_response(result)
-    logging.info("{}".format(response))
+    
+    
     return response
