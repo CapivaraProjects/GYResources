@@ -110,7 +110,7 @@ def make_prediction(analysis, host, port):
         response = get_response(result)
         logging.info("{}".format(response))
     except Exception as exception:
-        logging.info("erro ao tentar predict")
+        logging.info("durante o make_prediction ocorreu uma exceptioin: {}".format(exception))
         Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                          'Error',
                          'Error to predict',

@@ -13,7 +13,8 @@ from api.restplus import api, token_auth, FLASK_APP
 from repository.AnalysisRepository import AnalysisRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.logic.tf_serving_client import make_prediction
-from api.gyresources.logic.analysisResultParallelThread import ThreadWithReturnValue
+from api.gyresources.logic.threadpool import ThreadPool
+from api.gyresources.logic.threadpool import Worker
 from api.gyresources.serializers import analysis as analysisSerializer
 from api.gyresources.parsers import analysis_search_args
 from tools import Logger
@@ -161,11 +162,14 @@ class AnalysisController(BaseController):
             analysis.classifier.plant = analysis.classifier.plant.__dict__
             analysis.classifier = analysis.classifier.__dict__
             analysisDict = analysis.__dict__
+            
+            pool = ThreadPool(100)
 
             try:
                 logging.info("image url={}".format(analysisDict['image']['url']))
                 img = cv2.imread(analysisDict['image']['url'])
                 y = 0
+
                 while y + FLASK_APP.config['WINDOW_SIZE'] < img.shape[0]:
                     x = 0
                     while x + FLASK_APP.config['WINDOW_SIZE'] < img.shape[1]:
@@ -180,17 +184,22 @@ class AnalysisController(BaseController):
 
                         analysisDict['image']['url'] = crop_filepath
                         try:
-                            daemon_thread = ThreadWithReturnValue(
-                                              name='make_prediction_'+str(x)+'_'+str(y),
-                                              target=make_prediction,
-                                              daemon=True,
-                                              args=(analysisDict,
-                                                    FLASK_APP.config["TFSHOST"],
-                                                    FLASK_APP.config["TFSPORT"]))
-                            logging.info("Iniciando threading")
-                            daemon_thread.start()
+                            pool.add_task(make_prediction,
+                                          analysisDict,
+                                          FLASK_APP.config["TFSHOST"],
+                                          FLASK_APP.config["TFSPORT"])
+                            
+                            #daemon_thread = ThreadWithReturnValue(
+                            #                  name='make_prediction_'+str(x)+'_'+str(y),
+                            #                  target=make_prediction,
+                            #                  daemon=True,
+                            #                  args=(analysisDict,
+                            #                        FLASK_APP.config["TFSHOST"],
+                            #                        FLASK_APP.config["TFSPORT"]))
+                            #logging.info("Iniciando threading")
+                            
                         except Exception as exception:
-                            logging.info("Erro ao tentar make_prediction")
+                            logging.info("Erro ao tentar threading")
                             raise exception
                         x += FLASK_APP.config['WINDOW_SIZE']
                     y += FLASK_APP.config['WINDOW_SIZE']
