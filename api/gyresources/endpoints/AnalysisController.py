@@ -3,23 +3,25 @@ import uuid
 import time
 import logging
 import cv2
+import asyncio
+from threading import Thread
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
 from collections import namedtuple
-
 import models.Analysis
 from api.restplus import api, token_auth, FLASK_APP
 from repository.AnalysisRepository import AnalysisRepository
 from api.gyresources.endpoints.BaseController import BaseController
+from api.gyresources.logic.tf_serving_client import start_worker
 from api.gyresources.logic.tf_serving_client import make_prediction
-from api.gyresources.logic.threadpool import ThreadPool
-from api.gyresources.logic.threadpool import Worker
+#from api.gyresources.logic.threadpool import ThreadPool
+#from api.gyresources.logic.producer import start_worker
 from api.gyresources.serializers import analysis as analysisSerializer
 from api.gyresources.parsers import analysis_search_args
 from tools import Logger
 
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s] (%(threadName)-10s) %(message)s',)
+logging.basicConfig(level=logging.INFO, format='%(levelname)s | %(asctime)s | %(threadName)-10s | %(message)s',)
 
 ns = api.namespace('gyresources/analysis',
                    description='Operations related to analysis')
@@ -127,7 +129,6 @@ class AnalysisController(BaseController):
                 message="SQL error: "+str(sqlerr),
                 status=500)
 
-
     @api.response(200,'Analysis successfuly created.')
     @api.expect(analysisSerializer)
     #@token_auth.login_required
@@ -162,9 +163,10 @@ class AnalysisController(BaseController):
             analysis.classifier.plant = analysis.classifier.plant.__dict__
             analysis.classifier = analysis.classifier.__dict__
             analysisDict = analysis.__dict__
-            
-            pool = ThreadPool(100)
-
+            worker_loop = asyncio.new_event_loop()
+            worker = Thread(target=start_worker, args=(worker_loop,))
+            worker.start()
+            cont=0
             try:
                 logging.info("image url={}".format(analysisDict['image']['url']))
                 img = cv2.imread(analysisDict['image']['url'])
@@ -184,25 +186,18 @@ class AnalysisController(BaseController):
 
                         analysisDict['image']['url'] = crop_filepath
                         try:
-                            pool.add_task(make_prediction,
-                                          analysisDict,
-                                          FLASK_APP.config["TFSHOST"],
-                                          FLASK_APP.config["TFSPORT"])
-                            
-                            #daemon_thread = ThreadWithReturnValue(
-                            #                  name='make_prediction_'+str(x)+'_'+str(y),
-                            #                  target=make_prediction,
-                            #                  daemon=True,
-                            #                  args=(analysisDict,
-                            #                        FLASK_APP.config["TFSHOST"],
-                            #                        FLASK_APP.config["TFSPORT"]))
+                            cont+=1
+                            worker_loop.call_soon_threadsafe(make_prediction, 
+                                                            analysisDict,
+                                                            FLASK_APP.config["TFSHOST"],
+                                                            FLASK_APP.config["TFSPORT"])
                             #logging.info("Iniciando threading")
-                            
                         except Exception as exception:
                             logging.info("Erro ao tentar threading")
                             raise exception
                         x += FLASK_APP.config['WINDOW_SIZE']
                     y += FLASK_APP.config['WINDOW_SIZE']
+                logging.info("make_prediction of {} fragments".format(cont))
             except Exception as exc:
                 logging.info("Erro ao processar imagem")
                 logging.info("{}".format(str(exc)))
