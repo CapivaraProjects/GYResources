@@ -52,5 +52,7 @@ before_script:
 # command to run tests
 script:
   - coverage run --source=api setup.py test  
+after_script:
+  - kill $!
 after_success:
   - coveralls
