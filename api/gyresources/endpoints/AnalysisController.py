@@ -3,22 +3,25 @@ import uuid
 import time
 import logging
 import cv2
+import asyncio
+from threading import Thread
 from sqlalchemy import exc
 from flask import request
 from flask import Flask
 from collections import namedtuple
-
 import models.Analysis
 from api.restplus import api, token_auth, FLASK_APP
 from repository.AnalysisRepository import AnalysisRepository
 from api.gyresources.endpoints.BaseController import BaseController
+from api.gyresources.logic.tf_serving_client import start_worker
 from api.gyresources.logic.tf_serving_client import make_prediction
-from api.gyresources.logic.analysisResultParallelThread import ThreadWithReturnValue
+#from api.gyresources.logic.threadpool import ThreadPool
+#from api.gyresources.logic.producer import start_worker
 from api.gyresources.serializers import analysis as analysisSerializer
 from api.gyresources.parsers import analysis_search_args
 from tools import Logger
 
-logging.basicConfig(level=logging.INFO, format='[%(levelname)s] (%(threadName)-10s) %(message)s',)
+logging.basicConfig(level=logging.INFO, format='%(levelname)s | %(asctime)s | %(threadName)-10s | %(message)s',)
 
 ns = api.namespace('gyresources/analysis',
                    description='Operations related to analysis')
@@ -126,10 +129,9 @@ class AnalysisController(BaseController):
                 message="SQL error: "+str(sqlerr),
                 status=500)
 
-
     @api.response(200,'Analysis successfuly created.')
     @api.expect(analysisSerializer)
-    @token_auth.login_required
+    #@token_auth.login_required
     def post(self):
         """
         Method used to insert analysis in database
@@ -161,36 +163,43 @@ class AnalysisController(BaseController):
             analysis.classifier.plant = analysis.classifier.plant.__dict__
             analysis.classifier = analysis.classifier.__dict__
             analysisDict = analysis.__dict__
-
+            worker_loop = asyncio.new_event_loop()
+            worker = Thread(target=start_worker, args=(worker_loop,))
+            worker.start()
+            cont=0
             try:
+                logging.info("image url={}".format(analysisDict['image']['url']))
                 img = cv2.imread(analysisDict['image']['url'])
                 y = 0
+
                 while y + FLASK_APP.config['WINDOW_SIZE'] < img.shape[0]:
                     x = 0
                     while x + FLASK_APP.config['WINDOW_SIZE'] < img.shape[1]:
                         crop = img[y:y + FLASK_APP.config['WINDOW_SIZE'], x: x + FLASK_APP.config['WINDOW_SIZE'] ]
+
                         if crop.shape[0] != FLASK_APP.config['WINDOW_SIZE'] or crop.shape[1] !=  FLASK_APP.config['WINDOW_SIZE']:
                             continue
-                        crop_filepath = os.path.join(
-                            'tmp',
-                            str(uuid.uuid4()) + '.jpg'),
-                        cv2.imwrite(
-                            crop_filepath,
-                            crop)
+
+                        crop_filepath = os.path.join('/tmp',str(uuid.uuid4()) + '.jpg')
+
+                        ok = cv2.imwrite(crop_filepath,crop)
+
                         analysisDict['image']['url'] = crop_filepath
-                        daemon_thread = ThreadWithReturnValue(
-                            name='make_prediction',
-                            target=make_prediction,
-                            daemon=True,
-                            args=(analysisDict,
-                                  FLASK_APP.config["TFSHOST"],
-                                  FLASK_APP.config["TFSPORT"]))
-                        logging.info("Iniciando threading")
-                        daemon_thread.start()
+                        try:
+                            cont+=1
+                            worker_loop.call_soon_threadsafe(make_prediction, 
+                                                            analysisDict,
+                                                            FLASK_APP.config["TFSHOST"],
+                                                            FLASK_APP.config["TFSPORT"])
+                            #logging.info("Iniciando threading")
+                        except Exception as exception:
+                            logging.info("Erro ao tentar threading")
+                            raise exception
                         x += FLASK_APP.config['WINDOW_SIZE']
                     y += FLASK_APP.config['WINDOW_SIZE']
+                logging.info("make_prediction of {} fragments".format(cont))
             except Exception as exc:
-                logging.info("Erro ao tentar make_prediction")
+                logging.info("Erro ao processar imagem")
                 logging.info("{}".format(str(exc)))
                 pass
 
