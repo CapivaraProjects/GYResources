@@ -6,8 +6,7 @@ from grpc.beta import implementations
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
 from tools import Logger
-from flask import Flask
-import asyncio
+from api.restplus import CELERY, FLASK_APP
 import models.Analysis
 from repository.DiseaseRepository import DiseaseRepository
 from repository.AnalysisResultRepository import AnalysisResultRepository
@@ -16,10 +15,6 @@ from repository.AnalysisResultRepository import AnalysisResultRepository
 logging.basicConfig(level=logging.INFO, format='%(levelname)s | %(asctime)s | %(threadName)-10s | %(message)s',)
 
 tf.enable_eager_execution()
-
-FLASK_APP = Flask(__name__)
-FLASK_APP.config.from_object('config.TestConfig')
-
 
 def read_tensor_from_image_file(file_name,
                                 input_height=299,
@@ -55,7 +50,6 @@ def read_tensor_from_image_file(file_name,
     return normalized
     
 def get_response(result):
-    
     final_result={}
     prediction_result={}    
     model_info={}
@@ -77,7 +71,7 @@ def build_request(image):
     request.model_spec.name = 'inception'
     request.model_spec.signature_name = tf.saved_model.signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY
 
-    try:    
+    try:
         request.inputs['image'].CopyFrom(tf.contrib.util.make_tensor_proto(image))
     except Exception as exception:
         Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
@@ -89,15 +83,7 @@ def build_request(image):
     return request
 
 
-
-
-def start_worker(loop):
-    """Switch to new event loop and run forever"""
-    logging.info("stabilish a loop")
-    asyncio.set_event_loop(loop)
-    loop.run_forever()
-
-
+@CELERY.task(name='tf_serving_client.make_prediction')
 def make_prediction(analysis, host, port):
     logging.info("CHEGUEI NO make_prediction")
     logging.info("tentando channel")
@@ -108,22 +94,23 @@ def make_prediction(analysis, host, port):
     image = read_tensor_from_image_file(analysis['image']['url'])
     logging.info("tentando build_request")
     request = build_request(image)
-    response = [("None",0)]
+    response = [("None", 0)]
     try:
         start_time = time.time()
         logging.info("tentando predict")
         result = stub.Predict(request, 120.0)
         request_proccess_time = int(round((time.time() - start_time) * 1000))
         logging.info("request time: {0}ms".format(request_proccess_time))
-        Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
-                         'Info',
-                         'request time: {0}ms'.format(request_proccess_time),
-                         'make_prediction()',
-                         '',
-                         FLASK_APP.config["TYPE"])
+        Logger.Logger.create(
+            FLASK_APP.config["ELASTICURL"],
+            'Info',
+            'request time: {0}ms'.format(request_proccess_time),
+            'make_prediction()',
+            '',
+            FLASK_APP.config["TYPE"])
         response = get_response(result)
         logging.info("{}".format(response))
-        disease_name=""
+        disease_name = ""
         logging.info("response={}".format(response))
         if response[0][0].capitalize() == "Noise":
             logging.info("Noise detected, ignoring prediction!")
@@ -133,15 +120,15 @@ def make_prediction(analysis, host, port):
             return
         else:
             if response[0][0] == "healthy":
-                disease_name=response[0][0]
+                disease_name = response[0][0]
             else:
-                disease_name=response[0][0].capitalize()
+                disease_name = response[0][0].capitalize()
 
             # atributos para o AnalysisResult
             disease = models.Disease.Disease(
                             plant=models.Plant.Plant(
                                 id=analysis['classifier']['plant']['id']),
-                                scientificName=disease_name)
+                            scientificName=disease_name)
             score = response[0][1]
 
             # obtem a doença a partir do nome
@@ -172,7 +159,6 @@ def make_prediction(analysis, host, port):
                 FLASK_APP.config["DBHOST"],
                 FLASK_APP.config["DBPORT"],
                 FLASK_APP.config["DBNAME"])
-            
             logging.info("creating new analysis...")
             result = analysisResultRepo.create(analysisResult)
             logging.info("analysisresult={}".format(result))
@@ -184,4 +170,4 @@ def make_prediction(analysis, host, port):
                          'Error to predict',
                          'make_prediction()',
                          '{}'.format(exception),
-                         FLASK_APP.config["TYPE"])    
+                         FLASK_APP.config["TYPE"])

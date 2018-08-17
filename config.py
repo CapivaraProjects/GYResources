@@ -62,3 +62,4 @@ class TestConfig(object):
     MAIL_USERNAME = 'green.eyescorporate@gmail.com'
     MAIL_PASSWORD = 'ohhjxhswxjdanxvs'
     WINDOW_SIZE = 28
+    CELERY_BROKER_URL = 'anqb://localhost//'
