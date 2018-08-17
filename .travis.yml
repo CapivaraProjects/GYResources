@@ -41,6 +41,7 @@ before_script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then createuser -s postgres; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start elasticsearch; fi
   - sleep 10
+  - celery -A tasks worker --loglevel-info&
   - createuser -s -w -U postgres -e capivara
   - createdb green_eyes -U capivara
   - psql -c "ALTER USER capivara WITH PASSWORD 'test';" -U postgres

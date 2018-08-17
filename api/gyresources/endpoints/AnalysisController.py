@@ -10,7 +10,6 @@ import models.Analysis
 from api.restplus import api, token_auth, FLASK_APP
 from repository.AnalysisRepository import AnalysisRepository
 from api.gyresources.endpoints.BaseController import BaseController
-from api.gyresources.logic.tf_serving_client import start_worker
 from api.gyresources.logic.tf_serving_client import make_prediction
 from api.gyresources.serializers import analysis as analysisSerializer
 from api.gyresources.parsers import analysis_search_args
