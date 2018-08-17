@@ -12,6 +12,7 @@ from api.gyresources.endpoints.token import ns as token_namespace
 from api.gyresources.endpoints.AnalysisController import ns as analysis_namespace
 from api.gyresources.endpoints.AnalysisResultController import ns as analysisResult_namespace
 from api.restplus import api
+from api.restplus import CELERY as celery
 
 
 # import settings
