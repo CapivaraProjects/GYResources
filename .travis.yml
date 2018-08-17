@@ -28,9 +28,7 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew upgrade python3; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install elasticsearch; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew postinstall python3; fi
-  - docker build -t travis/gykernel -f Dockerfile.gykernel .
-  - docker run --name=gykernel -d -it -p 7000:7000 travis/gykernel
-  - docker ps -a
+  - docker run --name=gykernel -d -it -p 7000:7000 wendelhime/gykernel
 cache: pip
 install:
   - pip3 install -r requirements.txt
