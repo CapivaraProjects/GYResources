@@ -46,6 +46,7 @@ before_script:
   - psql -U capivara green_eyes < backupGreeneyes.sql
   - psql -U capivara green_eyes < missingSQL.sql  
   - export PYTHONPATH=$PYTHONPATH:$(pwd)  
+  - sleep 5
 # command to run tests
 script:
   - travis_wait 15 coverage run --source=api setup.py test
