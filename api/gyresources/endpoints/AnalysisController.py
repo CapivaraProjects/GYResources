@@ -159,6 +159,16 @@ class AnalysisController(BaseController):
             analysisDict = analysis.__dict__
 
             img = cv2.imread(analysisDict['image']['url'])
+
+            saliency = cv2.saliency.StaticSaliencyFineGrained_create()
+            (success, saliencyMap) = saliency.computeSaliency(img)
+
+            threshMap = cv2.threshold(
+                saliencyMap,
+                0,
+                255,
+                cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+
             y = 0
 
             while y + FLASK_APP.config['WINDOW_SIZE'] < img.shape[0]:
@@ -168,16 +178,19 @@ class AnalysisController(BaseController):
 
                     if crop.shape[0] != FLASK_APP.config['WINDOW_SIZE'] or crop.shape[1] != FLASK_APP.config['WINDOW_SIZE']:
                         continue
+                    thresh_roi = threshMap[y:y + FLASK_APP.config['WINDOW_SIZE'], x: x + FLASK_APP.config['WINDOW_SIZE']]
+                    if (cv2.countNonZero(thresh_roi) * 100) / (
+                            FLASK_APP.config['WINDOW_SIZE'] ** 2) > 20:
 
-                    crop_filepath = os.path.join('/tmp', str(uuid.uuid4()) + '.jpg')
+                        crop_filepath = os.path.join('/tmp', str(uuid.uuid4()) + '.jpg')
 
-                    cv2.imwrite(crop_filepath, crop)
+                        cv2.imwrite(crop_filepath, crop)
 
-                    analysisDict['image']['url'] = crop_filepath
-                    make_prediction.delay(
-                        analysisDict,
-                        FLASK_APP.config["TFSHOST"],
-                        FLASK_APP.config["TFSPORT"])
+                        analysisDict['image']['url'] = crop_filepath
+                        make_prediction.delay(
+                            analysisDict,
+                            FLASK_APP.config["TFSHOST"],
+                            FLASK_APP.config["TFSPORT"])
                     x += FLASK_APP.config['WINDOW_SIZE']
                 y += FLASK_APP.config['WINDOW_SIZE']
 
