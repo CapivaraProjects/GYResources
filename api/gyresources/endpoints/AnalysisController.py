@@ -9,6 +9,7 @@ from collections import namedtuple
 import models.Analysis
 from api.restplus import api, token_auth, FLASK_APP
 from repository.AnalysisRepository import AnalysisRepository
+from repository.PlantRepository import PlantRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.logic.tf_serving_client import make_prediction
 from api.gyresources.serializers import analysis as analysisSerializer
@@ -151,6 +152,16 @@ class AnalysisController(BaseController):
                 raise Exception('Analysis fields not defined')
 
             analysis = repository.create(analysis)
+            plant_repository = PlantRepository(
+                                FLASK_APP.config["DBUSER"],
+                                FLASK_APP.config["DBPASS"],
+                                FLASK_APP.config["DBHOST"],
+                                FLASK_APP.config["DBPORT"],
+                                FLASK_APP.config["DBNAME"])
+            plant = plant_repository.searchByID(analysis.classifier.plant.id)
+            diseases = {}
+            for disease in plant.diseases:
+                diseases[disease.scientificName.lower().replace(' ', '_')] = disease
             analysis.image.disease.plant = analysis.image.disease.plant.__dict__
             analysis.image.disease = analysis.image.disease.__dict__
             analysis.image = analysis.image.__dict__
@@ -190,7 +201,8 @@ class AnalysisController(BaseController):
                         make_prediction.delay(
                             analysisDict,
                             FLASK_APP.config["TFSHOST"],
-                            FLASK_APP.config["TFSPORT"])
+                            FLASK_APP.config["TFSPORT"],
+                            diseases)
                     x += FLASK_APP.config['WINDOW_SIZE']
                 y += FLASK_APP.config['WINDOW_SIZE']
 

@@ -84,7 +84,7 @@ def build_request(image):
 
 
 @CELERY.task(name='tf_serving_client.make_prediction')
-def make_prediction(analysis, host, port):
+def make_prediction(analysis, host, port, diseases):
     logging.info("CHEGUEI NO make_prediction")
     logging.info("tentando channel")
     channel = implementations.insecure_channel(host, int(port))
@@ -125,24 +125,27 @@ def make_prediction(analysis, host, port):
                 disease_name = response[0][0].capitalize()
 
             # atributos para o AnalysisResult
-            disease = models.Disease.Disease(
-                            plant=models.Plant.Plant(
-                                id=analysis['classifier']['plant']['id']),
-                            scientificName=disease_name)
+            # disease = models.Disease.Disease(
+            #                 plant=models.Plant.Plant(
+            #                     id=analysis['classifier']['plant']['id']),
+            #                 scientificName=disease_name)
             score = response[0][1]
 
             # obtem a doença a partir do nome
-            diseaseRepo = DiseaseRepository(
-                FLASK_APP.config["DBUSER"],
-                FLASK_APP.config["DBPASS"],
-                FLASK_APP.config["DBHOST"],
-                FLASK_APP.config["DBPORT"],
-                FLASK_APP.config["DBNAME"])
+            # diseaseRepo = DiseaseRepository(
+            #     FLASK_APP.config["DBUSER"],
+            #     FLASK_APP.config["DBPASS"],
+            #     FLASK_APP.config["DBHOST"],
+            #     FLASK_APP.config["DBPORT"],
+            #     FLASK_APP.config["DBNAME"])
 
             logging.info("searching for disease...")
-            result = diseaseRepo.search(disease=disease, pageSize=1, offset=0)
-            logging.info("doencas={}".format(result))
-            disease = result['content'][0]
+            # result = diseaseRepo.search(disease=disease, pageSize=1, offset=0)
+            for key in diseases.keys():
+                if disease_name in key:
+                    disease = diseases[key]
+            # logging.info("doencas={}".format(result))
+            # disease = result['content'][0]
             logging.info("doenca={}".format(disease))
 
             # cria o objeto AnalysisResult
