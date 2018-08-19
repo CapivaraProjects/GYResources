@@ -7,9 +7,10 @@ from sqlalchemy import exc
 from flask import request
 from collections import namedtuple
 import models.Analysis
-from api.restplus import api, token_auth, FLASK_APP
 from repository.AnalysisRepository import AnalysisRepository
+from repository.ClassifierRepository import ClassifierRepository
 from repository.PlantRepository import PlantRepository
+from api.restplus import api, token_auth, FLASK_APP
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.logic.tf_serving_client import make_prediction
 from api.gyresources.serializers import analysis as analysisSerializer
@@ -147,18 +148,28 @@ class AnalysisController(BaseController):
                 FLASK_APP.config["DBPORT"],
                 FLASK_APP.config["DBNAME"])
 
+        plant_repository = PlantRepository(
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
+
+        classifier_repository = ClassifierRepository(
+                FLASK_APP.config["DBUSER"],
+                FLASK_APP.config["DBPASS"],
+                FLASK_APP.config["DBHOST"],
+                FLASK_APP.config["DBPORT"],
+                FLASK_APP.config["DBNAME"])
+
         try:
             if not analysis.image.id or not analysis.classifier.id:
                 raise Exception('Analysis fields not defined')
 
             analysis = repository.create(analysis)
-            plant_repository = PlantRepository(
-                                FLASK_APP.config["DBUSER"],
-                                FLASK_APP.config["DBPASS"],
-                                FLASK_APP.config["DBHOST"],
-                                FLASK_APP.config["DBPORT"],
-                                FLASK_APP.config["DBNAME"])
-            plant = plant_repository.searchByID(analysis.classifier.plant.id)
+            classifier = classifier_repository.searchByID(
+                analysis.classifier.id)
+            plant = plant_repository.searchByID(classifier.plant.id)
             diseases = {}
             for disease in plant.diseases:
                 diseases[disease.scientificName.lower().replace(' ', '_')] = disease
