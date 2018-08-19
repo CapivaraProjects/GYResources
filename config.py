@@ -3,6 +3,7 @@ import os
 
 class DefaultConfig(object):
     """Default configuration"""
+    DEBUG = False
     # Database setting
     DBHOST = '127.0.0.1'
     DBUSER = 'capivara'
@@ -10,7 +11,7 @@ class DefaultConfig(object):
     DBPORT = '5432'
     DBNAME = 'green_eyes'
     # Application setting
-    SERVER_NAME = '127.0.0.1:8888'
+    # SERVER_NAME = '0.0.0.0:5000'
     SWAGGER_UI_DOC_EXPANSION = 'list'
     RESTPLUS_VALIDATE = True
     RESTPLUS_MASK_SWAGGER = False
@@ -30,6 +31,8 @@ class DefaultConfig(object):
     MAIL_USE_SSL = False
     MAIL_USERNAME = 'green.eyescorporate@gmail.com'
     MAIL_PASSWORD = 'ohhjxhswxjdanxvs'
+    WINDOW_SIZE = 28
+    CELERY_BROKER_URL = 'amqp://localhost//'
 
 
 class TestConfig(object):
@@ -41,7 +44,7 @@ class TestConfig(object):
     DBPORT = '5432'
     DBNAME = 'green_eyes'
     # Application setting
-    SERVER_NAME = '127.0.0.1:8888'
+    # SERVER_NAME = '0.0.0.0:5000'
     SWAGGER_UI_DOC_EXPANSION = 'list'
     RESTPLUS_VALIDATE = True
     RESTPLUS_MASK_SWAGGER = False
