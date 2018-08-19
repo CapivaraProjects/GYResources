@@ -142,7 +142,7 @@ def make_prediction(analysis, host, port, diseases):
             logging.info("searching for disease...")
             # result = diseaseRepo.search(disease=disease, pageSize=1, offset=0)
             for key in diseases.keys():
-                if disease_name in key:
+                if disease_name.lower() in key.lower():
                     disease = diseases[key]
             # logging.info("doencas={}".format(result))
             # disease = result['content'][0]

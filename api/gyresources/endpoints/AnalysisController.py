@@ -162,6 +162,8 @@ class AnalysisController(BaseController):
             diseases = {}
             for disease in plant.diseases:
                 diseases[disease.scientificName.lower().replace(' ', '_')] = disease
+
+            logging.info('diseases: %s' % str(diseases))
             analysis.image.disease.plant = analysis.image.disease.plant.__dict__
             analysis.image.disease = analysis.image.disease.__dict__
             analysis.image = analysis.image.__dict__
