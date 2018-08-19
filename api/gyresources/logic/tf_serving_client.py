@@ -84,19 +84,14 @@ def build_request(image):
 
 @CELERY.task(name='tf_serving_client.make_prediction')
 def make_prediction(analysis, host, port, diseases):
-    logging.info("CHEGUEI NO make_prediction")
-    logging.info("tentando channel")
     channel = implementations.insecure_channel(host, int(port))
-    logging.info("tentando stub")
     stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)
 
     image = read_tensor_from_image_file(analysis['image']['url'])
-    logging.info("tentando build_request")
     request = build_request(image)
     response = [("None", 0)]
     try:
         start_time = time.time()
-        logging.info("tentando predict")
         result = stub.Predict(request, 120.0)
         request_proccess_time = int(round((time.time() - start_time) * 1000))
         logging.info("request time: {0}ms".format(request_proccess_time))
@@ -108,8 +103,6 @@ def make_prediction(analysis, host, port, diseases):
             '',
             FLASK_APP.config["TYPE"])
         response = get_response(result)
-        logging.info("{}".format(response))
-        disease_name = ""
         logging.info("response={}".format(response))
         if response[0][0].capitalize() == "Noise":
             logging.info("Noise detected, ignoring prediction!")
@@ -120,23 +113,17 @@ def make_prediction(analysis, host, port, diseases):
         else:
             if response[0][0] == "healthy":
                 disease_name = response[0][0]
+                return
             else:
                 disease_name = response[0][0].capitalize()
 
-            # atributos para o AnalysisResult
-            # disease = models.Disease.Disease(
-            #                 plant=models.Plant.Plant(
-            #                     id=analysis['classifier']['plant']['id']),
-            #                 scientificName=disease_name)
             score = response[0][1]
 
             # obtem a doença a partir do nome
-            logging.info("searching for disease...")
             for x in diseases:
                 if disease_name.lower().replace('_', ' ') in x['scientificName'].lower():
                     disease = x
-            # logging.info("doencas={}".format(result))
-            # disease = result['content'][0]
+
             logging.info("doenca={}".format(disease))
 
             # cria o objeto AnalysisResult
@@ -153,10 +140,7 @@ def make_prediction(analysis, host, port, diseases):
                 FLASK_APP.config["DBHOST"],
                 FLASK_APP.config["DBPORT"],
                 FLASK_APP.config["DBNAME"])
-            logging.info("creating new analysis...")
-            result = analysisResultRepo.create(analysisResult)
-            logging.info("analysisresult={}".format(result))
-
+            analysisResultRepo.create(analysisResult)
     except Exception as exception:
         logging.info("durante o make_prediction ocorreu uma exceptioin: {}".format(exception))
         Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
