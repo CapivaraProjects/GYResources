@@ -9,9 +9,6 @@ matrix:
     - os: linux
       sudo: required
       python: 3.6
-    - os: osx
-      language: generic
-      env: TRAVIS_OS_NAME=osx
 # command to install dependencies
 services:
   - postgresql 
@@ -24,24 +21,11 @@ addons:
     packages:
       - docker-ce
 before_install:
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew upgrade python3; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew tap caskroom/cask; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install brew-cask; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew cask install java; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install elasticsearch; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew postinstall python3; fi
   - docker run --name=gykernel -d -it -p 7000:7000 wendelhime/gykernel
 cache: pip
 install:
   - pip3 install -r requirements.txt
 before_script:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then rm -rf /usr/local/var/postgres; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then initdb /usr/local/var/postgres; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then pg_ctl -D /usr/local/var/postgres start; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then createuser -s postgres; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start elasticsearch; fi
-  - sleep 10
   - celery -A api.gyresources.logic.tf_serving_client worker --loglevel=info &
   - createuser -s -w -U postgres -e capivara
   - createdb green_eyes -U capivara
