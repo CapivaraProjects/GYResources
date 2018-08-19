@@ -1,4 +1,5 @@
 import models.User
+from celery import Celery
 from flask import Flask, request, g, jsonify
 from flask_restplus import Api
 from tools import Logger
@@ -21,8 +22,9 @@ def generate_auth_token(expiration=600, user_id=0):
     """(int, int) -> (token)
     Method used to generate auth token
     """
-    print(FLASK_APP.config['SECRET_KEY'])
-    serializer = Serializer(FLASK_APP.config['SECRET_KEY'], expires_in=expiration)
+    serializer = Serializer(
+        FLASK_APP.config['SECRET_KEY'],
+        expires_in=expiration)
     Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                          'Informative',
                          'Ok',
@@ -30,6 +32,30 @@ def generate_auth_token(expiration=600, user_id=0):
                          str(user_id),
                          FLASK_APP.config["TYPE"])
     return serializer.dumps({'id': user_id})
+
+
+def make_celery(app):
+    """Create celery instance
+    Returns:
+        A celery instance
+    """
+    celery = Celery(
+        app.import_name,
+        broker=app.config['CELERY_BROKER_URL'])
+    celery.conf.update(app.config)
+    TaskBase = celery.Task
+
+    class ContextTask(TaskBase):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
+    return celery
+
+
+CELERY = make_celery(FLASK_APP)
 
 
 def verify_auth_token(token):

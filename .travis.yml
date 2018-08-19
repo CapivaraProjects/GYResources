@@ -12,20 +12,23 @@ matrix:
     - os: osx
       language: generic
       env: TRAVIS_OS_NAME=osx
-# python:
-#   - "3.5"
-#   - "3.6"
 # command to install dependencies
 services:
   - postgresql 
   - elasticsearch
+  - docker
+  - rabbitmq
 addons:
   postgresql: "9.5"  
+  apt:
+    packages:
+      - docker-ce
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install python3; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew upgrade python3; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install elasticsearch; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew postinstall python3; fi
+  - docker run --name=gykernel -d -it -p 7000:7000 wendelhime/gykernel
 cache: pip
 install:
   - pip3 install -r requirements.txt
@@ -36,14 +39,16 @@ before_script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then createuser -s postgres; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew services start elasticsearch; fi
   - sleep 10
+  - celery -A api.gyresources.logic.tf_serving_client worker --loglevel=info &
   - createuser -s -w -U postgres -e capivara
   - createdb green_eyes -U capivara
   - psql -c "ALTER USER capivara WITH PASSWORD 'test';" -U postgres
   - psql -U capivara green_eyes < backupGreeneyes.sql
   - psql -U capivara green_eyes < missingSQL.sql  
   - export PYTHONPATH=$PYTHONPATH:$(pwd)  
+  - sleep 5
 # command to run tests
 script:
-  - coverage run --source=api setup.py test  
+  - travis_wait 25 coverage run --source=api setup.py test
 after_success:
   - coveralls
