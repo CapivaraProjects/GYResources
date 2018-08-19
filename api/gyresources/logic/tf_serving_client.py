@@ -8,7 +8,6 @@ from tensorflow_serving.apis import prediction_service_pb2
 from tools import Logger
 from api.restplus import CELERY, FLASK_APP
 import models.Analysis
-from repository.DiseaseRepository import DiseaseRepository
 from repository.AnalysisResultRepository import AnalysisResultRepository
 
 
@@ -132,18 +131,10 @@ def make_prediction(analysis, host, port, diseases):
             score = response[0][1]
 
             # obtem a doença a partir do nome
-            # diseaseRepo = DiseaseRepository(
-            #     FLASK_APP.config["DBUSER"],
-            #     FLASK_APP.config["DBPASS"],
-            #     FLASK_APP.config["DBHOST"],
-            #     FLASK_APP.config["DBPORT"],
-            #     FLASK_APP.config["DBNAME"])
-
             logging.info("searching for disease...")
-            # result = diseaseRepo.search(disease=disease, pageSize=1, offset=0)
-            for key in diseases.keys():
-                if disease_name.lower() in key.lower():
-                    disease = diseases[key]
+            for x in diseases:
+                if disease_name.lower() in x['scientificName'].lower():
+                    disease = x
             # logging.info("doencas={}".format(result))
             # disease = result['content'][0]
             logging.info("doenca={}".format(disease))
@@ -152,7 +143,7 @@ def make_prediction(analysis, host, port, diseases):
             analysisResult = models.AnalysisResult.AnalysisResult(
                             id=None,
                             analysis=models.Analysis.Analysis(id=analysis['id']),
-                            disease=models.Disease.Disease(id=disease.id),
+                            disease=models.Disease.Disease(id=disease['id']),
                             score=score)
 
             # persistir o objeto

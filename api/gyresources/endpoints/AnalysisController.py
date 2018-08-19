@@ -8,7 +8,6 @@ from flask import request
 from collections import namedtuple
 import models.Analysis
 from repository.AnalysisRepository import AnalysisRepository
-from repository.ClassifierRepository import ClassifierRepository
 from repository.PlantRepository import PlantRepository
 from api.restplus import api, token_auth, FLASK_APP
 from api.gyresources.endpoints.BaseController import BaseController
@@ -155,29 +154,22 @@ class AnalysisController(BaseController):
                 FLASK_APP.config["DBPORT"],
                 FLASK_APP.config["DBNAME"])
 
-        classifier_repository = ClassifierRepository(
-                FLASK_APP.config["DBUSER"],
-                FLASK_APP.config["DBPASS"],
-                FLASK_APP.config["DBHOST"],
-                FLASK_APP.config["DBPORT"],
-                FLASK_APP.config["DBNAME"])
-
         try:
             if not analysis.image.id or not analysis.classifier.id:
                 raise Exception('Analysis fields not defined')
 
             analysis = repository.create(analysis)
-            classifier = classifier_repository.searchByID(
-                analysis.classifier.id)
-            plant = plant_repository.searchByID(classifier.plant.id)
-            diseases = {}
-            for disease in plant.diseases:
-                diseases[disease.scientificName.lower().replace(' ', '_')] = disease
+            plant = plant_repository.searchByID(analysis.classifier.plant.id)
+            diseases = []
+            for d in plant.diseases:
+                d.plant = d.plant.__dict__
+                diseases.append(d.__dict__)
 
-            logging.info('diseases: %s' % str(diseases))
+            analysis.image.disease.plant.diseases = []
             analysis.image.disease.plant = analysis.image.disease.plant.__dict__
             analysis.image.disease = analysis.image.disease.__dict__
             analysis.image = analysis.image.__dict__
+            analysis.classifier.plant.diseases = []
             analysis.classifier.plant = analysis.classifier.plant.__dict__
             analysis.classifier = analysis.classifier.__dict__
             analysisDict = analysis.__dict__
@@ -211,6 +203,7 @@ class AnalysisController(BaseController):
                         cv2.imwrite(crop_filepath, crop)
 
                         analysisDict['image']['url'] = crop_filepath
+                        logging.info('diseases: %s' % str(diseases))
                         make_prediction.delay(
                             analysisDict,
                             FLASK_APP.config["TFSHOST"],
