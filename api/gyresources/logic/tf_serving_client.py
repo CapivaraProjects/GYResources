@@ -133,7 +133,7 @@ def make_prediction(analysis, host, port, diseases):
             # obtem a doença a partir do nome
             logging.info("searching for disease...")
             for x in diseases:
-                if disease_name.lower() in x['scientificName'].lower():
+                if disease_name.lower().replace('_', ' ') in x['scientificName'].lower():
                     disease = x
             # logging.info("doencas={}".format(result))
             # disease = result['content'][0]
