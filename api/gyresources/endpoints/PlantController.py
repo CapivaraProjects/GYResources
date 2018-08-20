@@ -64,6 +64,12 @@ class PlantController(BaseController):
         try:
             if (action == 'searchByID'):
                 result = repository.searchByID(idPlant)
+                diseases = []
+                for disease in result.diseases:
+                    disease.plant = ''
+                    diseases.append(disease.__dict__)
+
+                result.diseases = diseases
                 return self.okResponse(
                             response=result,
                             message="Ok",
