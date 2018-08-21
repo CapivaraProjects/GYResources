@@ -22,13 +22,12 @@ generic_user = models.User.User(
         idType=1,
         email='test@test.com',
         username='test',
-        password='test',
+        password='password',
         salt='test',
         dateInsertion='03/02/2018',
         dateUpdate='10/02/2018')
 
 def auth(generic_user=generic_user):
-    data = {'salt': generic_user.salt}
     creds = base64.b64encode(
         bytes(
             generic_user.username+":"+generic_user.password,

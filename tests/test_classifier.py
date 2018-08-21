@@ -6,7 +6,6 @@ import models.Plant
 from flask import Flask
 from app import initialize_app
 from collections import namedtuple
-from tools.Cryptography import Crypto
 
 
 app = Flask(__name__)
@@ -21,7 +20,7 @@ generic_user = models.User.User(
         idType=1,
         email='test@test.com',
         username='test',
-        password='test',
+        password='password',
         salt='test',
         dateInsertion='03/02/2018',
         dateUpdate='10/02/2018')
