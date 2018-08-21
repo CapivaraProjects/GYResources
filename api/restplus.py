@@ -135,6 +135,7 @@ def verify_password(usernameOrToken, password):
     user = models.User.User(
             username=usernameOrToken,
             password=password)
+    print(user.__dict__)
     try:
         user = repository.authentication(user)
         if (user.id):

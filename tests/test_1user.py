@@ -64,6 +64,7 @@ def test_create(generic_user=generic_user):
 
 @pytest.mark.order3
 def test_auth(generic_user=generic_user):
+    print('user in auth: %s ' % str(generic_user.__dict__))
     creds = base64.b64encode(
         bytes(
             generic_user.username+":"+generic_user.password,
@@ -93,7 +94,9 @@ aux = models.User.User(
         salt='test',
         dateInsertion='03/02/2018',
         dateUpdate='10/02/2018')
+print(generic_user.__dict__)
 generic_user = test_create(generic_user=aux)
+print(generic_user.__dict__)
 generic_user = models.User.User(
     id=generic_user.id,
     idType=generic_user.idType,
