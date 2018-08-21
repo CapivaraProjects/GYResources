@@ -64,13 +64,6 @@ def test_create(generic_user=generic_user):
 
 @pytest.mark.order3
 def test_auth(generic_user=generic_user):
-    # crypto = Crypto()
-    # generic_user.salt = crypto.generateRandomSalt()
-    # generic_user.password = crypto.encrypt(
-    #     generic_user.salt,
-    #     'test')
-
-    # data = {'salt': generic_user.salt}
     creds = base64.b64encode(
         bytes(
             generic_user.username+":"+generic_user.password,
@@ -110,6 +103,7 @@ generic_user = models.User.User(
     salt=generic_user.salt,
     dateInsertion=generic_user.dateInsertion,
     dateUpdate=generic_user.dateUpdate)
+print(generic_user.__dict__)
 (generic_user, token) = test_auth(generic_user)
 
 
