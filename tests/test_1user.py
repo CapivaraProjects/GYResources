@@ -96,7 +96,7 @@ aux = models.User.User(
         dateUpdate='10/02/2018')
 print(generic_user.__dict__)
 generic_user = test_create(generic_user=aux)
-print(generic_user.__dict__)
+print(generic_user)
 generic_user = models.User.User(
     id=generic_user.id,
     idType=generic_user.idType,
