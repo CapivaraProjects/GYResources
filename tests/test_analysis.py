@@ -28,12 +28,6 @@ generic_user = models.User.User(
         dateUpdate='10/02/2018')
 
 def auth(generic_user=generic_user):
-    crypto = Crypto()
-    generic_user.salt = crypto.generateRandomSalt()
-    generic_user.password = crypto.encrypt(
-        generic_user.salt,
-        'test')
-
     data = {'salt': generic_user.salt}
     creds = base64.b64encode(
         bytes(
@@ -47,8 +41,6 @@ def auth(generic_user=generic_user):
     resp = client().post(
         '/api/gyresources/token/',
         headers=headers,
-        data=str(
-            json.dumps(data)),
         follow_redirects=True)
     resp = json.loads(resp.get_data(as_text=True))
     token = resp['response']
