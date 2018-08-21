@@ -10,8 +10,6 @@ import models.Plant
 from flask import Flask
 from app import initialize_app
 from collections import namedtuple
-from tools.Cryptography import Crypto
-
 
 app = Flask(__name__)
 app = initialize_app(app)
@@ -33,7 +31,6 @@ generic_user = models.User.User(
 
 
 def auth(generic_user=generic_user):
-    data = {'salt': generic_user.salt}
     creds = base64.b64encode(
         bytes(
             generic_user.username+":"+generic_user.password,
