@@ -41,11 +41,6 @@ def test_search_by_unexistent_id():
 
 @pytest.mark.order2
 def test_create(generic_user=generic_user):
-    crypto = Crypto()
-    generic_user.salt = crypto.generateRandomSalt()
-    generic_user.password = crypto.encrypt(
-            generic_user.salt,
-            generic_user.password)
     data = generic_user.__dict__
     resp = client.post('/api/gyresources/users/', data=str(
         json.dumps(data)), headers={
