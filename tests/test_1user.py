@@ -85,6 +85,7 @@ def test_auth(generic_user=generic_user):
         headers=headers,
         follow_redirects=True)
     resp = json.loads(resp.get_data(as_text=True))
+    print('response: %s' % str(resp))
     token = resp['response']
     generic_user.password = 'password'
     assert token
