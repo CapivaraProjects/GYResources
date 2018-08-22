@@ -8,10 +8,12 @@ from repository.UserRepository import UserRepository
 from api.gyresources.endpoints.BaseController import BaseController
 from api.gyresources.serializers import user as userSerializer
 from api.gyresources.parsers import user_search_args
+from tools.Cryptography import Crypto
 from tools import Logger
 
 ns = api.namespace('gyresources/users',
                    description='Operations related to users')
+
 
 @ns.route('/')
 class UserController(BaseController):
@@ -137,6 +139,9 @@ class UserController(BaseController):
             user.id = None
             if not user.email or not user.username or not user.password or not user.salt:
                 raise Exception('User fields not defined')
+            crypto = Crypto()
+            user.salt = crypto.generateRandomSalt()
+            user.password = crypto.encrypt(user.salt, user.password)
             user = repository.create(user)
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',

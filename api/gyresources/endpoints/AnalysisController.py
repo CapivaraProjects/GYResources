@@ -203,7 +203,6 @@ class AnalysisController(BaseController):
                         cv2.imwrite(crop_filepath, crop)
 
                         analysisDict['image']['url'] = crop_filepath
-                        logging.info('diseases: %s' % str(diseases))
                         make_prediction.delay(
                             analysisDict,
                             FLASK_APP.config["TFSHOST"],
