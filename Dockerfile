@@ -23,4 +23,4 @@ RUN git submodule update --init --recursive && \
         git submodule foreach git pull origin master && \
         export PYTHONPATH=$PYTHONPATH:/root/git/GYResources
 
-ENTRYPOINT ["/usr/bin/zsh", "-c", "./execute.sh"]
+# ENTRYPOINT ["/usr/bin/zsh", "-c", "./execute.sh"]
