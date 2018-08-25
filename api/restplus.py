@@ -134,8 +134,8 @@ def verify_password(usernameOrToken, password):
             FLASK_APP.config["DBNAME"])
     user = models.User.User(
             username=usernameOrToken,
-            password=password,
-            salt=request.json['salt'])
+            password=password)
+    print(user.__dict__)
     try:
         user = repository.authentication(user)
         if (user.id):

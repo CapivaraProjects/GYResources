@@ -15,7 +15,7 @@ generic_user = models.User.User(
         idType=1,
         email='test@test.com',
         username='test',
-        password='test',
+        password='password',
         salt='test',
         dateInsertion='03/02/2018',
         dateUpdate='10/02/2018')
@@ -41,11 +41,6 @@ def test_search_by_unexistent_id():
 
 @pytest.mark.order2
 def test_create(generic_user=generic_user):
-    crypto = Crypto()
-    generic_user.salt = crypto.generateRandomSalt()
-    generic_user.password = crypto.encrypt(
-            generic_user.salt,
-            generic_user.password)
     data = generic_user.__dict__
     resp = client.post('/api/gyresources/users/', data=str(
         json.dumps(data)), headers={
@@ -64,13 +59,7 @@ def test_create(generic_user=generic_user):
 
 @pytest.mark.order3
 def test_auth(generic_user=generic_user):
-    crypto = Crypto()
-    generic_user.salt = crypto.generateRandomSalt()
-    generic_user.password = crypto.encrypt(
-        generic_user.salt,
-        'test')
-
-    data = {'salt': generic_user.salt}
+    print('user in auth: %s ' % str(generic_user.__dict__))
     creds = base64.b64encode(
         bytes(
             generic_user.username+":"+generic_user.password,
@@ -83,10 +72,9 @@ def test_auth(generic_user=generic_user):
     resp = client.post(
         '/api/gyresources/token/',
         headers=headers,
-        data=str(
-            json.dumps(data)),
         follow_redirects=True)
     resp = json.loads(resp.get_data(as_text=True))
+    print('response: %s' % str(resp))
     token = resp['response']
     generic_user.password = 'password'
     assert token
@@ -101,7 +89,9 @@ aux = models.User.User(
         salt='test',
         dateInsertion='03/02/2018',
         dateUpdate='10/02/2018')
+print(generic_user.__dict__)
 generic_user = test_create(generic_user=aux)
+print(generic_user)
 generic_user = models.User.User(
     id=generic_user.id,
     idType=generic_user.idType,
@@ -111,6 +101,7 @@ generic_user = models.User.User(
     salt=generic_user.salt,
     dateInsertion=generic_user.dateInsertion,
     dateUpdate=generic_user.dateUpdate)
+print(generic_user.__dict__)
 (generic_user, token) = test_auth(generic_user)
 
 
