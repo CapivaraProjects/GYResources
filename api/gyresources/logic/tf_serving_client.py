@@ -83,7 +83,7 @@ def build_request(image):
 
 
 @CELERY.task(name='tf_serving_client.make_prediction')
-def make_prediction(analysis, host, port, diseases):
+def make_prediction(analysis, host, port, diseases, frame):
     channel = implementations.insecure_channel(host, int(port))
     stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)
 
@@ -131,7 +131,8 @@ def make_prediction(analysis, host, port, diseases):
                             id=None,
                             analysis=models.Analysis.Analysis(id=analysis['id']),
                             disease=models.Disease.Disease(id=disease['id']),
-                            score=score)
+                            score=score,
+                            frame=frame)
 
             # persistir o objeto
             analysisResultRepo = AnalysisResultRepository(

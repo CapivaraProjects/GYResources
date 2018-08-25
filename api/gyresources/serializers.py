@@ -133,7 +133,10 @@ analysisResult = api.model('AnalysisResult', {
         description='Disease identification'),
     'score': fields.Float(
         required=True,
-        description='score of analysis')
+        description='score of analysis'),
+    'frame': fields.String(
+        required=True,
+        description='Frame (28px,28px) of an image')
     })
 
 message = api.model('Message', {
