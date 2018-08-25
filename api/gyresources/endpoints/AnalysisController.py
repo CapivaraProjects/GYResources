@@ -201,7 +201,7 @@ class AnalysisController(BaseController):
                         crop_filepath = os.path.join('/tmp', str(uuid.uuid4()) + '.jpg')
 
                         cv2.imwrite(crop_filepath, crop)
-                        frame = str(x)+","+str(y)+","+str(x+FLASK_APP.config['WINDOW_SIZE'])+","+str(y+FLASK_APP.config['WINDOW_SIZE'])
+                        frame = str([y, y + FLASK_APP.config['WINDOW_SIZE'], x, x + FLASK_APP.config['WINDOW_SIZE']])
 
                         analysisDict['image']['url'] = crop_filepath
                         make_prediction.delay(
