@@ -20,7 +20,8 @@ generic_analysisResult = models.AnalysisResult.AnalysisResult(
         id=1,
         analysis=models.Analysis.Analysis(id=1),
         disease=models.Disease.Disease(id=1),
-        score=0.000000)
+        score=0.000000,
+        frame='100,100,128,128')
 
 generic_user = models.User.User(
         idType=1,
@@ -86,6 +87,7 @@ def test_create(generic_analysisResult=generic_analysisResult, generic_user=gene
     data["idDisease"] = generic_analysisResult.disease.id
     data["idAnalysis"] = generic_analysisResult.analysis.id
     data["score"] = generic_analysisResult.score
+    data["frame"] = generic_analysisResult.frame
     headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -98,7 +100,7 @@ def test_create(generic_analysisResult=generic_analysisResult, generic_user=gene
     analysisResult = namedtuple("AnalysisResult", analysisResult.keys())(*analysisResult.values())
     generic_analysisResult = analysisResult
     assert resp.status_code == 200
-    assert "'id': 0" not in json.loads(
+    assert "'id': 1" in json.loads(
             resp.get_data(as_text=True))['response']
 
 @pytest.mark.order3
@@ -126,6 +128,7 @@ def test_search():
             "idAnalysis": 1,
             "idDisease": 1,
             "score": 0.00,
+            "frame": "100,100,128,128",
             "pageSize": 10,
             "offset": 0	
             }
@@ -162,9 +165,11 @@ def test_update(generic_analysisResult=generic_analysisResult, generic_user=gene
                 "id": analysisResult.response['id'],
                 "idAnalysis": analysisResult.response['analysis']['id'],
                 "idDisease": analysisResult.response['disease']['id'],
-                "score": 0.9999
+                "score": 0.9999,
+                "frame": "300,300,328,328"
                 }
     generic_analysisResult.score = 0.9999
+    generic_analysisResult.score = '300,300,328,328'
     headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -198,7 +203,8 @@ def test_update_wrong_id(generic_analysisResult=generic_analysisResult, generic_
                 "id": 1000,
                 "idAnalysis": analysisResult.response['analysis']['id'],
                 "idDisease": analysisResult.response['disease']['id'],
-                "score": 0.9999
+                "score": 0.9999,
+                "frame": "300,300,328,328"
                 }
 
     headers = {
@@ -233,7 +239,8 @@ def test_delete_non_existent(generic_analysisResult=generic_analysisResult, gene
                 "id": 1000,
                 "idAnalysis": analysisResult.response['analysis']['id'],
                 "idDisease": analysisResult.response['disease']['id'],
-                "score": 0.9999
+                "score": 0.9999,
+                "frame": "300,300,328,328"
                 }
     headers = {
             'Accept': 'application/json',
@@ -265,7 +272,8 @@ def test_delete(generic_analysisResult=generic_analysisResult, generic_user=gene
                 "id": analysisResult.response['id'],
                 "idAnalysis": analysisResult.response['analysis']['id'],
                 "idDisease": analysisResult.response['disease']['id'],
-                "score": analysisResult.response['score']
+                "score": analysisResult.response['score'],
+                "frame": analysisResult.response['frame']
                 }
     headers = {
             'Accept': 'application/json',
@@ -286,6 +294,7 @@ def test_create_empty(generic_analysisResult=generic_analysisResult, generic_use
     data["idAnalysis"] = 0
     data["idDisease"] = 0
     data["score"] = 0.000
+    data["score"] = ""
     headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',

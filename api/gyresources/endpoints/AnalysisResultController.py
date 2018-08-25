@@ -34,7 +34,7 @@ class AnalysisResultController(BaseController):
             please set id parameter.
 
         If action=search:
-            you can use idAnalysis|idDisease|score to search,
+            you can use idAnalysis|idDisease|score|frame to search,
             please define pageSize and offset parameters
         """
         self.startTime = time.time()
@@ -47,7 +47,8 @@ class AnalysisResultController(BaseController):
                                         id=request.args.get('idAnalysis')),
                         disease=models.Disease.Disease(
                                         id=request.args.get('idDisease')),
-                        score=request.args.get('score'))
+                        score=request.args.get('score'),
+                        frame=request.args.get('frame'))
         pageSize = 10
         if request.args.get('pageSize'):
             pageSize = int(request.args.get('pageSize'))
@@ -142,7 +143,8 @@ class AnalysisResultController(BaseController):
                                                 id=analysisResult_request.idAnalysis),
                                 disease=models.Disease.Disease(
                                                 id=analysisResult_request.idDisease),
-                                score=analysisResult_request.score)
+                                score=analysisResult_request.score,
+                                frame=analysisResult_request.frame)
         repository = AnalysisResultRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
@@ -203,7 +205,8 @@ class AnalysisResultController(BaseController):
                                                 id=analysisResult_request.idAnalysis),
                                 disease=models.Disease.Disease(
                                                 id=analysisResult_request.idDisease),
-                                score=analysisResult_request.score)
+                                score=analysisResult_request.score,
+                                frame=analysisResult_request.frame)
         repository = AnalysisResultRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
@@ -261,7 +264,8 @@ class AnalysisResultController(BaseController):
                                                 id=analysisResult_request.idAnalysis),
                                 disease=models.Disease.Disease(
                                                 id=analysisResult_request.idDisease),
-                                score=analysisResult_request.score)
+                                score=analysisResult_request.score,
+                                frame=analysisResult_request.frame)
         repository = AnalysisResultRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
