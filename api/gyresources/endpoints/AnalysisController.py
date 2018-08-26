@@ -134,6 +134,12 @@ class AnalysisController(BaseController):
                     result.image.url = base64.encodestring(
                         fh.read()).decode('utf-8')
 
+                result.image.disease.plant = result.image.disease.plant.__dict__
+                result.image.disease = result.image.disease.__dict__
+                result.image = result.image.__dict__
+                result.classifier.plant = result.classifier.plant.__dict__
+                result.classifier = result.classifier.__dict__
+
                 return self.okResponse(
                     response=result,
                     message='Ok',
