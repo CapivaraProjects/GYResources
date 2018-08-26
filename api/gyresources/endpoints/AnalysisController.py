@@ -1,8 +1,10 @@
+import ast
 import os
 import uuid
 import time
 import logging
 import cv2
+import base64
 from sqlalchemy import exc
 from flask import request
 from collections import namedtuple
@@ -16,10 +18,12 @@ from api.gyresources.serializers import analysis as analysisSerializer
 from api.gyresources.parsers import analysis_search_args
 from tools import Logger
 
+
 logging.basicConfig(level=logging.INFO, format='%(levelname)s | %(asctime)s | %(threadName)-10s | %(message)s',)
 
 ns = api.namespace('gyresources/analysis',
                    description='Operations related to analysis')
+
 
 @ns.route('/')
 class AnalysisController(BaseController):
@@ -28,6 +32,7 @@ class AnalysisController(BaseController):
         from AnalysisRepository, here, you can insert, update and delete
         data. Searchs are realized in AnalysisSearch.
     """
+
 
     @api.expect(analysis_search_args)
     @api.response(200, 'Analysis searched.')
@@ -112,6 +117,27 @@ class AnalysisController(BaseController):
                             total=total,
                             offset=offset,
                             pageSize=pageSize), 200
+            elif action == 'read':
+                result = repository.searchByID(id)
+                img = cv2.imread(result.image.url)
+                for anal_res in result.analysis_results:
+                    frame = ast.literal_eval(anal_res.frame)
+                    cv2.rectangle(
+                        img,
+                        (frame[0], frame[2]),
+                        (frame[1], frame[3]),
+                        (255, 0, 0),
+                        2)
+                filepath = os.path.join('/tmp', uuid.uuid4() + '.png')
+                cv2.imwrite(img, filepath)
+                with open(filepath, 'rb') as fh:
+                    result.image.url = base64.encodestring(
+                        fh.read()).decode('utf-8')
+
+                return self.okResponse(
+                    response=result,
+                    message='Ok',
+                    status=200)
         except (exc.SQLAlchemyError, Exception) as sqlerr:
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
