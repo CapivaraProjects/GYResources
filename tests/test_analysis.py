@@ -108,7 +108,7 @@ def test_search_by_id():
 @pytest.mark.order3
 def test_read():
     data = {
-                "action": "searchByID",
+                "action": "read",
                 "id": 1
             }
     resp = client().get(
