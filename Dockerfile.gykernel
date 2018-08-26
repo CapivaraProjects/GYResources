@@ -25,6 +25,6 @@ EXPOSE 7000
 ADD saved_models /models
 
 ENTRYPOINT [ "tensorflow_model_server", \
-"--model_base_path=/model", \
+"--model_base_path=/models", \
 "--port=7000", \
 "--model_name=inception" ]
