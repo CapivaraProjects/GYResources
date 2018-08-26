@@ -128,7 +128,7 @@ class AnalysisController(BaseController):
                         (frame[1], frame[3]),
                         (255, 0, 0),
                         2)
-                filepath = os.path.join('/tmp', str(uuid.uuid4()) + '.png')
+                filepath = os.path.join('/tmp', str(uuid.uuid4()) + '.jpg')
                 cv2.imwrite(filepath, img)
                 with open(filepath, 'rb') as fh:
                     result.image.url = base64.encodestring(
