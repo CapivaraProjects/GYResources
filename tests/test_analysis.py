@@ -120,7 +120,9 @@ def test_read():
                 'dataType': 'json',
                 'timeout': 240},
             query_string=data, follow_redirects=True)
-    assert json.loads(resp.get_data(as_text=True))['status_code'] == 200
+    response = json.loads(resp.get_data(as_text=True))
+    print(str(response))
+    assert response['status_code'] == 200
 
 
 @pytest.mark.order4
