@@ -191,6 +191,8 @@ analysisResult_search_args.add_argument('idDisease', type=int, required=False,
                               default='', help='Disease ID')
 analysisResult_search_args.add_argument('score', type=float, required=False,
                               default='', help='predicted score')
+analysisResult_search_args.add_argument('frame', type=str, required=False,
+                              default='', help='frame (28x28) of an image')
 analysisResult_search_args.add_argument('pageSize', type=int, required=False,
                               default=10,
                               help='Quantity of elements required')
