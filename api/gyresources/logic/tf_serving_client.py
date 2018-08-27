@@ -111,7 +111,9 @@ def make_prediction(analysis, host, port, diseases, frame):
             logging.info("Error to predict!")
             return
         else:
+            logging.info('diseases: %s' % str(diseases))
             healthy = [x if x['commonName'] == 'healthy' else {} for x in diseases][0]
+            logging.info('healthy: %s' % str(healthy))
             if not healthy:
                 return
             if response[0][0] == healthy['id']:
