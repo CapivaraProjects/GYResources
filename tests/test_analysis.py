@@ -7,7 +7,6 @@ import models.Classifier
 from flask import Flask
 from app import initialize_app
 from collections import namedtuple
-from tools.Cryptography import Crypto
 
 
 app = Flask(__name__)
@@ -15,8 +14,8 @@ app = initialize_app(app)
 client = app.test_client
 generic_analysis = models.Analysis.Analysis(
         id=1,
-        image = models.Image.Image(id=3264),
-        classifier = models.Classifier.Classifier(id=1))
+        image=models.Image.Image(id=3264),
+        classifier=models.Classifier.Classifier(id=1))
 
 generic_user = models.User.User(
         idType=1,
@@ -27,6 +26,7 @@ generic_user = models.User.User(
         dateInsertion='03/02/2018',
         dateUpdate='10/02/2018')
 
+
 def auth(generic_user=generic_user):
     creds = base64.b64encode(
         bytes(
@@ -36,7 +36,7 @@ def auth(generic_user=generic_user):
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': 'Basic %s' % creds
-    }    
+    }
     resp = client().post(
         '/api/gyresources/token/',
         headers=headers,
@@ -45,6 +45,7 @@ def auth(generic_user=generic_user):
     token = resp['response']
     generic_user.password = 'password'
     return (generic_user, token)
+
 
 @pytest.mark.order1
 def test_search_by_unexistent_id():
@@ -62,6 +63,7 @@ def test_search_by_unexistent_id():
                 'timeout': 240},
             query_string=data, follow_redirects=True)
     assert json.loads(resp.get_data(as_text=True))['status_code'] == 500
+
 
 @pytest.mark.order2
 def test_create(generic_analysis=generic_analysis, generic_user=generic_user):
@@ -103,6 +105,26 @@ def test_search_by_id():
     assert json.loads(resp.get_data(as_text=True))['status_code'] == 200
 
 
+@pytest.mark.order3
+def test_read():
+    data = {
+                "action": "read",
+                "id": 1
+            }
+    resp = client().get(
+            '/api/gyresources/analysis',
+            content_type='application/json',
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'dataType': 'json',
+                'timeout': 240},
+            query_string=data, follow_redirects=True)
+    response = json.loads(resp.get_data(as_text=True))
+    print(str(response))
+    assert response['status_code'] == 200
+
+
 @pytest.mark.order4
 def test_search():
     data = {
@@ -140,7 +162,9 @@ def test_update(generic_analysis=generic_analysis, generic_user=generic_user):
                 'dataType': 'json'},
             query_string=data, follow_redirects=True)
     get_response = json.loads(resp.get_data(as_text=True))
-    get_response = namedtuple("Analysis", get_response.keys())(*get_response.values())
+    get_response = namedtuple(
+        "Analysis",
+        get_response.keys())(*get_response.values())
     analysis = {
             "id": get_response.response["id"],
             "idImage": 2,
@@ -160,8 +184,11 @@ def test_update(generic_analysis=generic_analysis, generic_user=generic_user):
     analysis = namedtuple("Analysis", analysis.keys())(*analysis.values())
     assert 2 == analysis.response["image"]['id']
 
+
 @pytest.mark.order6
-def test_update_wrong_id(generic_analysis=generic_analysis, generic_user=generic_user):
+def test_update_wrong_id(
+        generic_analysis=generic_analysis,
+        generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     data = generic_analysis.__dict__
     data['action'] = 'searchByID'
@@ -174,7 +201,9 @@ def test_update_wrong_id(generic_analysis=generic_analysis, generic_user=generic
                 'dataType': 'json'},
             query_string=data, follow_redirects=True)
     get_response = json.loads(resp.get_data(as_text=True))
-    get_response = namedtuple("Analysis", get_response.keys())(*get_response.values())
+    get_response = namedtuple(
+        "Analysis",
+        get_response.keys())(*get_response.values())
     analysis = {
             "id": 1000,
             "idImage": get_response.response['image']['id'],
@@ -215,8 +244,11 @@ def test_search_with_page_size_and_offset():
     for response in pagedResponse['response']:
         assert response['image']['id'] == 2
 
+
 @pytest.mark.order8
-def test_delete_non_existent(generic_analysis=generic_analysis, generic_user=generic_user):
+def test_delete_non_existent(
+        generic_analysis=generic_analysis,
+        generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     data = generic_analysis.__dict__
     data['action'] = 'searchByID'
@@ -229,7 +261,9 @@ def test_delete_non_existent(generic_analysis=generic_analysis, generic_user=gen
                 'dataType': 'json'},
             query_string=data, follow_redirects=True)
     get_response = json.loads(resp.get_data(as_text=True))
-    get_response = namedtuple("Analysis", get_response.keys())(*get_response.values())
+    get_response = namedtuple(
+        "Analysis",
+        get_response.keys())(*get_response.values())
     analysis = {
             "id": 1000,
             "idImage": get_response.response['image']['id'],
@@ -240,7 +274,10 @@ def test_delete_non_existent(generic_analysis=generic_analysis, generic_user=gen
             'Content-Type': 'application/json',
             'Authorization': 'Bearer %s' % token['token']
             }
-    resp = client().delete('/api/gyresources/analysis/', data=str(json.dumps(analysis)), headers=headers)
+    resp = client().delete(
+        '/api/gyresources/analysis/',
+        data=str(json.dumps(analysis)),
+        headers=headers)
     resp = json.loads(resp.get_data(as_text=True))
     assert resp['status_code'] == 500
     assert 'Internal server error' in resp['message']
@@ -260,7 +297,9 @@ def test_delete(generic_analysis=generic_analysis, generic_user=generic_user):
                 'dataType': 'json'},
             query_string=data, follow_redirects=True)
     get_response = json.loads(resp.get_data(as_text=True))
-    get_response = namedtuple("Analysis", get_response.keys())(*get_response.values())
+    get_response = namedtuple(
+        "Analysis",
+        get_response.keys())(*get_response.values())
     analysis = {
             "id": get_response.response['id'],
             "idImage": get_response.response['image']['id'],
@@ -280,7 +319,9 @@ def test_delete(generic_analysis=generic_analysis, generic_user=generic_user):
 
 
 @pytest.mark.order10
-def test_create_empty(generic_analysis=generic_analysis, generic_user=generic_user):
+def test_create_empty(
+        generic_analysis=generic_analysis,
+        generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     data = {}
     data["id"] = 0

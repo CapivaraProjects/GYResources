@@ -1,12 +1,16 @@
+import ast
 import os
 import uuid
 import time
 import logging
 import cv2
+import base64
 from sqlalchemy import exc
 from flask import request
 from collections import namedtuple
 import models.Analysis
+import models.AnalysisResult
+import models.Disease
 from repository.AnalysisRepository import AnalysisRepository
 from repository.PlantRepository import PlantRepository
 from api.restplus import api, token_auth, FLASK_APP
@@ -16,10 +20,12 @@ from api.gyresources.serializers import analysis as analysisSerializer
 from api.gyresources.parsers import analysis_search_args
 from tools import Logger
 
+
 logging.basicConfig(level=logging.INFO, format='%(levelname)s | %(asctime)s | %(threadName)-10s | %(message)s',)
 
 ns = api.namespace('gyresources/analysis',
                    description='Operations related to analysis')
+
 
 @ns.route('/')
 class AnalysisController(BaseController):
@@ -28,6 +34,7 @@ class AnalysisController(BaseController):
         from AnalysisRepository, here, you can insert, update and delete
         data. Searchs are realized in AnalysisSearch.
     """
+
 
     @api.expect(analysis_search_args)
     @api.response(200, 'Analysis searched.')
@@ -73,6 +80,13 @@ class AnalysisController(BaseController):
         try:
             if (action == 'searchByID'):
                 result = repository.searchByID(id)
+                a = []
+                for x in result.analysis_results:
+                    x.disease.plant = x.disease.plant.__dict__
+                    x.disease = x.disease.__dict__
+                    x.analysis = ''
+                    a.append(x.__dict__)
+                result.analysis_results = a
                 result.image.disease.plant = result.image.disease.plant.__dict__
                 result.image.disease = result.image.disease.__dict__
                 result.image = result.image.__dict__
@@ -112,6 +126,42 @@ class AnalysisController(BaseController):
                             total=total,
                             offset=offset,
                             pageSize=pageSize), 200
+            elif action == 'read':
+                result = repository.searchByID(id)
+                img = cv2.imread(os.path.join(
+                    FLASK_APP.config['IMAGESPATH'],
+                    result.image.url))
+                for anal_res in result.analysis_results:
+                    frame = ast.literal_eval(anal_res.frame)
+                    cv2.rectangle(
+                        img,
+                        (frame[0], frame[2]),
+                        (frame[1], frame[3]),
+                        (255, 0, 0),
+                        2)
+                filepath = os.path.join('/tmp', str(uuid.uuid4()) + '.jpg')
+                cv2.imwrite(filepath, img)
+                with open(filepath, 'rb') as fh:
+                    result.image.url = base64.encodestring(
+                        fh.read()).decode('utf-8')
+
+                a = []
+                for x in result.analysis_results:
+                    x.disease.plant = x.disease.plant.__dict__
+                    x.disease = x.disease.__dict__
+                    x.analysis = ''
+                    a.append(x.__dict__)
+                result.analysis_results = a
+                result.image.disease.plant = result.image.disease.plant.__dict__
+                result.image.disease = result.image.disease.__dict__
+                result.image = result.image.__dict__
+                result.classifier.plant = result.classifier.plant.__dict__
+                result.classifier = result.classifier.__dict__
+
+                return self.okResponse(
+                    response=result,
+                    message='Ok',
+                    status=200)
         except (exc.SQLAlchemyError, Exception) as sqlerr:
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
@@ -174,7 +224,9 @@ class AnalysisController(BaseController):
             analysis.classifier = analysis.classifier.__dict__
             analysisDict = analysis.__dict__
 
-            img = cv2.imread(analysisDict['image']['url'])
+            img = cv2.imread(os.path.join(
+                FLASK_APP.config['IMAGESPATH'],
+                analysisDict['image']['url']))
 
             saliency = cv2.saliency.StaticSaliencyFineGrained_create()
             (success, saliencyMap) = saliency.computeSaliency(img)
