@@ -165,7 +165,7 @@ analysis_search_args = reqparse.RequestParser()
 analysis_search_args.add_argument('action', type=str, required=True,
                               default='searchByID',
                               help='Defines what kind of search you gonna do.',
-                              choices=['searchByID', 'search'])
+                              choices=['searchByID', 'search', 'read'])
 analysis_search_args.add_argument('id', type=int, required=False, default=1,
                               help='Analysis ID, used when action=searchByID')
 analysis_search_args.add_argument('idImage', type=int, required=False,
