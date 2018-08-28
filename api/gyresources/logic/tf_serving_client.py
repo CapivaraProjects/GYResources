@@ -116,7 +116,7 @@ def make_prediction(analysis, host, port, diseases, frame):
             logging.info('healthy: %s' % str(healthy))
             if not healthy:
                 return
-            if response[0][0] == healthy['id']:
+            if int(response[0][0]) == healthy['id']:
                 # means that this frame is healthy
                 return
             else:
