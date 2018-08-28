@@ -111,9 +111,7 @@ def make_prediction(analysis, host, port, diseases, frame):
             logging.info("Error to predict!")
             return
         else:
-            logging.info('diseases: %s' % str(diseases))
             healthy = [x if x['commonName'] == 'healthy' else {} for x in diseases][0]
-            logging.info('healthy: %s' % str(healthy))
             if not healthy:
                 return
             if int(response[0][0]) == healthy['id']:
@@ -126,10 +124,9 @@ def make_prediction(analysis, host, port, diseases, frame):
 
             # obtem a doença a partir do nome
             for x in diseases:
-                if disease_id in x['id']:
+                if disease_id == x['id']:
                     disease = x
 
-            logging.info("doenca={}".format(disease))
 
             # cria o objeto AnalysisResult
             analysisResult = models.AnalysisResult.AnalysisResult(
