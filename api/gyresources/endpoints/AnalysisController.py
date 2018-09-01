@@ -273,10 +273,11 @@ class AnalysisController(BaseController):
                                  'post()',
                                  str(analysisDict),
                                  FLASK_APP.config["TYPE"])
+            analysis.estimated_results = counter
             return self.okResponse(
-                    response={'estimated_results': counter, 'analysis': analysis},
-                message="Analysis sucessfuly created.",
-                status=201), 200
+                    response=analysis,
+                    message="Analysis sucessfuly created.",
+                    status=201), 200
         except Exception as err:
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
