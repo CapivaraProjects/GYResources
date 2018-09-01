@@ -79,11 +79,9 @@ def test_create(generic_analysis=generic_analysis, generic_user=generic_user):
             }
     resp = client().post('/api/gyresources/analysis/', data=str(
         json.dumps(data)), headers=headers)
-    print(resp.get_data(as_text=True))
     analysis = json.loads(resp.get_data(as_text=True))['response']
-    print(analysis)
-    response = namedtuple("Response", analysis.keys())(*analysis.values())
-    generic_analysis = namedtuple("Analysis", dict(response.analysis).keys())(*dict(response.analysis).values())
+    response = namedtuple("Analysis", analysis.keys())(*analysis.values())
+    generic_analysis = response
     assert resp.status_code == 200
     assert "'id': 1" not in json.loads(
             resp.get_data(as_text=True))['response']
