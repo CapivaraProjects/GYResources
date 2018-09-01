@@ -238,6 +238,7 @@ class AnalysisController(BaseController):
                 cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
 
             y = 0
+            counter = 0
 
             while y + FLASK_APP.config['WINDOW_SIZE'] < img.shape[0]:
                 x = 0
@@ -262,6 +263,7 @@ class AnalysisController(BaseController):
                             FLASK_APP.config["TFSPORT"],
                             diseases,
                             frame)
+                        counter += 1
                     x += FLASK_APP.config['WINDOW_SIZE']
                 y += FLASK_APP.config['WINDOW_SIZE']
 
@@ -272,7 +274,7 @@ class AnalysisController(BaseController):
                                  str(analysisDict),
                                  FLASK_APP.config["TYPE"])
             return self.okResponse(
-                response=analysis,
+                    response={'estimated_results': counter, 'analysis': analysis},
                 message="Analysis sucessfuly created.",
                 status=201), 200
         except Exception as err:

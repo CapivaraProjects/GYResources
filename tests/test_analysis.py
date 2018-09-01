@@ -79,12 +79,12 @@ def test_create(generic_analysis=generic_analysis, generic_user=generic_user):
             }
     resp = client().post('/api/gyresources/analysis/', data=str(
         json.dumps(data)), headers=headers)
-    analysis = json.loads(resp.get_data(as_text=True))['response']
+    analysis = json.loads(resp.get_data(as_text=True))['response']['analysis']
     analysis = namedtuple("Analysis", analysis.keys())(*analysis.values())
     generic_analysis = analysis
     assert resp.status_code == 200
     assert "'id': 1" not in json.loads(
-            resp.get_data(as_text=True))['response']
+            resp.get_data(as_text=True))['response']['analysis']
 
 
 @pytest.mark.order3
