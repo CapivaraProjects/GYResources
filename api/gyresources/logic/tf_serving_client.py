@@ -1,3 +1,6 @@
+import os
+import cv2
+import uuid
 import logging
 import operator
 import time
@@ -11,9 +14,12 @@ import models.Analysis
 from repository.AnalysisResultRepository import AnalysisResultRepository
 
 
-logging.basicConfig(level=logging.INFO, format='%(levelname)s | %(asctime)s | %(threadName)-10s | %(message)s',)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(levelname)s | %(asctime)s | %(threadName)-10s | %(message)s',)
 
 tf.enable_eager_execution()
+
 
 def read_tensor_from_image_file(file_name,
                                 input_height=299,
@@ -45,25 +51,28 @@ def read_tensor_from_image_file(file_name,
                              'Error to convert image',
                              'read_tensor_from_image_file()',
                              '{}'.format(exception),
-                             FLASK_APP.config["TYPE"])        
+                             FLASK_APP.config["TYPE"])
     return normalized
-    
+
+
 def get_response(result):
-    final_result={}
-    prediction_result={}    
-    model_info={}
+    # final_result = {}
+    # model_info = {}
+    prediction_result = {}
     prediction = result.outputs['prediction'].float_val
     classes = result.outputs['classes'].string_val
-    output_length = len(classes) if (len(classes)==len(prediction)) else -1
+    output_length = len(classes) if (len(classes) == len(prediction)) else -1
 
     if (output_length != -1):
         for i in range(output_length):
             prediction_result[classes[i].decode()] = float(prediction[i])
 
-    sorted_result = sorted(prediction_result.items(),
-                            key=operator.itemgetter(1),
-                            reverse=True)
+    sorted_result = sorted(
+        prediction_result.items(),
+        key=operator.itemgetter(1),
+        reverse=True)
     return sorted_result[0:3]
+
 
 def build_request(image):
     request = predict_pb2.PredictRequest()
@@ -71,7 +80,8 @@ def build_request(image):
     request.model_spec.signature_name = tf.saved_model.signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY
 
     try:
-        request.inputs['image'].CopyFrom(tf.contrib.util.make_tensor_proto(image))
+        request.inputs['image'].CopyFrom(
+            tf.contrib.util.make_tensor_proto(image))
     except Exception as exception:
         Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                              'Error',
@@ -83,72 +93,118 @@ def build_request(image):
 
 
 @CELERY.task(name='tf_serving_client.make_prediction')
-def make_prediction(analysis, host, port, diseases, frame):
-    channel = implementations.insecure_channel(host, int(port))
-    stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)
+def make_prediction(
+        analysis,
+        diseases):
+    img = cv2.imread(os.path.join(
+        FLASK_APP.config['IMAGESPATH'],
+        analysis['image']['url']))
 
-    image = read_tensor_from_image_file(analysis['image']['url'])
-    request = build_request(image)
-    response = [("None", 0)]
-    try:
-        start_time = time.time()
-        result = stub.Predict(request, 120.0)
-        request_proccess_time = int(round((time.time() - start_time) * 1000))
-        logging.info("request time: {0}ms".format(request_proccess_time))
-        Logger.Logger.create(
-            FLASK_APP.config["ELASTICURL"],
-            'Info',
-            'request time: {0}ms'.format(request_proccess_time),
-            'make_prediction()',
-            '',
-            FLASK_APP.config["TYPE"])
-        response = get_response(result)
-        logging.info("response={}".format(response))
-        if response[0][0].capitalize() == "Noise":
-            logging.info("Noise detected, ignoring prediction!")
-            return
-        elif response[0][0].capitalize() == "None":
-            logging.info("Error to predict!")
-            return
-        else:
-            healthy = [x if x['commonName'] == 'healthy' else {} for x in diseases][0]
-            if not healthy:
-                return
-            if int(response[0][0]) == healthy['id']:
-                # means that this frame is healthy
-                return
-            else:
-                disease_id = int(response[0][0])
+    saliency = cv2.saliency.StaticSaliencyFineGrained_create()
+    (success, saliencyMap) = saliency.computeSaliency(img)
 
-            score = response[0][1]
+    threshMap = cv2.threshold(
+        saliencyMap,
+        0,
+        255,
+        cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
 
-            # obtem a doença a partir do nome
-            for x in diseases:
-                if disease_id == x['id']:
-                    disease = x
+    y = 0
+    results = []
+    window_size = FLASK_APP.config['WINDOW_SIZE']
 
+    while y + window_size < img.shape[0]:
+        x = 0
+        while x + window_size < img.shape[1]:
+            crop = img[y:y + window_size, x: x + window_size]
 
-            # cria o objeto AnalysisResult
-            analysisResult = models.AnalysisResult.AnalysisResult(
+            if crop.shape[0] != window_size or crop.shape[1] != window_size:
+                continue
+            thresh_roi = threshMap[y:y + window_size, x: x + window_size]
+            if (cv2.countNonZero(thresh_roi) * 100) / (
+                    window_size ** 2) > 20:
+
+                crop_filepath = os.path.join(
+                    '/tmp',
+                    str(uuid.uuid4()) + '.jpg')
+
+                cv2.imwrite(crop_filepath, crop)
+                frame = str([y, y + window_size, x, x + window_size])
+
+                channel = implementations.insecure_channel(
+                    FLASK_APP.config["TFSHOST"],
+                    int(FLASK_APP.config["TFSPORT"]))
+                stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)
+
+                image = read_tensor_from_image_file(crop_filepath)
+                request = build_request(image)
+                response = [("None", 0)]
+                try:
+                    start_time = time.time()
+                    result = stub.Predict(request, 120.0)
+                    request_proccess_time = int(round((time.time() - start_time) * 1000))
+                    logging.info("request time: {0}ms".format(request_proccess_time))
+                    Logger.Logger.create(
+                        FLASK_APP.config["ELASTICURL"],
+                        'Info',
+                        'request time: {0}ms'.format(request_proccess_time),
+                        'make_prediction()',
+                        '',
+                        FLASK_APP.config["TYPE"])
+                    response = get_response(result)
+                    logging.info("response={}".format(response))
+                    if response[0][0].capitalize() == "Noise":
+                        logging.info("Noise detected, ignoring prediction!")
+                        return
+                    elif response[0][0].capitalize() == "None":
+                        logging.info("Error to predict!")
+                        return
+                    else:
+                        healthy = [d if d['commonName'] == 'healthy' else {} for d in diseases][0]
+                        if not healthy:
+                            return
+                        if int(response[0][0]) == healthy['id']:
+                            # means that this frame is healthy
+                            return
+                        else:
+                            disease_id = int(response[0][0])
+
+                        score = response[0][1]
+
+                        # obtem a doença a partir do nome
+                        for x in diseases:
+                            if disease_id == x['id']:
+                                disease = x
+
+                        # cria o objeto AnalysisResult
+                        results.append(models.AnalysisResult.AnalysisResult(
                             id=None,
-                            analysis=models.Analysis.Analysis(id=analysis['id']),
+                            analysis=models.Analysis.Analysis(
+                                id=analysis['id']),
                             disease=models.Disease.Disease(id=disease['id']),
                             score=score,
-                            frame=frame)
+                            frame=frame))
 
-            # persistir o objeto
-            analysisResultRepo = AnalysisResultRepository(
-                FLASK_APP.config["DBUSER"],
-                FLASK_APP.config["DBPASS"],
-                FLASK_APP.config["DBHOST"],
-                FLASK_APP.config["DBPORT"],
-                FLASK_APP.config["DBNAME"])
-            analysisResultRepo.create(analysisResult)
-    except Exception as exception:
-        logging.info("durante o make_prediction ocorreu uma exceptioin: {}".format(exception))
-        Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
-                         'Error',
-                         'Error to predict',
-                         'make_prediction()',
-                         '{}'.format(exception),
-                         FLASK_APP.config["TYPE"])
+                except Exception as exception:
+                    logging.error(
+                        "make_prediction: %s" % (str(exception)))
+                    Logger.Logger.create(
+                        FLASK_APP.config["ELASTICURL"],
+                        'Error',
+                        'Error to predict',
+                        'make_prediction()',
+                        '{}'.format(exception),
+                        FLASK_APP.config["TYPE"])
+            x += window_size
+        y += window_size
+
+    try:
+        analysisResultRepo = AnalysisResultRepository(
+            FLASK_APP.config["DBUSER"],
+            FLASK_APP.config["DBPASS"],
+            FLASK_APP.config["DBHOST"],
+            FLASK_APP.config["DBPORT"],
+            FLASK_APP.config["DBNAME"])
+        analysisResultRepo.create_using_list(results)
+    except Exception as ex:
+        logging.error('AnalysisResult insertion: %s' % str(ex))
