@@ -10,7 +10,9 @@ from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2
 from tools import Logger
 from api.restplus import CELERY, FLASK_APP
+import models.Disease
 import models.Analysis
+import models.AnalysisResult
 from repository.AnalysisResultRepository import AnalysisResultRepository
 
 
@@ -181,8 +183,9 @@ def split_prediction(
                         results.append(models.AnalysisResult.AnalysisResult(
                             id=None,
                             analysis=models.Analysis.Analysis(
-                                id=analysis['id']),
-                            disease=models.Disease.Disease(id=disease['id']),
+                                id=analysis['id']).__dict__,
+                            disease=models.Disease.Disease(
+                                id=disease['id']).__dict__,
                             score=score,
                             frame=frame).__dict__)
 
@@ -232,7 +235,15 @@ def make_prediction(
             FLASK_APP.config["DBNAME"])
         results = []
         for t in tasks:
-            results.extend(t.get())
+            while not t.ready():
+                logging.info('waiting end task')
+            if t.ready():
+                results.extend([models.AnalysisResult.AnalysisResult(
+                    id=None,
+                    analysis=models.Analysis.Analysis(id=r['analysis']['id']),
+                    disease=models.Disease.Disease(id=r['disease']['id']),
+                    score=r['score'],
+                    frame=r['frame']) for r in t.get()])
         analysisResultRepo.create_using_list(results)
     except Exception as ex:
         logging.error('AnalysisResult insertion: %s' % str(ex))
