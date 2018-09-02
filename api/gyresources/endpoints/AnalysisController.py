@@ -235,9 +235,9 @@ class AnalysisController(BaseController):
                                  str(analysisDict),
                                  FLASK_APP.config["TYPE"])
             return self.okResponse(
-                response=analysis,
-                message="Analysis sucessfuly created.",
-                status=201), 200
+                    response=analysis,
+                    message="Analysis sucessfuly created.",
+                    status=201), 200
         except Exception as err:
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
