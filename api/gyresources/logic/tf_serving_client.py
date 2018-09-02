@@ -14,6 +14,7 @@ import models.Disease
 import models.Analysis
 import models.AnalysisResult
 from repository.AnalysisResultRepository import AnalysisResultRepository
+from celery.task.sets import TaskSet
 
 
 logging.basicConfig(
@@ -222,13 +223,14 @@ def make_prediction(
         init[i] = img_step * i
         end[i] = init[i] * img_step
 
-    tasks = [split_prediction.delay(
+    job = TaskSet(tasks=[split_prediction.subtask((
         analysis['image']['url'],
         window_size,
         init[i],
         end[i],
         analysis,
-        diseases) for i in range(0, FLASK_APP.config['THREADS'])]
+        diseases)) for i in range(0, FLASK_APP.config['THREADS'])])
+    result = job.apply_async()
     try:
         analysisResultRepo = AnalysisResultRepository(
             FLASK_APP.config["DBUSER"],
@@ -237,16 +239,15 @@ def make_prediction(
             FLASK_APP.config["DBPORT"],
             FLASK_APP.config["DBNAME"])
         results = []
-        for t in tasks:
-            while not t.ready():
-                logging.info('waiting end task')
-            if t.ready():
-                results.extend([models.AnalysisResult.AnalysisResult(
-                    id=None,
-                    analysis=models.Analysis.Analysis(id=r['analysis']['id']),
-                    disease=models.Disease.Disease(id=r['disease']['id']),
-                    score=r['score'],
-                    frame=r['frame']) for r in t.get()])
+        while not result.ready():
+            logging.info('waiting end task')
+        if result.successful():
+            results.extend([models.AnalysisResult.AnalysisResult(
+                id=None,
+                analysis=models.Analysis.Analysis(id=r['analysis']['id']),
+                disease=models.Disease.Disease(id=r['disease']['id']),
+                score=r['score'],
+                frame=r['frame']) for r in result.join()])
         analysisResultRepo.create_using_list(results)
     except Exception as ex:
         logging.error('AnalysisResult insertion: %s' % str(ex))
