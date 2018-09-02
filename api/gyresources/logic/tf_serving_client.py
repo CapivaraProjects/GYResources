@@ -105,6 +105,11 @@ def split_prediction(
         FLASK_APP.config['IMAGESPATH'],
         img))
 
+    channel = implementations.insecure_channel(
+        FLASK_APP.config["TFSHOST"],
+        int(FLASK_APP.config["TFSPORT"]))
+    stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)
+
     saliency = cv2.saliency.StaticSaliencyFineGrained_create()
     (success, saliencyMap) = saliency.computeSaliency(img)
 
@@ -180,7 +185,7 @@ def split_prediction(
                                 id=analysis['id']),
                             disease=models.Disease.Disease(id=disease['id']),
                             score=score,
-                            frame=frame))
+                            frame=frame).__dict__)
 
                 except Exception as exception:
                     logging.error(
@@ -205,11 +210,6 @@ def make_prediction(
 
     window_size = FLASK_APP.config['WINDOW_SIZE']
 
-    channel = implementations.insecure_channel(
-        FLASK_APP.config["TFSHOST"],
-        int(FLASK_APP.config["TFSPORT"]))
-    stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)
-
     img_step = img.shape[0] // FLASK_APP.config['THREADS']
     init = [0] * FLASK_APP.config['THREADS']
     end = [0] * FLASK_APP.config['THREADS']
@@ -222,7 +222,6 @@ def make_prediction(
         window_size,
         init[i],
         end[i],
-        stub,
         analysis,
         diseases) for i in range(0, FLASK_APP.config['THREADS'])]
     try:
