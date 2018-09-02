@@ -98,10 +98,21 @@ def split_prediction(
         window_size,
         init,
         end,
-        threshMap,
         stub,
         analysis,
         diseases):
+    img = cv2.imread(os.path.join(
+        FLASK_APP.config['IMAGESPATH'],
+        img))
+
+    saliency = cv2.saliency.StaticSaliencyFineGrained_create()
+    (success, saliencyMap) = saliency.computeSaliency(img)
+
+    threshMap = cv2.threshold(
+        saliencyMap,
+        0,
+        255,
+        cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
     results = []
     for y in range(init, end, window_size):
         for x in range(0, img.shape[1], window_size):
@@ -181,17 +192,7 @@ def split_prediction(
                         'make_prediction()',
                         '{}'.format(exception),
                         FLASK_APP.config["TYPE"])
-
-    try:
-        analysisResultRepo = AnalysisResultRepository(
-            FLASK_APP.config["DBUSER"],
-            FLASK_APP.config["DBPASS"],
-            FLASK_APP.config["DBHOST"],
-            FLASK_APP.config["DBPORT"],
-            FLASK_APP.config["DBNAME"])
-        analysisResultRepo.create_using_list(results)
-    except Exception as ex:
-        logging.error('AnalysisResult insertion: %s' % str(ex))
+    return results
 
 
 @CELERY.task(name='tf_serving_client.make_prediction')
@@ -201,15 +202,6 @@ def make_prediction(
     img = cv2.imread(os.path.join(
         FLASK_APP.config['IMAGESPATH'],
         analysis['image']['url']))
-
-    saliency = cv2.saliency.StaticSaliencyFineGrained_create()
-    (success, saliencyMap) = saliency.computeSaliency(img)
-
-    threshMap = cv2.threshold(
-        saliencyMap,
-        0,
-        255,
-        cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
 
     window_size = FLASK_APP.config['WINDOW_SIZE']
 
@@ -225,12 +217,24 @@ def make_prediction(
         init[i] = img_step * i
         end[i] = init[i] * img_step
 
-    [split_prediction.delay(
-        img,
+    tasks = [split_prediction.delay(
+        analysis['image']['url'],
         window_size,
         init[i],
         end[i],
-        threshMap,
         stub,
         analysis,
         diseases) for i in range(0, FLASK_APP.config['THREADS'])]
+    try:
+        analysisResultRepo = AnalysisResultRepository(
+            FLASK_APP.config["DBUSER"],
+            FLASK_APP.config["DBPASS"],
+            FLASK_APP.config["DBHOST"],
+            FLASK_APP.config["DBPORT"],
+            FLASK_APP.config["DBNAME"])
+        results = []
+        for t in tasks:
+            results.extend(t.get())
+        analysisResultRepo.create_using_list(results)
+    except Exception as ex:
+        logging.error('AnalysisResult insertion: %s' % str(ex))
