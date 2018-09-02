@@ -98,7 +98,6 @@ def split_prediction(
         window_size,
         init,
         end,
-        stub,
         analysis,
         diseases):
     img = cv2.imread(os.path.join(
