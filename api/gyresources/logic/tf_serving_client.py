@@ -155,17 +155,17 @@ def make_prediction(
                     logging.info("response={}".format(response))
                     if response[0][0].capitalize() == "Noise":
                         logging.info("Noise detected, ignoring prediction!")
-                        return
+                        continue
                     elif response[0][0].capitalize() == "None":
                         logging.info("Error to predict!")
-                        return
+                        continue
                     else:
                         healthy = [d if d['commonName'] == 'healthy' else {} for d in diseases][0]
                         if not healthy:
-                            return
+                            continue
                         if int(response[0][0]) == healthy['id']:
                             # means that this frame is healthy
-                            return
+                            continue
                         else:
                             disease_id = int(response[0][0])
 
