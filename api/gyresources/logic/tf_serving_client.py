@@ -92,30 +92,19 @@ def build_request(image):
     return request
 
 
-@CELERY.task(name='tf_serving_client.make_prediction')
-def make_prediction(
+@CELERY.task(name='tf_serving_client.split_prediction')
+def split_prediction(
+        img,
+        window_size,
+        init,
+        end,
+        threshMap,
+        stub,
         analysis,
         diseases):
-    img = cv2.imread(os.path.join(
-        FLASK_APP.config['IMAGESPATH'],
-        analysis['image']['url']))
-
-    saliency = cv2.saliency.StaticSaliencyFineGrained_create()
-    (success, saliencyMap) = saliency.computeSaliency(img)
-
-    threshMap = cv2.threshold(
-        saliencyMap,
-        0,
-        255,
-        cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-
-    y = 0
     results = []
-    window_size = FLASK_APP.config['WINDOW_SIZE']
-
-    while y + window_size < img.shape[0]:
-        x = 0
-        while x + window_size < img.shape[1]:
+    for y in range(init, end, window_size):
+        for x in range(0, img.shape[1], window_size):
             crop = img[y:y + window_size, x: x + window_size]
 
             if crop.shape[0] != window_size or crop.shape[1] != window_size:
@@ -131,19 +120,16 @@ def make_prediction(
                 cv2.imwrite(crop_filepath, crop)
                 frame = str([y, y + window_size, x, x + window_size])
 
-                channel = implementations.insecure_channel(
-                    FLASK_APP.config["TFSHOST"],
-                    int(FLASK_APP.config["TFSPORT"]))
-                stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)
-
                 image = read_tensor_from_image_file(crop_filepath)
                 request = build_request(image)
                 response = [("None", 0)]
                 try:
                     start_time = time.time()
                     result = stub.Predict(request, 120.0)
-                    request_proccess_time = int(round((time.time() - start_time) * 1000))
-                    logging.info("request time: {0}ms".format(request_proccess_time))
+                    request_proccess_time = int(
+                        round((time.time() - start_time) * 1000))
+                    logging.info("request time: {0}ms".format(
+                        request_proccess_time))
                     Logger.Logger.create(
                         FLASK_APP.config["ELASTICURL"],
                         'Info',
@@ -195,8 +181,6 @@ def make_prediction(
                         'make_prediction()',
                         '{}'.format(exception),
                         FLASK_APP.config["TYPE"])
-            x += window_size
-        y += window_size
 
     try:
         analysisResultRepo = AnalysisResultRepository(
@@ -208,3 +192,45 @@ def make_prediction(
         analysisResultRepo.create_using_list(results)
     except Exception as ex:
         logging.error('AnalysisResult insertion: %s' % str(ex))
+
+
+@CELERY.task(name='tf_serving_client.make_prediction')
+def make_prediction(
+        analysis,
+        diseases):
+    img = cv2.imread(os.path.join(
+        FLASK_APP.config['IMAGESPATH'],
+        analysis['image']['url']))
+
+    saliency = cv2.saliency.StaticSaliencyFineGrained_create()
+    (success, saliencyMap) = saliency.computeSaliency(img)
+
+    threshMap = cv2.threshold(
+        saliencyMap,
+        0,
+        255,
+        cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+
+    window_size = FLASK_APP.config['WINDOW_SIZE']
+
+    channel = implementations.insecure_channel(
+        FLASK_APP.config["TFSHOST"],
+        int(FLASK_APP.config["TFSPORT"]))
+    stub = prediction_service_pb2.beta_create_PredictionService_stub(channel)
+
+    img_step = img.shape[0] // FLASK_APP.config['THREADS']
+    init = [0] * FLASK_APP.config['THREADS']
+    end = [0] * FLASK_APP.config['THREADS']
+    for i in range(0, FLASK_APP.config['THREADS']):
+        init[i] = img_step * i
+        end[i] = init[i] * img_step
+
+    [split_prediction.delay(
+        img,
+        window_size,
+        init[i],
+        end[i],
+        threshMap,
+        stub,
+        analysis,
+        diseases) for i in range(0, FLASK_APP.config['THREADS'])]

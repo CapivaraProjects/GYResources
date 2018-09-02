@@ -33,6 +33,7 @@ class DefaultConfig(object):
     MAIL_PASSWORD = 'ohhjxhswxjdanxvs'
     WINDOW_SIZE = 28
     CELERY_BROKER_URL = 'amqp://localhost//'
+    THREADS = 4
 
 
 class TestConfig(object):
@@ -66,3 +67,4 @@ class TestConfig(object):
     MAIL_PASSWORD = 'ohhjxhswxjdanxvs'
     WINDOW_SIZE = 28
     CELERY_BROKER_URL = 'amqp://localhost//'
+    THREADS = 2
