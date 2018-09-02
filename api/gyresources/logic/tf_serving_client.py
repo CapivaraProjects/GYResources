@@ -183,9 +183,12 @@ def split_prediction(
                         results.append(models.AnalysisResult.AnalysisResult(
                             id=None,
                             analysis=models.Analysis.Analysis(
-                                id=analysis['id']).__dict__,
+                                id=analysis['id'],
+                                image=None,
+                                classifier=None).__dict__,
                             disease=models.Disease.Disease(
-                                id=disease['id']).__dict__,
+                                id=disease['id'],
+                                plant=None).__dict__,
                             score=score,
                             frame=frame).__dict__)
 
