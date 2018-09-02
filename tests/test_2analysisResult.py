@@ -257,8 +257,8 @@ def test_delete(generic_analysisResult=generic_analysisResult, generic_user=gene
                 'dataType': 'json'},
             query_string=data, follow_redirects=True)
 
+    print(resp.get_data(as_text=True))
     response = json.loads(resp.get_data(as_text=True))
-    print(response)
     analysisResult = namedtuple("AnalysisResult", response.keys())(*response.values())
     analysisResult = {
                 "id": analysisResult.response['id'],
@@ -274,7 +274,7 @@ def test_delete(generic_analysisResult=generic_analysisResult, generic_user=gene
             }
     resp = client().delete('/api/gyresources/analysisResult/', data=str(
         json.dumps(analysisResult)), headers=headers)
-    print(resp)
+    print(resp.get_data(as_text=True))
     assert resp.status_code == 200
     assert 204 == json.loads(resp.get_data(as_text=True))['status_code']
 
