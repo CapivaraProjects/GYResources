@@ -104,6 +104,8 @@ def split_prediction(
         end,
         analysis,
         diseases):
+    logging.info('init: %s' % init)
+    logging.info('end: %s' % end)
     img = cv2.imread(os.path.join(
         FLASK_APP.config['IMAGESPATH'],
         img))
@@ -243,12 +245,15 @@ def make_prediction(
         with allow_join_result():
             for r in jobs.join():
                 logging.info('r: %s' % str(r))
-                results.extend(models.AnalysisResult.AnalysisResult(
-                    id=None,
-                    analysis=models.Analysis.Analysis(id=r['analysis']['id']),
-                    disease=models.Disease.Disease(id=r['disease']['id']),
-                    score=r['score'],
-                    frame=r['frame']))
+                for resp in r:
+                    results.append(models.AnalysisResult.AnalysisResult(
+                        id=None,
+                        analysis=models.Analysis.Analysis(
+                            id=resp['analysis']['id']),
+                        disease=models.Disease.Disease(
+                            id=resp['disease']['id']),
+                        score=resp['score'],
+                        frame=resp['frame']))
         analysisResultRepo.create_using_list(results)
     except Exception as ex:
         logging.error('AnalysisResult insertion: %s' % str(ex))
