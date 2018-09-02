@@ -224,7 +224,7 @@ def make_prediction(
     end = [0] * FLASK_APP.config['THREADS']
     for i in range(0, FLASK_APP.config['THREADS']):
         init[i] = img_step * i
-        end[i] = init[i] * img_step
+        end[i] = init[i] + img_step
 
     job = group([split_prediction.s(
         analysis['image']['url'],
@@ -255,5 +255,6 @@ def make_prediction(
                         score=resp['score'],
                         frame=resp['frame']))
         analysisResultRepo.create_using_list(results)
+        logging.info('inserted results!')
     except Exception as ex:
         logging.error('AnalysisResult insertion: %s' % str(ex))
