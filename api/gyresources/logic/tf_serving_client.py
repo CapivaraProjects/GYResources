@@ -14,7 +14,7 @@ import models.Disease
 import models.Analysis
 import models.AnalysisResult
 from repository.AnalysisResultRepository import AnalysisResultRepository
-from celery.task.sets import TaskSet
+from celery import group
 
 
 logging.basicConfig(
@@ -223,13 +223,13 @@ def make_prediction(
         init[i] = img_step * i
         end[i] = init[i] * img_step
 
-    job = TaskSet(tasks=[split_prediction.subtask((
+    job = group([split_prediction.s(
         analysis['image']['url'],
         window_size,
         init[i],
         end[i],
         analysis,
-        diseases)) for i in range(0, FLASK_APP.config['THREADS'])])
+        diseases) for i in range(0, FLASK_APP.config['THREADS'])])
     result = job.apply_async()
     try:
         analysisResultRepo = AnalysisResultRepository(
