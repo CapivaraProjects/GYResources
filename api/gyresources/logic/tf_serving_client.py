@@ -15,6 +15,7 @@ import models.Analysis
 import models.AnalysisResult
 from repository.AnalysisResultRepository import AnalysisResultRepository
 from celery import group
+from celery.result import allow_join_result
 
 
 logging.basicConfig(
@@ -230,7 +231,7 @@ def make_prediction(
         end[i],
         analysis,
         diseases) for i in range(0, FLASK_APP.config['THREADS'])])
-    result = job.apply_async()
+    jobs = job.apply_async()
     try:
         analysisResultRepo = AnalysisResultRepository(
             FLASK_APP.config["DBUSER"],
@@ -239,15 +240,15 @@ def make_prediction(
             FLASK_APP.config["DBPORT"],
             FLASK_APP.config["DBNAME"])
         results = []
-        while not result.ready():
-            logging.info('waiting end task')
-        if result.successful():
-            results.extend([models.AnalysisResult.AnalysisResult(
-                id=None,
-                analysis=models.Analysis.Analysis(id=r['analysis']['id']),
-                disease=models.Disease.Disease(id=r['disease']['id']),
-                score=r['score'],
-                frame=r['frame']) for r in result.join()])
+        with allow_join_result():
+            for r in jobs.join():
+                logging.info('r: %s' % str(r))
+                results.extend(models.AnalysisResult.AnalysisResult(
+                    id=None,
+                    analysis=models.Analysis.Analysis(id=r['analysis']['id']),
+                    disease=models.Disease.Disease(id=r['disease']['id']),
+                    score=r['score'],
+                    frame=r['frame']))
         analysisResultRepo.create_using_list(results)
     except Exception as ex:
         logging.error('AnalysisResult insertion: %s' % str(ex))
