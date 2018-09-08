@@ -132,7 +132,7 @@ def test_search():
     pagedResponse = json.loads(resp.get_data(as_text=True))
     assert pagedResponse['status_code'] == 200
     for response in pagedResponse['response']:
-        assert response['disease']['id'] == 1
+        assert response['disease']['id']
 
 
 @pytest.mark.order5
@@ -242,6 +242,7 @@ def test_delete_non_existent(generic_analysisResult=generic_analysisResult, gene
     assert resp['status_code'] == 500
     assert 'Internal server error' in resp['message']
 
+
 @pytest.mark.order8
 def test_delete(generic_analysisResult=generic_analysisResult, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
@@ -256,6 +257,7 @@ def test_delete(generic_analysisResult=generic_analysisResult, generic_user=gene
                 'dataType': 'json'},
             query_string=data, follow_redirects=True)
 
+    print(resp.get_data(as_text=True))
     response = json.loads(resp.get_data(as_text=True))
     analysisResult = namedtuple("AnalysisResult", response.keys())(*response.values())
     analysisResult = {
@@ -272,6 +274,7 @@ def test_delete(generic_analysisResult=generic_analysisResult, generic_user=gene
             }
     resp = client().delete('/api/gyresources/analysisResult/', data=str(
         json.dumps(analysisResult)), headers=headers)
+    print(resp.get_data(as_text=True))
     assert resp.status_code == 200
     assert 204 == json.loads(resp.get_data(as_text=True))['status_code']
 
