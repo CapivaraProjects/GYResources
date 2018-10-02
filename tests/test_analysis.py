@@ -27,7 +27,7 @@ generic_analysis = models.Analysis.Analysis(
         id=1,
         image=models.Image.Image(id=3264),
         classifier=models.Classifier.Classifier(id=1),
-        user=models.User.User(id=1))
+        user=models.User.User(id=2))
 
 
 def auth(generic_user=generic_user):
@@ -197,7 +197,6 @@ def test_update_wrong_id(
         generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     data = generic_analysis.__dict__
-    data['user'] = generic_analysis.user.__dict__
     data['action'] = 'searchByID'
     resp = client().get(
             '/api/gyresources/analysis',
@@ -259,7 +258,6 @@ def test_delete_non_existent(
         generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     data = generic_analysis.__dict__
-    data['user'] = generic_analysis.user.__dict__
     data['action'] = 'searchByID'
     resp = client().get(
             '/api/gyresources/analysis',
@@ -297,7 +295,6 @@ def test_delete_non_existent(
 def test_delete(generic_analysis=generic_analysis, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     data = generic_analysis.__dict__
-    data['user'] = generic_analysis.user.__dict__
     data['action'] = 'searchByID'
     resp = client().get(
             '/api/gyresources/analysis',
