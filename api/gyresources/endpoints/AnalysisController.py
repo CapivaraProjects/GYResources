@@ -92,6 +92,7 @@ class AnalysisController(BaseController):
                 result.image = result.image.__dict__
                 result.classifier.plant = result.classifier.plant.__dict__
                 result.classifier = result.classifier.__dict__
+                result.user = result.user.__dict__
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Ok',
@@ -112,6 +113,7 @@ class AnalysisController(BaseController):
                     content.image = content.image.__dict__
                     content.classifier.plant = content.classifier.plant.__dict__
                     content.classifier = content.classifier.__dict__
+                    content.user = content.user.__dict__
                     response.append(content)
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
@@ -131,13 +133,14 @@ class AnalysisController(BaseController):
                 img = cv2.imread(os.path.join(
                     FLASK_APP.config['IMAGESPATH'],
                     result.image.url))
+                colors = {53: (255, 0, 0), 56: (0, 0, 255), 52: (203, 66, 244)}
                 for anal_res in result.analysis_results:
                     frame = ast.literal_eval(anal_res.frame)
                     cv2.rectangle(
                         img,
                         (frame[0], frame[2]),
                         (frame[1], frame[3]),
-                        (255, 0, 0),
+                        colors[anal_res.disease.id],
                         2)
                 filepath = os.path.join('/tmp', str(uuid.uuid4()) + '.jpg')
                 cv2.imwrite(filepath, img)
@@ -157,6 +160,7 @@ class AnalysisController(BaseController):
                 result.image = result.image.__dict__
                 result.classifier.plant = result.classifier.plant.__dict__
                 result.classifier = result.classifier.__dict__
+                result.user = result.user.__dict__
 
                 return self.okResponse(
                     response=result,
@@ -222,6 +226,7 @@ class AnalysisController(BaseController):
             analysis.classifier.plant.diseases = []
             analysis.classifier.plant = analysis.classifier.plant.__dict__
             analysis.classifier = analysis.classifier.__dict__
+            analysis.user = analysis.user.__dict__
             analysisDict = analysis.__dict__
 
             make_prediction.delay(
@@ -281,6 +286,7 @@ class AnalysisController(BaseController):
             analysis.image = analysis.image.__dict__
             analysis.classifier.plant = analysis.classifier.plant.__dict__
             analysis.classifier = analysis.classifier.__dict__
+            analysis.user = analysis.user.__dict__
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'Analysis sucessfuly updated',
@@ -334,6 +340,7 @@ class AnalysisController(BaseController):
                 analysis = models.Analysis.Analysis()
                 analysis.image = analysis.image.__dict__
                 analysis.classifier = analysis.classifier.__dict__
+                analysis.user = analysis.user.__dict__
 
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
