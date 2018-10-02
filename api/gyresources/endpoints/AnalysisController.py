@@ -134,14 +134,20 @@ class AnalysisController(BaseController):
                 img = cv2.imread(os.path.join(
                     FLASK_APP.config['IMAGESPATH'],
                     result.image.url))
-                colors = {53: (255, 0, 0), 56: (0, 0, 255), 52: (203, 66, 244)}
+                # colors = {53: (255, 0, 0), 56: (0, 0, 255), 52: (203, 66, 244)}
                 for anal_res in result.analysis_results:
                     frame = ast.literal_eval(anal_res.frame)
+                    # cv2.rectangle(
+                    #     img,
+                    #     (frame[0], frame[2]),
+                    #     (frame[1], frame[3]),
+                    #     colors[anal_res.disease.id],
+                    #     2)
                     cv2.rectangle(
                         img,
                         (frame[0], frame[2]),
                         (frame[1], frame[3]),
-                        colors[anal_res.disease.id],
+                        (0, 0, 255),
                         2)
                 filepath = os.path.join('/tmp', str(uuid.uuid4()) + '.jpg')
                 cv2.imwrite(filepath, img)

@@ -109,24 +109,24 @@ def test_search_by_id():
     assert json.loads(resp.get_data(as_text=True))['status_code'] == 200
 
 
-@pytest.mark.order3
-def test_read():
-    data = {
-                "action": "read",
-                "id": 1
-            }
-    resp = client().get(
-            '/api/gyresources/analysis',
-            content_type='application/json',
-            headers={
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-                'dataType': 'json',
-                'timeout': 240},
-            query_string=data, follow_redirects=True)
-    response = json.loads(resp.get_data(as_text=True))
-    print(str(response))
-    assert response['status_code'] == 200
+# @pytest.mark.order3
+# def test_read():
+#     data = {
+#                 "action": "read",
+#                 "id": 1
+#             }
+#     resp = client().get(
+#             '/api/gyresources/analysis',
+#             content_type='application/json',
+#             headers={
+#                 'Accept': 'application/json',
+#                 'Content-Type': 'application/json',
+#                 'dataType': 'json',
+#                 'timeout': 240},
+#             query_string=data, follow_redirects=True)
+#     response = json.loads(resp.get_data(as_text=True))
+#     print(str(response))
+#     assert response['status_code'] == 200
 
 
 @pytest.mark.order4
