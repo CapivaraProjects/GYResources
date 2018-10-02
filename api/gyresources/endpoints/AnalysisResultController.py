@@ -74,6 +74,7 @@ class AnalysisResultController(BaseController):
                 result.analysis.image = result.analysis.image.__dict__
                 result.analysis.classifier.plant = result.analysis.classifier.plant.__dict__
                 result.analysis.classifier = result.analysis.classifier.__dict__
+                result.analysis.user = result.analysis.user.__dict__
                 result.analysis = result.analysis.__dict__
 
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
@@ -98,6 +99,7 @@ class AnalysisResultController(BaseController):
                     content.analysis.image = content.analysis.image.__dict__
                     content.analysis.classifier.plant = content.analysis.classifier.plant.__dict__
                     content.analysis.classifier = content.analysis.classifier.__dict__
+                    content.analysis.user = content.analysis.user.__dict__
                     content.analysis = content.analysis.__dict__
                     response.append(content)
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
@@ -162,6 +164,7 @@ class AnalysisResultController(BaseController):
             result.analysis.image = result.analysis.image.__dict__
             result.analysis.classifier.plant = result.analysis.classifier.plant.__dict__
             result.analysis.classifier = result.analysis.classifier.__dict__
+            result.analysis.user = result.analysis.user.__dict__
             result.analysis = result.analysis.__dict__
 
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
@@ -222,6 +225,7 @@ class AnalysisResultController(BaseController):
             result.analysis.image = result.analysis.image.__dict__
             result.analysis.classifier.plant = result.analysis.classifier.plant.__dict__
             result.analysis.classifier = result.analysis.classifier.__dict__
+            result.analysis.user = result.analysis.user.__dict__
             result.analysis = result.analysis.__dict__
 
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
@@ -285,6 +289,7 @@ class AnalysisResultController(BaseController):
                 result.analysis.image = result.analysis.image.__dict__
                 result.analysis.classifier.plant = result.analysis.classifier.plant.__dict__
                 result.analysis.classifier = result.analysis.classifier.__dict__
+            result.analysis.user = result.analysis.user.__dict__
                 result.analysis = result.analysis.__dict__
 
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
