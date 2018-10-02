@@ -34,7 +34,9 @@ disease = api.model('Disease', {
     })
 
 classifier = api.model('Classifier', {
-    'id': fields.Integer(readOnly=True, description='Classifier identification'),
+    'id': fields.Integer(
+        readOnly=True,
+        description='Classifier identification'),
     'idPlant': fields.Integer(
         required=True,
         attribute='plant.id',
@@ -118,7 +120,10 @@ analysis = api.model('Analysis', {
         description='Image identification'),
     'idClassifier': fields.Integer(
         required=True,
-        description='Classifier identification')
+        description='Classifier identification'),
+    'idUser': fields.Integer(
+        required=True,
+        description='User identifier')
     })
 
 analysisResult = api.model('AnalysisResult', {

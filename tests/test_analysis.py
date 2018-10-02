@@ -4,6 +4,7 @@ import base64
 import models.Analysis
 import models.Image
 import models.Classifier
+import models.User
 from flask import Flask
 from app import initialize_app
 from collections import namedtuple
@@ -12,10 +13,6 @@ from collections import namedtuple
 app = Flask(__name__)
 app = initialize_app(app)
 client = app.test_client
-generic_analysis = models.Analysis.Analysis(
-        id=1,
-        image=models.Image.Image(id=3264),
-        classifier=models.Classifier.Classifier(id=1))
 
 generic_user = models.User.User(
         idType=1,
@@ -25,6 +22,12 @@ generic_user = models.User.User(
         salt='test',
         dateInsertion='03/02/2018',
         dateUpdate='10/02/2018')
+
+generic_analysis = models.Analysis.Analysis(
+        id=1,
+        image=models.Image.Image(id=3264),
+        classifier=models.Classifier.Classifier(id=1),
+        user=models.User.User(id=1))
 
 
 def auth(generic_user=generic_user):
@@ -72,6 +75,7 @@ def test_create(generic_analysis=generic_analysis, generic_user=generic_user):
     data["id"] = generic_analysis.id
     data["idImage"] = generic_analysis.image.id
     data["idClassifier"] = generic_analysis.classifier.id
+    data["idUser"] = generic_analysis.user.id
     headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
@@ -152,6 +156,7 @@ def test_search():
 def test_update(generic_analysis=generic_analysis, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     data = generic_analysis.__dict__
+    data['user'] = generic_analysis.user.__dict__
     data['action'] = 'searchByID'
     resp = client().get(
             '/api/gyresources/analysis',
@@ -168,7 +173,8 @@ def test_update(generic_analysis=generic_analysis, generic_user=generic_user):
     analysis = {
             "id": get_response.response["id"],
             "idImage": 2,
-            "idClassifier": get_response.response["classifier"]["id"]
+            "idClassifier": get_response.response["classifier"]["id"],
+            "idUser": get_response.response["user"]["id"]
             }
     generic_analysis.image.id = 2
     headers = {
@@ -191,6 +197,7 @@ def test_update_wrong_id(
         generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     data = generic_analysis.__dict__
+    data['user'] = generic_analysis.user.__dict__
     data['action'] = 'searchByID'
     resp = client().get(
             '/api/gyresources/analysis',
@@ -207,7 +214,8 @@ def test_update_wrong_id(
     analysis = {
             "id": 1000,
             "idImage": get_response.response['image']['id'],
-            "idClassifier": get_response.response["classifier"]["id"]
+            "idClassifier": get_response.response["classifier"]["id"],
+            "idUser": get_response.response["user"]["id"]
             }
     headers = {
             'Accept': 'application/json',
@@ -251,6 +259,7 @@ def test_delete_non_existent(
         generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     data = generic_analysis.__dict__
+    data['user'] = generic_analysis.user.__dict__
     data['action'] = 'searchByID'
     resp = client().get(
             '/api/gyresources/analysis',
@@ -267,7 +276,8 @@ def test_delete_non_existent(
     analysis = {
             "id": 1000,
             "idImage": get_response.response['image']['id'],
-            "idClassifier": get_response.response['classifier']['id']
+            "idClassifier": get_response.response['classifier']['id'],
+            "idUser": get_response.response["user"]["id"]
         }
     headers = {
             'Accept': 'application/json',
@@ -287,6 +297,7 @@ def test_delete_non_existent(
 def test_delete(generic_analysis=generic_analysis, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     data = generic_analysis.__dict__
+    data['user'] = generic_analysis.user.__dict__
     data['action'] = 'searchByID'
     resp = client().get(
             '/api/gyresources/analysis',
@@ -304,7 +315,8 @@ def test_delete(generic_analysis=generic_analysis, generic_user=generic_user):
     analysis = {
             "id": get_response.response['id'],
             "idImage": get_response.response['image']['id'],
-            "idClassifier": get_response.response['classifier']['id']
+            "idClassifier": get_response.response['classifier']['id'],
+            "idUser": get_response.response["user"]["id"]
             }
     headers = {
             'Accept': 'application/json',
@@ -329,6 +341,7 @@ def test_create_empty(
     data["id"] = 0
     data["idImage"] = 0
     data["idClassifier"] = 0
+    data["idUser"] = 999999
     headers = {
             'Accept': 'application/json',
             'Content-Type': 'application/json',

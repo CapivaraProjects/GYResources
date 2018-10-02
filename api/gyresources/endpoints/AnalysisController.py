@@ -11,6 +11,7 @@ from collections import namedtuple
 import models.Analysis
 import models.AnalysisResult
 import models.Disease
+import models.User
 from repository.AnalysisRepository import AnalysisRepository
 from repository.PlantRepository import PlantRepository
 from api.restplus import api, token_auth, FLASK_APP
@@ -34,7 +35,6 @@ class AnalysisController(BaseController):
         from AnalysisRepository, here, you can insert, update and delete
         data. Searchs are realized in AnalysisSearch.
     """
-
 
     @api.expect(analysis_search_args)
     @api.response(200, 'Analysis searched.')
@@ -104,7 +104,8 @@ class AnalysisController(BaseController):
                             message="Ok",
                             status=200)
             elif (action == 'search'):
-                result = repository.search(analysis, pageSize, offset)# retorna um dicionario2
+                # retorna um dicionario2
+                result = repository.search(analysis, pageSize, offset)
                 total = result['total']
                 response = []
                 for content in result['content']:
@@ -190,9 +191,11 @@ class AnalysisController(BaseController):
         analysis_request = request.json
         analysis_request = namedtuple("Analysis", analysis_request.keys())(*analysis_request.values())
         analysis = models.Analysis.Analysis(
-                      id=None,
-                      image=models.Image.Image(id=analysis_request.idImage),
-                      classifier=models.Classifier.Classifier(id=analysis_request.idClassifier))
+            id=None,
+            image=models.Image.Image(id=analysis_request.idImage),
+            classifier=models.Classifier.Classifier(
+                id=analysis_request.idClassifier),
+            user=models.User.User(id=analysis_request.idUser))
 
         repository = AnalysisRepository(
                 FLASK_APP.config["DBUSER"],
@@ -255,7 +258,6 @@ class AnalysisController(BaseController):
                 message="Internal server error "+str(err),
                 status=500)
 
-
     @api.response(200, 'Analysis changed successfuly')
     @api.expect(analysisSerializer)
     @token_auth.login_required
@@ -268,11 +270,12 @@ class AnalysisController(BaseController):
         analysis_request = request.json
 
         analysis = models.Analysis.Analysis(
-                              id=analysis_request['id'],
-                      image=models.Image.Image(
-                                      id=analysis_request['idImage']),
-                      classifier=models.Classifier.Classifier(
-                                            id=analysis_request['idClassifier']))
+            id=analysis_request['id'],
+            image=models.Image.Image(
+                id=analysis_request['idImage']),
+            classifier=models.Classifier.Classifier(
+                id=analysis_request['idClassifier']),
+            user=models.User.User(id=analysis_request['idUser']))
         repository = AnalysisRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
@@ -309,7 +312,6 @@ class AnalysisController(BaseController):
                 message="Internal server error: " + str(err),
                 status=500)
 
-
     @api.response(200, 'Analysis deleted successfuly')
     @api.expect(analysisSerializer)
     @token_auth.login_required
@@ -321,11 +323,12 @@ class AnalysisController(BaseController):
         """
         analysis_request = request.json
         analysis = models.Analysis.Analysis(
-                              id=analysis_request['id'],
-                      image=models.Image.Image(
-                                      id=analysis_request['idImage']),
-                      classifier=models.Classifier.Classifier(
-                                            id=analysis_request['idClassifier']))
+            id=analysis_request['id'],
+            image=models.Image.Image(
+                id=analysis_request['idImage']),
+            classifier=models.Classifier.Classifier(
+                id=analysis_request['idClassifier']),
+            user=models.User.User(id=analysis_request['idUser']))
 
         repository = AnalysisRepository(
                 FLASK_APP.config["DBUSER"],
