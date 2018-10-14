@@ -11,6 +11,7 @@ from collections import namedtuple
 import models.Analysis
 import models.AnalysisResult
 import models.Disease
+import models.User
 from repository.AnalysisRepository import AnalysisRepository
 from repository.PlantRepository import PlantRepository
 from api.restplus import api, token_auth, FLASK_APP
@@ -34,7 +35,6 @@ class AnalysisController(BaseController):
         from AnalysisRepository, here, you can insert, update and delete
         data. Searchs are realized in AnalysisSearch.
     """
-
 
     @api.expect(analysis_search_args)
     @api.response(200, 'Analysis searched.')
@@ -92,6 +92,7 @@ class AnalysisController(BaseController):
                 result.image = result.image.__dict__
                 result.classifier.plant = result.classifier.plant.__dict__
                 result.classifier = result.classifier.__dict__
+                result.user = result.user.__dict__
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Ok',
@@ -103,7 +104,8 @@ class AnalysisController(BaseController):
                             message="Ok",
                             status=200)
             elif (action == 'search'):
-                result = repository.search(analysis, pageSize, offset)# retorna um dicionario2
+                # retorna um dicionario2
+                result = repository.search(analysis, pageSize, offset)
                 total = result['total']
                 response = []
                 for content in result['content']:
@@ -112,6 +114,7 @@ class AnalysisController(BaseController):
                     content.image = content.image.__dict__
                     content.classifier.plant = content.classifier.plant.__dict__
                     content.classifier = content.classifier.__dict__
+                    content.user = content.user.__dict__
                     response.append(content)
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
@@ -131,13 +134,20 @@ class AnalysisController(BaseController):
                 img = cv2.imread(os.path.join(
                     FLASK_APP.config['IMAGESPATH'],
                     result.image.url))
+                # colors = {53: (255, 0, 0), 56: (0, 0, 255), 52: (203, 66, 244)}
                 for anal_res in result.analysis_results:
                     frame = ast.literal_eval(anal_res.frame)
+                    # cv2.rectangle(
+                    #     img,
+                    #     (frame[0], frame[2]),
+                    #     (frame[1], frame[3]),
+                    #     colors[anal_res.disease.id],
+                    #     2)
                     cv2.rectangle(
                         img,
                         (frame[0], frame[2]),
                         (frame[1], frame[3]),
-                        (255, 0, 0),
+                        (0, 0, 255),
                         2)
                 filepath = os.path.join('/tmp', str(uuid.uuid4()) + '.jpg')
                 cv2.imwrite(filepath, img)
@@ -157,6 +167,7 @@ class AnalysisController(BaseController):
                 result.image = result.image.__dict__
                 result.classifier.plant = result.classifier.plant.__dict__
                 result.classifier = result.classifier.__dict__
+                result.user = result.user.__dict__
 
                 return self.okResponse(
                     response=result,
@@ -186,9 +197,11 @@ class AnalysisController(BaseController):
         analysis_request = request.json
         analysis_request = namedtuple("Analysis", analysis_request.keys())(*analysis_request.values())
         analysis = models.Analysis.Analysis(
-                      id=None,
-                      image=models.Image.Image(id=analysis_request.idImage),
-                      classifier=models.Classifier.Classifier(id=analysis_request.idClassifier))
+            id=None,
+            image=models.Image.Image(id=analysis_request.idImage),
+            classifier=models.Classifier.Classifier(
+                id=analysis_request.idClassifier),
+            user=models.User.User(id=analysis_request.idUser))
 
         repository = AnalysisRepository(
                 FLASK_APP.config["DBUSER"],
@@ -222,6 +235,7 @@ class AnalysisController(BaseController):
             analysis.classifier.plant.diseases = []
             analysis.classifier.plant = analysis.classifier.plant.__dict__
             analysis.classifier = analysis.classifier.__dict__
+            analysis.user = analysis.user.__dict__
             analysisDict = analysis.__dict__
 
             make_prediction.delay(
@@ -250,7 +264,6 @@ class AnalysisController(BaseController):
                 message="Internal server error "+str(err),
                 status=500)
 
-
     @api.response(200, 'Analysis changed successfuly')
     @api.expect(analysisSerializer)
     @token_auth.login_required
@@ -263,11 +276,12 @@ class AnalysisController(BaseController):
         analysis_request = request.json
 
         analysis = models.Analysis.Analysis(
-                              id=analysis_request['id'],
-                      image=models.Image.Image(
-                                      id=analysis_request['idImage']),
-                      classifier=models.Classifier.Classifier(
-                                            id=analysis_request['idClassifier']))
+            id=analysis_request['id'],
+            image=models.Image.Image(
+                id=analysis_request['idImage']),
+            classifier=models.Classifier.Classifier(
+                id=analysis_request['idClassifier']),
+            user=models.User.User(id=analysis_request['idUser']))
         repository = AnalysisRepository(
                 FLASK_APP.config["DBUSER"],
                 FLASK_APP.config["DBPASS"],
@@ -281,6 +295,7 @@ class AnalysisController(BaseController):
             analysis.image = analysis.image.__dict__
             analysis.classifier.plant = analysis.classifier.plant.__dict__
             analysis.classifier = analysis.classifier.__dict__
+            analysis.user = analysis.user.__dict__
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'Analysis sucessfuly updated',
@@ -303,7 +318,6 @@ class AnalysisController(BaseController):
                 message="Internal server error: " + str(err),
                 status=500)
 
-
     @api.response(200, 'Analysis deleted successfuly')
     @api.expect(analysisSerializer)
     @token_auth.login_required
@@ -315,11 +329,12 @@ class AnalysisController(BaseController):
         """
         analysis_request = request.json
         analysis = models.Analysis.Analysis(
-                              id=analysis_request['id'],
-                      image=models.Image.Image(
-                                      id=analysis_request['idImage']),
-                      classifier=models.Classifier.Classifier(
-                                            id=analysis_request['idClassifier']))
+            id=analysis_request['id'],
+            image=models.Image.Image(
+                id=analysis_request['idImage']),
+            classifier=models.Classifier.Classifier(
+                id=analysis_request['idClassifier']),
+            user=models.User.User(id=analysis_request['idUser']))
 
         repository = AnalysisRepository(
                 FLASK_APP.config["DBUSER"],
@@ -334,6 +349,7 @@ class AnalysisController(BaseController):
                 analysis = models.Analysis.Analysis()
                 analysis.image = analysis.image.__dict__
                 analysis.classifier = analysis.classifier.__dict__
+                analysis.user = analysis.user.__dict__
 
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',

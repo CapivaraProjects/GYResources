@@ -70,6 +70,13 @@ class UserController(BaseController):
         try:
             if (action == 'searchByID'):
                 result = repository.searchByID(id)
+                analysis = []
+                for x in result.analysis:
+                    x.classifier = ''
+                    x.image = ''
+                    x.user = ''
+                    analysis.append(x.__dict__)
+                result.analysis = analysis
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Ok',
@@ -84,6 +91,16 @@ class UserController(BaseController):
                 result = repository.search(user, pageSize, offset)
                 total = result['total']
                 result = result['content']
+                results = []
+                for u in result:
+                    analysis = []
+                    for x in u.analysis:
+                        x.classifier = ''
+                        x.image = ''
+                        x.user = ''
+                        analysis.append(x.__dict__)
+                    u.analysis = analysis
+                    results.append(u)
                 Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                      'Informative',
                                      'Ok',
@@ -91,7 +108,7 @@ class UserController(BaseController):
                                      str(result),
                                      FLASK_APP.config["TYPE"])
                 return self.okResponse(
-                            response=result,
+                            response=results,
                             message="Ok",
                             status=200,
                             total=total,
@@ -185,6 +202,13 @@ class UserController(BaseController):
                 FLASK_APP.config["DBNAME"])
         try:
             user = repository.update(user)
+            analysis = []
+            for x in user.analysis:
+                x.classifier = ''
+                x.image = ''
+                x.user = ''
+                analysis.append(x.__dict__)
+            user.analysis = analysis
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
                                  'User sucessfuly updated',

@@ -16,3 +16,5 @@ CREATE TABLE USERS (
    date_insertion VARCHAR(100),
    date_last_update VARCHAR(100)
 );
+
+ALTER TABLE analysis ADD CONSTRAINT fk_id_user FOREIGN KEY (id_user) REFERENCES USERS(id);

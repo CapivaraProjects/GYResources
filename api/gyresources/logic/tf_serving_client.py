@@ -123,6 +123,7 @@ def split_prediction(
         0,
         255,
         cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
+
     results = []
     for y in range(init, end, window_size):
         for x in range(0, img.shape[1], window_size):
@@ -189,7 +190,8 @@ def split_prediction(
                             analysis=models.Analysis.Analysis(
                                 id=analysis['id'],
                                 image=None,
-                                classifier=None).__dict__,
+                                classifier=None,
+                                user=None).__dict__,
                             disease=models.Disease.Disease(
                                 id=disease['id'],
                                 plant=None).__dict__,
