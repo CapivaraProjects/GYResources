@@ -33,7 +33,15 @@ class DefaultConfig(object):
     MAIL_PASSWORD = 'ohhjxhswxjdanxvs'
     WINDOW_SIZE = 28
     CELERY_BROKER_URL = 'amqp://localhost//'
+    BROKER_POOL_LIMIT = 200
     THREADS = 4
+    CELERYD_CONCURRENCY = 4
+    CELERYBEAT_SYNC_EVERY = 300
+    BROKER_HEARTBEAT = 300
+    BROKER_HEARTBEAT_CHECKRATE = 2.0
+    PROJECT_ID = ''
+    STORAGE_BUCKET = ''
+    JSON_AUTH = ''
 
 
 class TestConfig(object):
@@ -67,4 +75,12 @@ class TestConfig(object):
     MAIL_PASSWORD = 'ohhjxhswxjdanxvs'
     WINDOW_SIZE = 28
     CELERY_BROKER_URL = 'amqp://localhost//'
+    BROKER_POOL_LIMIT = 200
     THREADS = 2
+    CELERYD_CONCURRENCY = 4
+    CELERYBEAT_SYNC_EVERY = 300
+    BROKER_HEARTBEAT = 300
+    BROKER_HEARTBEAT_CHECKRATE = 2.0
+    PROJECT_ID = ''
+    STORAGE_BUCKET = ''
+    JSON_AUTH = ''

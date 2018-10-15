@@ -12,3 +12,4 @@ flask_mail
 opencv-python
 opencv-contrib-python
 celery
+google-cloud-storage
