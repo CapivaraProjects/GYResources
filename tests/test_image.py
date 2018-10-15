@@ -199,9 +199,8 @@ def test_delete(generic_image=generic_image, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
     data = {
             "action": "search",
-            "url": "DSC04058_resized.JPG",
-            "description": "Healthy leaf, photographed in field/outside, " +
-            "Rock Springs Research Center, Penn State, PA",
+            "url": "FREC_Scab_3108_resized.JPG",
+            "description": "photographed in field/outside, FREC, Biglerville",
             "source": "PlantVillage",
             "pageSize": 10,
             "offset": 0
