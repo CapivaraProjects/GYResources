@@ -158,6 +158,7 @@ def test_update(generic_image=generic_image, generic_user=generic_user):
                 'Content-Type': 'application/json',
                 'dataType': 'json'},
             query_string=data, follow_redirects=True)
+    print('Update resp: %s' % str(resp))
     pagedResponse = json.loads(resp.get_data(as_text=True))
     image = object()
     for response in pagedResponse['response']:
@@ -199,6 +200,7 @@ def test_delete(generic_image=generic_image, generic_user=generic_user):
                 'Content-Type': 'application/json',
                 'dataType': 'json'},
             query_string=data, follow_redirects=True)
+    print('Delete resp: %s' % str(resp))
     pagedResponse = json.loads(resp.get_data(as_text=True))
     image = object()
     for response in pagedResponse['response']:
