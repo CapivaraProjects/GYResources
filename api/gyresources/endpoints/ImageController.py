@@ -93,12 +93,13 @@ class ImageController(BaseController):
                     content.disease.plant = content.disease.plant.__dict__
                     content.disease = content.disease.__dict__
                     response.append(content)
-                Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
-                                        'Informative',
-                                        'Ok',
-                                        'get()',
-                                        str(response),
-                                        FLASK_APP.config["TYPE"])
+                Logger.Logger.create(
+                    FLASK_APP.config["ELASTICURL"],
+                    'Informative',
+                    'Ok',
+                    'get()',
+                    str(response),
+                    FLASK_APP.config["TYPE"])
                 return self.okResponse(
                         response=response,
                         message="Ok",
@@ -143,6 +144,7 @@ class ImageController(BaseController):
         Method used to insert image in database
         receives in body request a image model
         """
+        self.startTime = time.time()
         image = request.json
         image = namedtuple("Image", image.keys())(*image.values())
         image = models.Image.Image(
@@ -168,11 +170,17 @@ class ImageController(BaseController):
 
         try:
             # if image is base 64 encoded save in a file
-            if (image.url.strip()[-1] == '=' and (not image.description or not image.source or not image.size)):
-                image.disease = diseaseRepository.searchByID(image.disease.id)
+            if (not image.description or not image.source or not image.size):
+                image.disease = diseaseRepository.searchByID(
+                    image.disease.id)
                 image = repository.saveImage(
                         image,
                         FLASK_APP.config["IMAGESPATH"])
+                if FLASK_APP.config['TYPE'] != 'TEST':
+                    image.url = repository.upload_file(
+                        image.url,
+                        FLASK_APP.config['JSON_AUTH'],
+                        FLASK_APP.config['STORAGE_BUCKET'])
             image = repository.create(image)
             image.disease.plant = image.disease.plant.__dict__
             image.disease = image.disease.__dict__
@@ -187,6 +195,7 @@ class ImageController(BaseController):
                 message="Image sucessfuly created.",
                 status=201), 200
         except Exception as err:
+            print('Error: %s' % str(err))
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Error',
                                  'Internal server error ',
@@ -257,7 +266,6 @@ class ImageController(BaseController):
                 message="Internal server error: " + str(err),
                 status=500)
 
-
     @api.response(200, 'Image deleted successfuly')
     @api.expect(imageSerializer)
     @token_auth.login_required
@@ -308,4 +316,3 @@ class ImageController(BaseController):
                 response=err,
                 message="Internal server error: " + str(err),
                 status=500)
-

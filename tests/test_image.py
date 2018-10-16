@@ -148,8 +148,15 @@ def test_create(generic_image=generic_image, generic_user=generic_user):
 @pytest.mark.order5
 def test_update(generic_image=generic_image, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
-    data = generic_image.__dict__
-    data['action'] = 'search'
+    data = {
+            "action": "search",
+            "url": "DSC04057_resized.JPG",
+            "description": "Healthy leaf, photographed in field/outside, " +
+            "Rock Springs Research Center, Penn State, PA",
+            "source": "PlantVillage",
+            "pageSize": 10,
+            "offset": 0
+            }
     resp = client().get(
             '/api/gyresources/images',
             content_type='application/json',
@@ -158,6 +165,7 @@ def test_update(generic_image=generic_image, generic_user=generic_user):
                 'Content-Type': 'application/json',
                 'dataType': 'json'},
             query_string=data, follow_redirects=True)
+    print('Update resp: %s' % str(resp.get_data(as_text=True)))
     pagedResponse = json.loads(resp.get_data(as_text=True))
     image = object()
     for response in pagedResponse['response']:
@@ -189,8 +197,14 @@ def test_update(generic_image=generic_image, generic_user=generic_user):
 @pytest.mark.order6
 def test_delete(generic_image=generic_image, generic_user=generic_user):
     (generic_user, token) = auth(generic_user)
-    data = generic_image.__dict__
-    data['action'] = 'search'
+    data = {
+            "action": "search",
+            "url": "FREC_Scab_3108_resized.JPG",
+            "description": "photographed in field/outside, FREC, Biglerville",
+            "source": "PlantVillage",
+            "pageSize": 10,
+            "offset": 0
+            }
     resp = client().get(
             '/api/gyresources/images',
             content_type='application/json',
@@ -199,6 +213,7 @@ def test_delete(generic_image=generic_image, generic_user=generic_user):
                 'Content-Type': 'application/json',
                 'dataType': 'json'},
             query_string=data, follow_redirects=True)
+    print('Delete resp: %s' % str(resp.get_data(as_text=True)))
     pagedResponse = json.loads(resp.get_data(as_text=True))
     image = object()
     for response in pagedResponse['response']:

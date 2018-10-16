@@ -5,6 +5,8 @@ import time
 import logging
 import cv2
 import base64
+import copy
+import urllib.request
 from sqlalchemy import exc
 from flask import request
 from collections import namedtuple
@@ -22,7 +24,9 @@ from api.gyresources.parsers import analysis_search_args
 from tools import Logger
 
 
-logging.basicConfig(level=logging.INFO, format='%(levelname)s | %(asctime)s | %(threadName)-10s | %(message)s',)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(levelname)s | %(asctime)s | %(threadName)-10s | %(message)s',)
 
 ns = api.namespace('gyresources/analysis',
                    description='Operations related to analysis')
@@ -228,6 +232,13 @@ class AnalysisController(BaseController):
                 d.plant = d.plant.__dict__
                 diseases.append(d.__dict__)
 
+            if FLASK_APP.config['TYPE'] != 'TEST':
+                with urllib.request.urlopen(
+                    analysis.image.url) as response, open(
+                        analysis.image.url.rsplit('/')[-1], 'wb') as out_file:
+                    data = response.read()
+                    out_file.write(data)
+
             analysis.image.disease.plant.diseases = []
             analysis.image.disease.plant = analysis.image.disease.plant.__dict__
             analysis.image.disease = analysis.image.disease.__dict__
@@ -236,7 +247,10 @@ class AnalysisController(BaseController):
             analysis.classifier.plant = analysis.classifier.plant.__dict__
             analysis.classifier = analysis.classifier.__dict__
             analysis.user = analysis.user.__dict__
-            analysisDict = analysis.__dict__
+            analysisDict = copy.deepcopy(analysis.__dict__)
+            if FLASK_APP.config['TYPE'] != 'TEST':
+                analysisDict['image']['url'] = analysis.image['url'].rsplit(
+                    '/')[-1]
 
             make_prediction.delay(
                 analysisDict,
