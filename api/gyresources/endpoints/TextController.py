@@ -33,7 +33,7 @@ class TextController(BaseController):
             please set id parameter.
 
         If action=search:
-            you can use language, tag, value or reference to search,
+            you can use language, plant, status, attribute, value or reference to search,
             please define pageSize and offset parameters
         """
         self.startTime = time.time()
@@ -137,7 +137,7 @@ class TextController(BaseController):
 
         try:
             if (not text.language or not text.tag or not text.value or not text.reference):
-                raise Exception('Not defined language, tag, value or reference field')
+                raise Exception('Not defined language, plant, status, attribute, value or reference field')
             text = repository.create(text)
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
