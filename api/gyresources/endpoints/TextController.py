@@ -136,7 +136,7 @@ class TextController(BaseController):
             FLASK_APP.config["DBNAME"])
 
         try:
-            if (not text.language or not text.tag or not text.value or not text.reference):
+            if (not text.language or not text.plant or not text.status or not text.attribute or not text.value or not text.reference):
                 raise Exception('Not defined language, plant, status, attribute, value or reference field')
             text = repository.create(text)
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
