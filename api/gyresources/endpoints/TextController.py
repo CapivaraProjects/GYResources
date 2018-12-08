@@ -12,7 +12,7 @@ from tools import Logger
 
 
 ns = api.namespace('gyresources/texts',
-                   reference='Operations related to texts')
+                   description='Operations related to texts')
 
 
 @ns.route('/')
