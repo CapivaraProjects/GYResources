@@ -12,7 +12,7 @@ from tools import Logger
 
 
 ns = api.namespace('gyresources/texts',
-                   description='Operations related to texts')
+                   reference='Operations related to texts')
 
 
 @ns.route('/')
@@ -33,7 +33,7 @@ class TextController(BaseController):
             please set id parameter.
 
         If action=search:
-            you can use language, tag, value or description to search,
+            you can use language, tag, value or reference to search,
             please define pageSize and offset parameters
         """
         self.startTime = time.time()
@@ -43,9 +43,11 @@ class TextController(BaseController):
         id = request.args.get('id')
         text = models.Text.Text(
                       language=request.args.get('language'),
-                      tag=request.args.get('tag'),
+                      plant=request.args.get('plant'),
+                      status=request.args.get('status'),
+                      attribute=request.args.get('attribute'),
                       value=request.args.get('value'),
-                      description=request.args.get('description'))
+                      reference=request.args.get('reference'))
         pageSize = None
         if request.args.get('pageSize'):
             pageSize = int(request.args.get('pageSize'))
@@ -120,9 +122,11 @@ class TextController(BaseController):
         text = models.Text.Text(
             id=None,
             language=text.language,
-            tag=text.tag,
+            plant=text.plant,
+            status=text.status,
+            attribute=text.attribute,
             value=text.value,
-            description=text.description)
+            reference=text.reference)
 
         repository = TextRepository(
             FLASK_APP.config["DBUSER"],
@@ -132,8 +136,8 @@ class TextController(BaseController):
             FLASK_APP.config["DBNAME"])
 
         try:
-            if (not text.language or not text.tag or not text.value or not text.description):
-                raise Exception('Not defined language, tag, value or description field')
+            if (not text.language or not text.tag or not text.value or not text.reference):
+                raise Exception('Not defined language, tag, value or reference field')
             text = repository.create(text)
             Logger.Logger.create(FLASK_APP.config["ELASTICURL"],
                                  'Informative',
